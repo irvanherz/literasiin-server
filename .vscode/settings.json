@@ -1,0 +1,12 @@
+{
+  "editor.detectIndentation": true,
+  "editor.tabSize": 2,
+  "editor.codeActionsOnSave": [
+    "source.organizeImports",
+    "source.formatDocument",
+    "source.fixAll.eslint"
+  ],
+  "eslint.validate": [
+    "javascript"
+  ]
+}
