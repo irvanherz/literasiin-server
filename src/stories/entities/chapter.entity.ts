@@ -20,9 +20,9 @@ export class Chapter {
   storyId: number;
   @Column({ type: 'varchar', length: 255 })
   title: string;
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   description?: string;
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   content?: string;
   @Column({ type: 'enum', enum: ['draft', 'published'], default: 'draft' })
   status: StoryType;
@@ -32,7 +32,6 @@ export class Chapter {
   updatedAt: Date;
   @DeleteDateColumn()
   deletedAt?: Date;
-
   @ManyToOne(() => User, (user) => user.stories)
   user: User;
   @ManyToOne(() => Story, (story) => story.chapters)

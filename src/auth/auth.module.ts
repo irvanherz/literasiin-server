@@ -1,8 +1,12 @@
+import { BullModule } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { NotificationsModule } from 'src/notifications/notifications.module';
 import { Identity } from 'src/users/entities/identity.entity';
+import { PasswordResetToken } from 'src/users/entities/password-reset-token.entity';
+import { UserDevice } from 'src/users/entities/user-device.entity';
 import { User } from 'src/users/entities/user.entity';
 import { IdentitiesService } from 'src/users/identities.service';
 import { UsersModule } from 'src/users/users.module';
@@ -20,8 +24,12 @@ import { LocalStrategy } from './local.strategy';
       secret: '1234',
       signOptions: { expiresIn: '1h' },
     }),
+    BullModule.registerQueue({
+      name: 'mails',
+    }),
     UsersModule,
-    TypeOrmModule.forFeature([User, Identity]),
+    NotificationsModule,
+    TypeOrmModule.forFeature([User, Identity, PasswordResetToken, UserDevice]),
   ],
   controllers: [AuthController],
   providers: [

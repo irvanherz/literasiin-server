@@ -4,7 +4,9 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: ['error', 'debug', 'log'],
+  });
   const config = new DocumentBuilder()
     .setTitle('Literasiin')
     .setDescription('Literasiin API documentation')
@@ -18,11 +20,13 @@ async function bootstrap() {
     new ValidationPipe({
       transform: true,
       skipUndefinedProperties: true,
+      transformOptions: { enableImplicitConversion: true },
       whitelist: true,
       forbidNonWhitelisted: true,
     }),
   );
-  app.enableCors({ origin: '*' });
+  app.enableCors({ origin: '*', credentials: true });
+  // initializeApp();
   await app.listen(5000);
 }
 bootstrap();

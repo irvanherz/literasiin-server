@@ -1,22 +1,51 @@
+import { MailerModule } from '@nestjs-modules/mailer';
+import { BullModule } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { MinioModule } from 'nestjs-minio-client';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { ArticlesModule } from './articles/articles.module';
+import { ArticleCategory } from './articles/entities/article-category.entity';
+import { Article } from './articles/entities/article.entity';
 import { AuthModule } from './auth/auth.module';
 import { ChatsModule } from './chats/chats.module';
+import { InternalsModule } from './internals/internals.module';
+import { Media } from './media/entities/media.entity';
+import { MediaModule } from './media/media.module';
+import { EmailTemplate } from './notifications/entities/email-template.entity';
+import { NotificationsModule } from './notifications/notifications.module';
+import { PublicationStatus } from './publications/entities/publication-status.entity';
+import { Publication } from './publications/entities/publication.entity';
+import { PublicationsModule } from './publications/publications.module';
 import { Chapter } from './stories/entities/chapter.entity';
+import { StoryCategory } from './stories/entities/story-category.entity';
+import { StoryTag } from './stories/entities/story-tag.entity';
 import { Story } from './stories/entities/story.entity';
 import { StoriesModule } from './stories/stories.module';
 import { Identity } from './users/entities/identity.entity';
+import { PasswordResetToken } from './users/entities/password-reset-token.entity';
+import { UserDevice } from './users/entities/user-device.entity';
 import { User } from './users/entities/user.entity';
 import { UsersModule } from './users/users.module';
-import { NotificationsModule } from './notifications/notifications.module';
+import { Wallet } from './wallets/entities/wallet.entity';
 import { WalletsModule } from './wallets/wallets.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    MinioModule.registerAsync({
+      isGlobal: true,
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        endPoint: configService.get<string>('MINIO_ENDPOINT'),
+        useSSL: true,
+        accessKey: configService.get<string>('MINIO_ACCESSKEY'),
+        secretKey: configService.get<string>('MINIO_SECRETKEY'),
+      }),
+    }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -28,7 +57,51 @@ import { WalletsModule } from './wallets/wallets.module';
         password: configService.get<string>('DATABASE_PASS'),
         database: configService.get<string>('DATABASE_NAME'),
         synchronize: true,
-        entities: [User, Identity, Story, Chapter],
+        entities: [
+          User,
+          UserDevice,
+          Identity,
+          Story,
+          Chapter,
+          StoryCategory,
+          StoryTag,
+          Publication,
+          PublicationStatus,
+          PasswordResetToken,
+          EmailTemplate,
+          Wallet,
+          Article,
+          ArticleCategory,
+          Media,
+        ],
+      }),
+    }),
+    MailerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        transport: {
+          host: configService.get<string>('MAIL_SMTP_HOST'),
+          port: configService.get<number>('MAIL_SMTP_PORT'),
+          secure: true,
+          auth: {
+            user: configService.get<string>('MAIL_SMTP_USER'),
+            pass: configService.get<string>('MAIL_SMTP_PASS'),
+          },
+        },
+        defaults: {
+          from: configService.get<string>('MAIL_FROM'),
+        },
+      }),
+    }),
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        redis: {
+          host: configService.get<string>('BULL_REDIS_HOST'),
+          port: configService.get<number>('BULL_REDIS_PORT'),
+        },
       }),
     }),
     UsersModule,
@@ -37,6 +110,10 @@ import { WalletsModule } from './wallets/wallets.module';
     StoriesModule,
     NotificationsModule,
     WalletsModule,
+    PublicationsModule,
+    InternalsModule,
+    MediaModule,
+    ArticlesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

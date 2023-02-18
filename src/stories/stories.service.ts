@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateStoryDto } from './dto/create-story.dto';
+import { StoryFiltersDto } from './dto/story-filters.dto';
 import { UpdateStoryDto } from './dto/update-story.dto';
 import { Story } from './entities/story.entity';
 
@@ -17,13 +18,34 @@ export class StoriesService {
     return await this.storiesRepository.save(story);
   }
 
-  async findMany() {
-    const result = await this.storiesRepository.findAndCount();
+  async findMany(filters: StoryFiltersDto) {
+    const take = filters.limit;
+    const skip = (filters.page - 1) * take;
+    const result = await this.storiesRepository.findAndCount({
+      where: {
+        userId: filters.userId || undefined,
+      },
+      skip,
+      take,
+      order: { [filters.sortBy]: filters.sortOrder },
+      relations: { category: true, user: true, cover: true },
+      select: {
+        category: { id: true, name: true },
+        user: { id: true, fullName: true },
+      },
+    });
     return result;
   }
 
   async findById(id: number) {
-    const result = await this.storiesRepository.findOne({ where: { id } });
+    const result = await this.storiesRepository.findOne({
+      where: { id },
+      relations: { category: true, user: true, cover: true },
+      select: {
+        category: { id: true, name: true },
+        user: { id: true, fullName: true },
+      },
+    });
     return result;
   }
 

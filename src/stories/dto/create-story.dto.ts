@@ -10,6 +10,12 @@ export class CreateStoryDto {
   @IsString()
   description?: string;
   @IsOptional()
+  @IsNumber()
+  categoryId?: number;
+  @IsOptional()
+  @IsNumber()
+  coverId?: number;
+  @IsOptional()
   @IsEnum(['draft', 'published'])
   status?: 'draft' | 'published' = 'draft';
 }

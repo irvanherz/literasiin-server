@@ -8,11 +8,14 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { User } from 'src/auth/user.decorator';
 import { CreateStoryDto } from './dto/create-story.dto';
+import { StoryFiltersDto } from './dto/story-filters.dto';
 import { UpdateStoryDto } from './dto/update-story.dto';
 import { StoriesService } from './stories.service';
 
@@ -22,19 +25,24 @@ export class StoriesController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  async create(@Body() createStoryDto: CreateStoryDto, @Request() req) {
+  async create(@Body() setData: CreateStoryDto, @Request() req) {
     const user = req.user;
-    console.log('OKE', user);
+    setData.userId = setData.userId || user.id;
 
-    createStoryDto.userId = user.id;
-    return await this.storiesService.create(createStoryDto);
+    if (setData.userId !== user.id && user.role !== 'admin')
+      throw new ForbiddenException();
+    return await this.storiesService.create(setData);
   }
 
   @Get()
-  async findMany() {
-    const [data, count] = await this.storiesService.findMany();
+  async findMany(@Query() filters: StoryFiltersDto) {
+    const [data, count] = await this.storiesService.findMany(filters);
+    const numPages = Math.ceil(count / filters.limit);
     const meta = {
+      page: filters.page,
+      limit: filters.limit,
       numItems: count,
+      numPages,
     };
     return { data, meta };
   }
@@ -50,16 +58,15 @@ export class StoriesController {
   @Patch(':id')
   async updateById(
     @Param('id') id: number,
-    @Body() updateStoryDto: UpdateStoryDto,
-    @Request() req,
+    @Body() setData: UpdateStoryDto,
+    @User() currentUser,
   ) {
-    const user = req.user;
-
     const story = await this.storiesService.findById(id);
     if (!story) throw new NotFoundException();
-    if (user.id !== story.userId) throw new ForbiddenException();
+    if (currentUser.id !== story.userId && currentUser.role !== 'admin')
+      throw new ForbiddenException();
 
-    await this.storiesService.updateById(id, updateStoryDto);
+    await this.storiesService.updateById(id, setData);
     return;
   }
 

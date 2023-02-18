@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { ChapterFiltersDto } from './dto/chapter-filters.dto';
 import { CreateChapterDto } from './dto/create-chapter.dto';
 import { UpdateChapterDto } from './dto/update-chapter.dto';
 import { Chapter } from './entities/chapter.entity';
@@ -17,8 +18,17 @@ export class ChaptersService {
     return await this.chaptersRepository.save(chapter);
   }
 
-  async findMany() {
-    const result = await this.chaptersRepository.findAndCount();
+  async findMany(filters: ChapterFiltersDto) {
+    const take = filters.limit;
+    const skip = (filters.page - 1) * take;
+    const result = await this.chaptersRepository.findAndCount({
+      where: {
+        storyId: filters.storyId ? filters.storyId : undefined,
+      },
+      skip,
+      take,
+      order: { [filters.sortBy]: filters.sortOrder },
+    });
     return result;
   }
 

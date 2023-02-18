@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UserFiltersDto } from './dto/user-filters.dto';
 import { Identity } from './entities/identity.entity';
 import { User } from './entities/user.entity';
-import { FindManyFilter } from './users.interface';
 
 @Injectable()
 export class UsersService {
@@ -23,22 +23,52 @@ export class UsersService {
     return result;
   }
 
-  async findMany(filter: FindManyFilter = {}) {
+  async findMany(filters: UserFiltersDto) {
+    const take = filters.limit || 1;
+    const skip = (filters.page - 1) * take;
     const result = this.usersRepository.findAndCount({
       where: {
-        email: filter.email ? filter.email : undefined,
+        role: filters.role ? (filters.role as any) : undefined,
+        fullName: filters.search ? Like(`%${filters.search}%`) : undefined,
+        gender: filters.gender ? (filters.gender as any) : undefined,
       },
+      relations: {
+        photo: true,
+      },
+      skip,
+      take,
+      order: { [filters.sortBy]: filters.sortOrder },
     });
     return result;
   }
 
   async findById(id: number) {
-    const result = this.usersRepository.findOne({ where: { id } });
+    const result = this.usersRepository.findOne({
+      where: { id },
+      relations: {
+        photo: true,
+      },
+    });
+    return result;
+  }
+
+  async findByUsername(username: string) {
+    const result = this.usersRepository.findOne({
+      where: { username },
+      relations: {
+        photo: true,
+      },
+    });
     return result;
   }
 
   async findByEmail(email: string) {
-    const result = this.usersRepository.findOne({ where: { email } });
+    const result = this.usersRepository.findOne({
+      where: { email },
+      relations: {
+        photo: true,
+      },
+    });
     return result;
   }
 
