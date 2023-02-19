@@ -80,6 +80,7 @@ export class AuthController {
     if (!user) throw new UnauthorizedException();
     const auth = await this.authService.signin({
       id: user.id,
+      username: user.username,
       email: user.email,
       role: user.role,
     });
