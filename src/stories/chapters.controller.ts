@@ -15,7 +15,10 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { User } from 'src/auth/user.decorator';
 import { Mixed } from 'src/mixed.decorator';
 import { ChaptersService } from './chapters.service';
-import { ChapterFiltersDto } from './dto/chapter-filters.dto';
+import {
+  ChapterFiltersDto,
+  FindChapterByIdOptions,
+} from './dto/chapter-filters.dto';
 import { CreateChapterDto } from './dto/create-chapter.dto';
 import { UpdateChapterDto } from './dto/update-chapter.dto';
 import { StoriesService } from './stories.service';
@@ -44,8 +47,11 @@ export class ChaptersController {
   }
 
   @Get('/stories/chapters/:id')
-  async findById(@Param('id') id: number) {
-    const chapter = await this.chaptersService.findById(id);
+  async findById(
+    @Param('id') id: number,
+    @Query() options: FindChapterByIdOptions,
+  ) {
+    const chapter = await this.chaptersService.findById(id, options);
     return { data: chapter };
   }
 

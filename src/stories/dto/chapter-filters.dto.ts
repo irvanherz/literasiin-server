@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-inferrable-types */
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class ChapterFiltersDto {
   @IsOptional()
@@ -17,4 +18,13 @@ export class ChapterFiltersDto {
   @IsOptional()
   @IsString()
   sortOrder: string = 'desc';
+}
+
+export class FindChapterByIdOptions {
+  @IsOptional()
+  @Transform(({ obj }) => {
+    return [true, 'enabled', 'true'].indexOf(obj.includeStory) > -1;
+  })
+  @IsBoolean()
+  includeStory?: boolean;
 }

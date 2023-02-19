@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ChapterFiltersDto } from './dto/chapter-filters.dto';
+import {
+  ChapterFiltersDto,
+  FindChapterByIdOptions,
+} from './dto/chapter-filters.dto';
 import { CreateChapterDto } from './dto/create-chapter.dto';
 import { UpdateChapterDto } from './dto/update-chapter.dto';
 import { Chapter } from './entities/chapter.entity';
@@ -32,8 +35,14 @@ export class ChaptersService {
     return result;
   }
 
-  async findById(id: number) {
-    const result = await this.chaptersRepository.findOne({ where: { id } });
+  async findById(id: number, options: FindChapterByIdOptions = {}) {
+    const { includeStory } = options;
+    console.log(includeStory);
+
+    const result = await this.chaptersRepository.findOne({
+      where: { id },
+      relations: { story: includeStory ? { user: true } : undefined },
+    });
     return result;
   }
 
