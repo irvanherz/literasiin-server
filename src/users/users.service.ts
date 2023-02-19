@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Like, Repository } from 'typeorm';
@@ -46,6 +46,7 @@ export class UsersService {
   }
 
   async findById(id: number) {
+    if (!id) throw new BadRequestException();
     const result = this.usersRepository.findOne({
       where: { id },
       relations: {
@@ -56,6 +57,7 @@ export class UsersService {
   }
 
   async findByUsername(username: string) {
+    if (!username) throw new BadRequestException();
     const result = this.usersRepository.findOne({
       where: { username },
       relations: {
@@ -66,6 +68,7 @@ export class UsersService {
   }
 
   async findByEmail(email: string) {
+    if (!email) throw new BadRequestException();
     const result = this.usersRepository.findOne({
       where: { email },
       relations: {
@@ -75,12 +78,25 @@ export class UsersService {
     return result;
   }
 
+  async findByEmailOrUsername(id: string) {
+    if (!id) throw new BadRequestException();
+    const result = this.usersRepository.findOne({
+      where: [{ email: id }, { username: id }],
+      relations: {
+        photo: true,
+      },
+    });
+    return result;
+  }
+
   async updateById(id: number, data: UpdateUserDto) {
+    if (!id) throw new BadRequestException();
     const result = await this.usersRepository.update(id, data);
     return result.affected;
   }
 
   async deleteById(id: number) {
+    if (!id) throw new BadRequestException();
     const result = await this.usersRepository.softDelete(id);
     return result.affected;
   }

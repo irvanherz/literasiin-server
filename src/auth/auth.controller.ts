@@ -6,6 +6,7 @@ import {
   NotFoundException,
   Post,
   Request,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { Queue } from 'bull';
@@ -36,6 +37,7 @@ export class AuthController {
     const user = await this.authService.signupWithEmail(signupWithEmailDto);
     const auth = await this.authService.signin({
       id: user.id,
+      username: user.username,
       email: user.email,
       role: user.role,
     });
@@ -50,6 +52,7 @@ export class AuthController {
   async signIn(@User() user, @Body() body) {
     const auth = await this.authService.signin({
       id: user.id,
+      username: user.username,
       email: user.email,
       role: user.role,
     });
@@ -65,6 +68,26 @@ export class AuthController {
         token: auth.token,
         refreshToken: auth.refreshToken,
         device,
+      },
+    };
+  }
+
+  @Post('/refresh-token')
+  async refreshToken(@Body('refreshToken') rtoken: string) {
+    const cred = await this.authService.validateRefreshToken(rtoken);
+    if (!cred) throw new UnauthorizedException();
+    const user = await this.usersService.findById(cred.id);
+    if (!user) throw new UnauthorizedException();
+    const auth = await this.authService.signin({
+      id: user.id,
+      email: user.email,
+      role: user.role,
+    });
+    return {
+      data: user,
+      meta: {
+        token: auth.token,
+        refreshToken: auth.refreshToken,
       },
     };
   }

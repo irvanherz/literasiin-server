@@ -34,15 +34,22 @@ export class AuthService {
   ) {}
 
   async signin(user: any) {
-    const token = this.jwtService.sign({ ...user });
-    const refreshToken = this.jwtService.sign(
-      { user: { id: user.id } },
-      { expiresIn: '1d' },
-    );
+    const token = this.jwtService.sign({ ...user }, { expiresIn: '5m' });
+    const refreshToken = this.jwtService.sign({ ...user }, { expiresIn: '5d' });
     return {
       token,
       refreshToken,
     };
+  }
+
+  async validateRefreshToken(refreshToken: string) {
+    try {
+      const user = await this.jwtService.verifyAsync(refreshToken);
+      return user;
+    } catch (err) {
+      console.log(err);
+      return false;
+    }
   }
 
   async signout(payload: any) {
@@ -119,7 +126,7 @@ export class AuthService {
   }
 
   async validateUser(username: string, password: string) {
-    const user = await this.usersService.findByEmail(username);
+    const user = await this.usersService.findByEmailOrUsername(username);
     if (!user) return null;
     const identity = await this.identitiesRepo.findOne({
       where: { userId: user.id, type: 'email' },
