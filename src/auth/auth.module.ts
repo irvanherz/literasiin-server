@@ -7,6 +7,7 @@ import { NotificationsModule } from 'src/notifications/notifications.module';
 import { Identity } from 'src/users/entities/identity.entity';
 import { PasswordResetToken } from 'src/users/entities/password-reset-token.entity';
 import { UserDevice } from 'src/users/entities/user-device.entity';
+import { UserFollow } from 'src/users/entities/user-follow.entity';
 import { User } from 'src/users/entities/user.entity';
 import { IdentitiesService } from 'src/users/identities.service';
 import { UsersModule } from 'src/users/users.module';
@@ -29,7 +30,13 @@ import { LocalStrategy } from './local.strategy';
     }),
     UsersModule,
     NotificationsModule,
-    TypeOrmModule.forFeature([User, Identity, PasswordResetToken, UserDevice]),
+    TypeOrmModule.forFeature([
+      User,
+      Identity,
+      UserFollow,
+      PasswordResetToken,
+      UserDevice,
+    ]),
   ],
   controllers: [AuthController],
   providers: [

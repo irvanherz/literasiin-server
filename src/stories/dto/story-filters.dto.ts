@@ -3,6 +3,9 @@ import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class StoryFiltersDto {
   @IsOptional()
+  @IsString()
+  status: 'draft' | 'published';
+  @IsOptional()
   @IsNumber()
   userId?: number;
   @IsOptional()

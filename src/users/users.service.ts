@@ -6,6 +6,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserFiltersDto } from './dto/user-filters.dto';
 import { Identity } from './entities/identity.entity';
+import { UserFollow } from './entities/user-follow.entity';
 import { User } from './entities/user.entity';
 
 @Injectable()
@@ -15,6 +16,8 @@ export class UsersService {
     private usersRepository: Repository<User>,
     @InjectRepository(Identity)
     private identitiesRepository: Repository<Identity>,
+    @InjectRepository(UserFollow)
+    private userFollowRepo: Repository<UserFollow>,
   ) {}
 
   async create(data: CreateUserDto) {
@@ -90,5 +93,46 @@ export class UsersService {
     const match = bcrypt.compare(key, identity.key);
     if (!match) return false;
     return user;
+  }
+
+  async followUser(followerId: number, followingId: number) {
+    const data = this.userFollowRepo.create({ followerId, followingId });
+    const link = await this.userFollowRepo.save(data);
+    return link;
+  }
+
+  async unfollowUser(followerId: number, followingId: number) {
+    const result = await this.userFollowRepo.delete({
+      followerId,
+      followingId,
+    });
+    return result.affected;
+  }
+
+  async findManyFollowing(userId: number) {
+    const [data, numItems] = await this.usersRepository.findAndCount({
+      where: { followers: { id: userId } },
+    });
+
+    const meta = {
+      numItems,
+    };
+    return {
+      data,
+      meta,
+    };
+  }
+
+  async findManyFollowers(userId: number) {
+    const [data, numItems] = await this.usersRepository.findAndCount({
+      where: { following: { id: userId } },
+    });
+    const meta = {
+      numItems,
+    };
+    return {
+      data,
+      meta,
+    };
   }
 }

@@ -5,6 +5,7 @@ import { MediaModule } from 'src/media/media.module';
 import { Identity } from './entities/identity.entity';
 import { PasswordResetToken } from './entities/password-reset-token.entity';
 import { UserDevice } from './entities/user-device.entity';
+import { UserFollow } from './entities/user-follow.entity';
 import { User } from './entities/user.entity';
 import { IdentitiesController } from './identities.controller';
 import { IdentitiesService } from './identities.service';
@@ -14,6 +15,7 @@ import { UsersService } from './users.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
+      UserFollow,
       User,
       Identity,
       PasswordResetToken,

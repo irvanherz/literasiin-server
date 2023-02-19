@@ -24,6 +24,7 @@ export class StoriesService {
     const result = await this.storiesRepository.findAndCount({
       where: {
         userId: filters.userId || undefined,
+        status: filters.status || undefined,
       },
       skip,
       take,

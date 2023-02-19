@@ -104,4 +104,28 @@ export class UsersController {
     if (!user) throw new NotFoundException();
     return this.usersService.deleteById(id);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':userId/follow')
+  async followUser(@Param('userId') followingId, @User() currentUser) {
+    const followerId = currentUser.id;
+    await this.usersService.followUser(followerId, followingId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':userId/unfollow')
+  async unfollowUser(@Param('userId') followingId, @User() currentUser) {
+    const followerId = currentUser.id;
+    await this.usersService.unfollowUser(followerId, followingId);
+  }
+
+  @Get(':userId/following')
+  async findManyFollowing(@Param('userId') userId: number) {
+    return await this.usersService.findManyFollowing(userId);
+  }
+
+  @Get(':userId/followers')
+  async findManyFollowers(@Param('userId') userId: number) {
+    return await this.usersService.findManyFollowers(userId);
+  }
 }

@@ -54,9 +54,14 @@ export class User {
   @OneToMany(() => Story, (story) => story.user)
   stories: Story[];
   @ManyToMany(() => User, (user) => user.following)
-  @JoinTable()
   followers: User[];
   @ManyToMany(() => User, (user) => user.followers)
+  @JoinTable({
+    name: 'user_follow',
+    synchronize: false,
+    joinColumn: { name: 'followerId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'followingId', referencedColumnName: 'id' },
+  })
   following: User[];
   @OneToOne(() => Wallet, (wallet) => wallet.user)
   wallet: Wallet;

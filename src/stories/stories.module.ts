@@ -14,7 +14,7 @@ import { StoryCategoriesService } from './story-categories.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Story, Chapter, StoryCategory, StoryTag, User]),
+    TypeOrmModule.forFeature([Chapter, Story, StoryCategory, StoryTag, User]),
   ],
   controllers: [
     StoryCategoriesController,

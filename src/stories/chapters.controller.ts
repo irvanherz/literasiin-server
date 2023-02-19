@@ -9,7 +9,9 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { User } from 'src/auth/user.decorator';
 import { Mixed } from 'src/mixed.decorator';
 import { ChaptersService } from './chapters.service';
@@ -25,11 +27,11 @@ export class ChaptersController {
     private readonly chaptersService: ChaptersService,
   ) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post(['/stories/chapters', 'stories/:storyId/chapters'])
   async create(@Mixed(['body', 'params']) payload: CreateChapterDto) {
-    console.log(payload);
-
-    return await this.chaptersService.create(payload);
+    const data = await this.chaptersService.create(payload);
+    return { data };
   }
 
   @Get('/stories/chapters')
@@ -47,6 +49,7 @@ export class ChaptersController {
     return { data: chapter };
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch('/stories/chapters/:id')
   async updateById(
     @Param('id') id: number,
@@ -55,20 +58,23 @@ export class ChaptersController {
   ) {
     const chapter = await this.chaptersService.findById(id);
     if (!chapter) throw new NotFoundException();
-    const story = await this.storiesService.findById(id);
+    const story = await this.storiesService.findById(chapter.storyId);
     if (!story) throw new NotFoundException();
-    if (story.userId !== currentUser?.id) throw new ForbiddenException();
+    if (story.userId !== currentUser?.id && currentUser?.role !== 'admin')
+      throw new ForbiddenException();
     await this.chaptersService.updateById(id, setData);
     return true;
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete('/stories/chapters/:id')
   async deleteById(@Param('id') id: number, @User() currentUser) {
     const chapter = await this.chaptersService.findById(id);
     if (!chapter) throw new NotFoundException();
-    const story = await this.storiesService.findById(id);
+    const story = await this.storiesService.findById(chapter.storyId);
     if (!story) throw new NotFoundException();
-    if (story.userId !== currentUser?.id) throw new ForbiddenException();
+    if (story.userId !== currentUser?.id && currentUser?.role !== 'admin')
+      throw new ForbiddenException();
     return this.chaptersService.deleteById(id);
   }
 }

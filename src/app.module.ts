@@ -27,6 +27,7 @@ import { StoriesModule } from './stories/stories.module';
 import { Identity } from './users/entities/identity.entity';
 import { PasswordResetToken } from './users/entities/password-reset-token.entity';
 import { UserDevice } from './users/entities/user-device.entity';
+import { UserFollow } from './users/entities/user-follow.entity';
 import { User } from './users/entities/user.entity';
 import { UsersModule } from './users/users.module';
 import { Wallet } from './wallets/entities/wallet.entity';
@@ -58,6 +59,7 @@ import { WalletsModule } from './wallets/wallets.module';
         database: configService.get<string>('DATABASE_NAME'),
         synchronize: true,
         entities: [
+          UserFollow,
           User,
           UserDevice,
           Identity,
