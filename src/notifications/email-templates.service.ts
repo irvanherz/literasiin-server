@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Like, Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { CreateEmailTemplateDto } from './dto/create-email-template.dto';
 import { EmailTemplateFiltersDto } from './dto/email-template-filters.dto';
 import { UpdateEmailTemplateDto } from './dto/update-email-template.dto';
@@ -23,7 +23,7 @@ export class EmailTemplatesService {
     const skip = (filters.page - 1) * take;
     const result = this.templatesRepo.findAndCount({
       where: {
-        name: filters.search ? Like(`%${filters.search}%`) : undefined,
+        name: filters.search ? ILike(`%${filters.search}%`) : undefined,
       },
       skip,
       take,

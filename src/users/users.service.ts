@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
-import { Like, Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserFiltersDto } from './dto/user-filters.dto';
@@ -32,7 +32,7 @@ export class UsersService {
     const result = this.usersRepository.findAndCount({
       where: {
         role: filters.role ? (filters.role as any) : undefined,
-        fullName: filters.search ? Like(`%${filters.search}%`) : undefined,
+        fullName: filters.search ? ILike(`%${filters.search}%`) : undefined,
         gender: filters.gender ? (filters.gender as any) : undefined,
       },
       relations: {

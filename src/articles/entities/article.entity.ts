@@ -1,3 +1,4 @@
+import { Media } from 'src/media/entities/media.entity';
 import { User } from 'src/users/entities/user.entity';
 import {
   Column,
@@ -18,13 +19,15 @@ export class Article {
   id: number;
   @Column()
   userId: number;
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   title: string;
   @Column({ type: 'text' })
   description?: string;
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   content?: string;
-  @Column({ type: 'enum', enum: ['draft', 'published'], default: 'draft' })
+  @Column({ type: 'int', nullable: true })
+  imageId?: string;
+  @Column({ type: 'enum', enum: ['draft', 'published'] })
   status: ArticleStatus;
   @CreateDateColumn()
   createdAt: Date;
@@ -34,6 +37,8 @@ export class Article {
   deletedAt?: Date;
   @ManyToOne(() => User, (user) => user.stories)
   user: User;
+  @ManyToOne(() => Media)
+  image: Media;
   @ManyToOne(() => ArticleCategory, (category) => category.articles)
   category: ArticleCategory;
 }

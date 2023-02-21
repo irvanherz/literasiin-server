@@ -17,7 +17,7 @@ export class StoryCategory {
   name: string;
   @Column({ type: 'text', nullable: true })
   description: string;
-  @Column()
+  @Column({ type: 'int', default: 0 })
   priority: number;
   @CreateDateColumn()
   createdAt: Date;

@@ -16,8 +16,8 @@ export class ArticleCategory {
   @Column({ type: 'varchar', length: 255 })
   name: string;
   @Column({ type: 'text', nullable: true })
-  description: string;
-  @Column()
+  description?: string;
+  @Column({ type: 'int', default: 0 })
   priority: number;
   @CreateDateColumn()
   createdAt: Date;

@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, ILike, Repository } from 'typeorm';
+import { ArticleCategoryFiltersDto } from './dto/article-category-filters.dto';
 import { BulkUpdateCategoryEntryDto } from './dto/bulk-update-category.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -19,8 +20,17 @@ export class ArticleCategoriesService {
     return await this.categoriesRepo.save(category);
   }
 
-  async findMany() {
-    const result = await this.categoriesRepo.findAndCount();
+  async findMany(filters: ArticleCategoryFiltersDto) {
+    const take = filters.limit || 1;
+    const skip = (filters.page - 1) * take;
+    const result = await this.categoriesRepo.findAndCount({
+      where: {
+        name: filters?.search ? ILike(`${filters.search}`) : undefined,
+      },
+      skip,
+      take,
+      order: { [filters.sortBy]: filters.sortOrder },
+    });
     return result;
   }
 
@@ -35,9 +45,12 @@ export class ArticleCategoriesService {
   }
 
   async bulkUpdate(payload: BulkUpdateCategoryEntryDto[]) {
+    console.log('OOOK');
+
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
+    let ok = false;
     try {
       for await (const category of payload) {
         await queryRunner.manager.update(
@@ -47,6 +60,7 @@ export class ArticleCategoriesService {
         );
       }
       await queryRunner.commitTransaction();
+      ok = true;
     } catch (err) {
       // since we have errors lets rollback the changes we made
       await queryRunner.rollbackTransaction();
@@ -54,6 +68,8 @@ export class ArticleCategoriesService {
       // you need to release a queryRunner which was manually instantiated
       await queryRunner.release();
     }
+    if (!ok) throw new BadRequestException();
+    return true;
   }
 
   async deleteById(id: number) {

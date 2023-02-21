@@ -7,11 +7,13 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { BulkUpdateCategoryDto } from './dto/bulk-update-category.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
+import { StoryCategoryFiltersDto } from './dto/story-category-filters.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { StoryCategoriesService } from './story-categories.service';
 
@@ -26,8 +28,8 @@ export class StoryCategoriesController {
   }
 
   @Get()
-  async findMany() {
-    const [data, count] = await this.categoriesService.findMany();
+  async findMany(@Query() filters: StoryCategoryFiltersDto) {
+    const [data, count] = await this.categoriesService.findMany(filters);
     const meta = {
       numItems: count,
     };

@@ -10,6 +10,9 @@ export class CreateArticleDto {
   @IsString()
   description?: string;
   @IsOptional()
+  @IsString()
+  content?: string;
+  @IsOptional()
   @IsNumber()
   categoryId?: number;
   @IsOptional()

@@ -1,26 +1,20 @@
 /* eslint-disable @typescript-eslint/no-inferrable-types */
 import { IsNumber, IsOptional, IsString } from 'class-validator';
 
-export class StoryFiltersDto {
-  @IsOptional()
-  @IsString()
-  search?: string;
-  @IsOptional()
-  @IsString()
-  status?: 'draft' | 'published';
+export class StoryCategoryFiltersDto {
   @IsOptional()
   @IsNumber()
-  userId?: number;
+  search: string;
   @IsOptional()
   @IsNumber()
   page: number = 1;
   @IsOptional()
   @IsNumber()
-  limit: number = 10;
+  limit: number = 100;
   @IsOptional()
   @IsString()
-  sortBy: string = 'createdAt';
+  sortBy: string = 'priority';
   @IsOptional()
   @IsString()
-  sortOrder: string = 'desc';
+  sortOrder: string = 'asc';
 }

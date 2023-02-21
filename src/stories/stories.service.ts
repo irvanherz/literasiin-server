@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { CreateStoryDto } from './dto/create-story.dto';
 import { StoryFiltersDto } from './dto/story-filters.dto';
 import { UpdateStoryDto } from './dto/update-story.dto';
@@ -23,6 +23,7 @@ export class StoriesService {
     const skip = (filters.page - 1) * take;
     const result = await this.storiesRepository.findAndCount({
       where: {
+        title: filters.search ? ILike(`%${filters.search}%`) : undefined,
         userId: filters.userId || undefined,
         status: filters.status || undefined,
       },

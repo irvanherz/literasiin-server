@@ -6,5 +6,8 @@ export class CreateCategoryDto {
   name: string;
   @IsOptional()
   @IsNumber()
-  priority: number = 0;
+  priority: number;
+  @IsOptional()
+  @IsString()
+  description?: string;
 }
