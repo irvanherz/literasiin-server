@@ -3,6 +3,15 @@ import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class ArticleFiltersDto {
   @IsOptional()
+  @IsString()
+  search?: string;
+  @IsOptional()
+  @IsNumber()
+  categoryId?: number;
+  @IsOptional()
+  @IsNumber()
+  userId?: number;
+  @IsOptional()
   @IsNumber()
   page: number = 1;
   @IsOptional()

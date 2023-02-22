@@ -22,6 +22,10 @@ export class ArticlesService {
     const take = filters.limit;
     const skip = (filters.page - 1) * take;
     const result = await this.articlesRepository.findAndCount({
+      where: {
+        userId: filters.userId || undefined,
+        categoryId: filters.categoryId || undefined,
+      },
       skip,
       take,
       order: { [filters.sortBy]: filters.sortOrder },

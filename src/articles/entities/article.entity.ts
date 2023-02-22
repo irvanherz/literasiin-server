@@ -26,7 +26,9 @@ export class Article {
   @Column({ type: 'text', nullable: true })
   content?: string;
   @Column({ type: 'int', nullable: true })
-  imageId?: string;
+  imageId?: number;
+  @Column({ type: 'int' })
+  categoryId: number;
   @Column({ type: 'enum', enum: ['draft', 'published'] })
   status: ArticleStatus;
   @CreateDateColumn()
