@@ -11,7 +11,8 @@ import { ArticleCategory } from './articles/entities/article-category.entity';
 import { Article } from './articles/entities/article.entity';
 import { AuthModule } from './auth/auth.module';
 import { ChatsModule } from './chats/chats.module';
-import { InternalsModule } from './internals/internals.module';
+import { ConfigurationsModule } from './configurations/configurations.module';
+import { Configuration } from './configurations/entities/configuration.entity';
 import { Media } from './media/entities/media.entity';
 import { MediaModule } from './media/media.module';
 import { EmailTemplate } from './notifications/entities/email-template.entity';
@@ -75,6 +76,7 @@ import { WalletsModule } from './wallets/wallets.module';
           Article,
           ArticleCategory,
           Media,
+          Configuration,
         ],
       }),
     }),
@@ -113,9 +115,9 @@ import { WalletsModule } from './wallets/wallets.module';
     NotificationsModule,
     WalletsModule,
     PublicationsModule,
-    InternalsModule,
     MediaModule,
     ArticlesModule,
+    ConfigurationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
