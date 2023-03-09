@@ -65,7 +65,7 @@ export class AuthService {
     });
     const key = await bcrypt.hash(password, 5);
     const identity = this.identitiesRepo.create({
-      type: 'email',
+      type: 'password',
       userId: user.id,
       key,
     });
@@ -116,7 +116,7 @@ export class AuthService {
     console.log(prt);
     if (!prt) throw new NotFoundException();
     const identity = await this.identitiesRepo.findOne({
-      where: { userId: prt.userId, type: 'email' },
+      where: { userId: prt.userId, type: 'password' },
     });
     if (!identity) throw new NotFoundException();
     const key = await bcrypt.hash(password, 5);
@@ -129,7 +129,7 @@ export class AuthService {
     const user = await this.usersService.findByEmailOrUsername(username);
     if (!user) return null;
     const identity = await this.identitiesRepo.findOne({
-      where: { userId: user.id, type: 'email' },
+      where: { userId: user.id, type: 'password' },
     });
     if (!identity) return null;
     const match = await bcrypt.compare(password, identity.key);

@@ -5,11 +5,13 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from './user.entity';
 
 @Entity()
+@Unique(['userId', 'type'])
 export class Identity {
   @PrimaryGeneratedColumn()
   id: number;

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 import { CreateIdentityDto } from './dto/create-identity.dto';
 import { IdentityFiltersDto } from './dto/identity-filters.dto';
@@ -13,9 +14,13 @@ export class IdentitiesService {
     private identitiesRepository: Repository<Identity>,
   ) {}
 
-  async create(data: CreateIdentityDto) {
-    const identity = this.identitiesRepository.create(data);
+  async create(payload: CreateIdentityDto) {
+    if (payload.type === 'password') {
+      payload.key = await bcrypt.hash(payload.key, 5);
+    }
+    const identity = this.identitiesRepository.create(payload);
     const result = await this.identitiesRepository.save(identity);
+    if (identity.type === 'password') identity.key = '<encrypted>';
     return result;
   }
 
@@ -27,7 +32,7 @@ export class IdentitiesService {
       },
     });
     result[0] = result[0].map((identity) => {
-      if (identity.type === 'email') identity.key = '<encrypted>';
+      if (identity.type === 'password') identity.key = '<encrypted>';
       return identity;
     });
     return result;
@@ -40,13 +45,13 @@ export class IdentitiesService {
         type: params?.type || undefined,
       },
     });
-    if (result && result.type === 'email') result.key = '<encrypted>';
+    if (result && result.type === 'password') result.key = '<encrypted>';
     return result;
   }
 
   async findById(id: number) {
     const result = await this.identitiesRepository.findOne({ where: { id } });
-    if (result && result.type === 'email') result.key = '<encrypted>';
+    if (result && result.type === 'password') result.key = '<encrypted>';
     return result;
   }
 

@@ -7,11 +7,13 @@ import {
   NotFoundException,
   Param,
   Patch,
+  Post,
   Query,
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { User } from 'src/auth/user.decorator';
+import { CreateIdentityDto } from './dto/create-identity.dto';
 import { IdentityFiltersDto } from './dto/identity-filters.dto';
 import { UpdateIdentityDto } from './dto/update-identity.dto';
 import { IdentitiesService } from './identities.service';
@@ -44,6 +46,13 @@ export class IdentitiesController {
       data: identities,
       meta,
     };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('identities')
+  async create(@Body() payload: CreateIdentityDto) {
+    const identity = await this.identitiesService.create(payload);
+    return { data: identity };
   }
 
   @UseGuards(JwtAuthGuard)
