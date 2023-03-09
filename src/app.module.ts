@@ -13,8 +13,11 @@ import { AuthModule } from './auth/auth.module';
 import { ChatsModule } from './chats/chats.module';
 import { ConfigurationsModule } from './configurations/configurations.module';
 import { Configuration } from './configurations/entities/configuration.entity';
+import { Invoice } from './finances/entities/invoice.entity';
+import { FinancesModule } from './finances/finances.module';
 import { Media } from './media/entities/media.entity';
 import { MediaModule } from './media/media.module';
+import { MidtransModule } from './midtrans/midtrans.module';
 import { EmailTemplate } from './notifications/entities/email-template.entity';
 import { NotificationsModule } from './notifications/notifications.module';
 import { PublicationStatus } from './publications/entities/publication-status.entity';
@@ -31,6 +34,7 @@ import { UserDevice } from './users/entities/user-device.entity';
 import { UserFollow } from './users/entities/user-follow.entity';
 import { User } from './users/entities/user.entity';
 import { UsersModule } from './users/users.module';
+import { WalletTransaction } from './wallets/entities/wallet-transaction.entity';
 import { Wallet } from './wallets/entities/wallet.entity';
 import { WalletsModule } from './wallets/wallets.module';
 
@@ -77,7 +81,21 @@ import { WalletsModule } from './wallets/wallets.module';
           ArticleCategory,
           Media,
           Configuration,
+          Wallet,
+          WalletTransaction,
+          Invoice,
         ],
+      }),
+    }),
+    MidtransModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        isProduction: !!JSON.parse(
+          configService.get<string>('MIDTRANS_IS_PRODUCTION'),
+        ),
+        serverKey: configService.get<string>('MIDTRANS_SERVER_KEY'),
+        clientKey: configService.get<string>('MIDTRANS_CLIENT_KEY'),
       }),
     }),
     MailerModule.forRootAsync({
@@ -118,6 +136,7 @@ import { WalletsModule } from './wallets/wallets.module';
     MediaModule,
     ArticlesModule,
     ConfigurationsModule,
+    FinancesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

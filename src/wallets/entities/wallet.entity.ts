@@ -3,24 +3,28 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { WalletTransaction } from './wallet-transaction.entity';
 
 @Entity()
 export class Wallet {
   @PrimaryGeneratedColumn()
   id: number;
-  @Column()
+  @Column({ type: 'int', unique: true })
   userId: number;
-  @Column({ type: 'money' })
+  @Column({ type: 'decimal', precision: 10, scale: 4, default: 0 })
   balance: number;
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt: Date;
 
+  @OneToMany(() => WalletTransaction, (trx) => trx.wallet)
+  transactions: WalletTransaction[];
   @OneToOne(() => User, (user) => user.wallet)
   user: User;
 }

@@ -17,5 +17,8 @@ export class CreateArticleDto {
   categoryId?: number;
   @IsOptional()
   @IsEnum(['draft', 'published'])
-  status?: 'draft' | 'published' = 'draft';
+  status?: 'draft' | 'published';
+  @IsOptional()
+  @IsNumber()
+  imageId?: number;
 }

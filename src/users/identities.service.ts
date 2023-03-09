@@ -61,7 +61,7 @@ export class IdentitiesService {
   }
 
   async deleteById(id: number) {
-    const result = await this.identitiesRepository.softDelete(id);
+    const result = await this.identitiesRepository.delete(id);
     return result.affected;
   }
 }

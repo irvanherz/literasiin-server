@@ -26,6 +26,7 @@ export class ArticlesService {
         userId: filters.userId || undefined,
         categoryId: filters.categoryId || undefined,
       },
+      relations: { image: true },
       skip,
       take,
       order: { [filters.sortBy]: filters.sortOrder },
@@ -34,7 +35,10 @@ export class ArticlesService {
   }
 
   async findById(id: number) {
-    const result = await this.articlesRepository.findOne({ where: { id } });
+    const result = await this.articlesRepository.findOne({
+      where: { id },
+      relations: { image: true },
+    });
     return result;
   }
 
