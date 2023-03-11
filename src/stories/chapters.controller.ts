@@ -52,7 +52,25 @@ export class ChaptersController {
     @Query() options: FindChapterByIdOptions,
   ) {
     const chapter = await this.chaptersService.findById(id, options);
+    if (!chapter) throw new NotFoundException();
     return { data: chapter };
+  }
+
+  @Post('/stories/chapters/:id/vote')
+  async vote(@Param('id') id: number) {
+    // const chapter = await this.chaptersService.findById(id);
+    // if (!chapter) throw new NotFoundException();
+    // await this.chaptersService.incrementNumViews(id);
+    // return;
+  }
+
+  @Post('/stories/chapters/:id/view')
+  async view(@Param('id') id: number) {
+    const chapter = await this.chaptersService.findById(id);
+    if (!chapter) throw new NotFoundException();
+    await this.storiesService.incrementNumViews(chapter.storyId);
+    await this.chaptersService.incrementNumViews(id);
+    return;
   }
 
   @UseGuards(JwtAuthGuard)
@@ -69,7 +87,7 @@ export class ChaptersController {
     if (story.userId !== currentUser?.id && currentUser?.role !== 'admin')
       throw new ForbiddenException();
     await this.chaptersService.updateById(id, setData);
-    return true;
+    return;
   }
 
   @UseGuards(JwtAuthGuard)
@@ -81,6 +99,7 @@ export class ChaptersController {
     if (!story) throw new NotFoundException();
     if (story.userId !== currentUser?.id && currentUser?.role !== 'admin')
       throw new ForbiddenException();
-    return this.chaptersService.deleteById(id);
+    await this.chaptersService.deleteById(id);
+    return;
   }
 }

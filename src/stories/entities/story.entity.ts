@@ -17,6 +17,7 @@ import {
 } from 'typeorm';
 import { Chapter } from './chapter.entity';
 import { StoryCategory } from './story-category.entity';
+import { StoryMeta } from './story-meta.entity';
 import { StoryTag } from './story-tag.entity';
 
 type StoryType = 'draft' | 'published';
@@ -73,4 +74,9 @@ export class Story {
   @OneToOne(() => Media)
   @JoinColumn()
   cover: Media;
+  @OneToOne(() => StoryMeta, (meta) => meta.story, {
+    eager: true,
+    nullable: true,
+  })
+  meta: StoryMeta;
 }

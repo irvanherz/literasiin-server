@@ -7,6 +7,7 @@ import { HttpExceptionFilter } from './http-exception.filter';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: ['error', 'debug', 'log'],
+    rawBody: true,
   });
   const config = new DocumentBuilder()
     .setTitle('Literasiin')

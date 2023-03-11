@@ -9,12 +9,12 @@ import {
 } from '@nestjs/common';
 import { MidtransService } from 'src/midtrans/midtrans.service';
 import { InvoiceFiltersDto } from './dto/invoice-filter.dto';
-import { InvoiceService } from './invoice.service';
+import { InvoicesService } from './invoices.service';
 
 @Controller('finances/invoices')
-export class InvoiceController {
+export class InvoicesController {
   constructor(
-    private readonly invoiceService: InvoiceService,
+    private readonly invoiceService: InvoicesService,
     private readonly midtransService: MidtransService,
   ) {}
 
@@ -41,7 +41,7 @@ export class InvoiceController {
     const params = {
       transaction_details: {
         order_id: invoice.id,
-        gross_amount: 100000,
+        gross_amount: +invoice.amount,
       },
     };
     const payment = await this.midtransService.snap.createTransaction(params);

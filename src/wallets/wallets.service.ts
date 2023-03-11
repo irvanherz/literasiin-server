@@ -1,26 +1,50 @@
-import { Injectable } from '@nestjs/common';
-import { CreateWalletDto } from './dto/create-wallet.dto';
-import { UpdateWalletDto } from './dto/update-wallet.dto';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { WalletFilterDto } from './dto/wallet-filter';
+import { Wallet } from './entities/wallet.entity';
 
 @Injectable()
 export class WalletsService {
-  create(createWalletDto: CreateWalletDto) {
-    return 'This action adds a new wallet';
+  constructor(
+    @InjectRepository(Wallet)
+    private walletsRepo: Repository<Wallet>,
+  ) {}
+
+  async findByQuery(filter: WalletFilterDto) {
+    const take = filter.limit || 1;
+    const skip = (filter.page - 1) * take;
+    const result = this.walletsRepo.findAndCount({
+      where: {},
+      relations: {
+        user: true,
+      },
+      skip,
+      take,
+      order: { [filter.sortBy]: filter.sortOrder },
+    });
+    return result;
   }
 
-  findAll() {
-    return `This action returns all wallets`;
+  async findById(id: number) {
+    if (!id) throw new BadRequestException();
+    const result = this.walletsRepo.findOne({
+      where: { id },
+      relations: {
+        user: true,
+      },
+    });
+    return result;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} wallet`;
-  }
-
-  update(id: number, updateWalletDto: UpdateWalletDto) {
-    return `This action updates a #${id} wallet`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} wallet`;
+  async findUserCoinWallet(userId: number) {
+    if (!userId) throw new BadRequestException();
+    const result = await this.walletsRepo.findOne({
+      where: { userId },
+      relations: {
+        user: true,
+      },
+    });
+    return result;
   }
 }

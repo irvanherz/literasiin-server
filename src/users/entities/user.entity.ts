@@ -63,8 +63,8 @@ export class User {
     inverseJoinColumn: { name: 'followingId', referencedColumnName: 'id' },
   })
   following: User[];
-  @OneToOne(() => Wallet, (wallet) => wallet.user)
-  wallet: Wallet;
+  @OneToMany(() => Wallet, (wallet) => wallet.user)
+  wallets: Wallet[];
   @OneToOne(() => Media)
   @JoinColumn()
   photo: Media;

@@ -17,7 +17,7 @@ export class ChapterFiltersDto {
   sortBy: string = 'createdAt';
   @IsOptional()
   @IsString()
-  sortOrder: string = 'desc';
+  sortOrder: string = 'asc';
 }
 
 export class FindChapterByIdOptions {

@@ -11,17 +11,17 @@ import { Wallet } from './wallet.entity';
 export class WalletTransaction {
   @PrimaryGeneratedColumn()
   id: number;
-  @Column({ type: 'int' })
+  @Column()
   walletId: number;
   @Column({ type: 'enum', enum: ['C', 'D'] })
   type: 'C' | 'D';
-  @Column({ type: 'money' })
+  @Column({ type: 'decimal', precision: 20, scale: 2, default: 0 })
   amount: number;
-  @Column({ type: 'money' })
+  @Column({ type: 'decimal', precision: 20, scale: 2, default: 0 })
   finalBalance: number;
-  @Column({ type: 'text', default: true })
-  description: number;
-  @Column({ type: 'json' })
+  @Column({ type: 'text', default: null })
+  description: string;
+  @Column({ type: 'json', default: {} })
   meta: any;
   @CreateDateColumn()
   createdAt: Date;

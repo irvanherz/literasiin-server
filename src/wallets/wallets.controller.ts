@@ -1,45 +1,48 @@
 import {
-  Body,
+  BadRequestException,
   Controller,
-  Delete,
   Get,
-  Param,
-  Patch,
-  Post,
+  Query,
+  UseGuards,
 } from '@nestjs/common';
-import { CreateWalletDto } from './dto/create-wallet.dto';
-import { UpdateWalletDto } from './dto/update-wallet.dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { User } from 'src/auth/user.decorator';
+import { WalletFilterDto } from './dto/wallet-filter';
 import { WalletsService } from './wallets.service';
+
+function sanitizeFilter(value: any, options: any) {
+  if (value === 'me') return options?.currentUser?.id;
+  if (value === 'any') return undefined;
+  return value;
+}
 
 @Controller('wallets')
 export class WalletsController {
   constructor(private readonly walletsService: WalletsService) {}
 
-  @Post()
-  async create(@Body() createWalletDto: CreateWalletDto) {
-    return this.walletsService.create(createWalletDto);
-  }
-
+  @UseGuards(JwtAuthGuard)
   @Get()
-  async findAll() {
-    return this.walletsService.findAll();
-  }
+  async findByQuery(@Query() filter: WalletFilterDto, @User() currentUser) {
+    filter.userId = sanitizeFilter(filter.userId, { currentUser });
 
-  @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return this.walletsService.findOne(+id);
-  }
+    if (
+      (filter.userId == undefined || filter.userId !== currentUser.id) &&
+      currentUser.role !== 'admin'
+    )
+      throw new BadRequestException();
 
-  @Patch(':id')
-  async update(
-    @Param('id') id: string,
-    @Body() updateWalletDto: UpdateWalletDto,
-  ) {
-    return this.walletsService.update(+id, updateWalletDto);
-  }
+    const [wallets, count] = await this.walletsService.findByQuery(filter);
+    const numPages = Math.ceil(count / filter.limit);
+    const meta = {
+      page: filter.page,
+      limit: filter.limit,
+      numItems: count,
+      numPages,
+    };
 
-  @Delete(':id')
-  async remove(@Param('id') id: string) {
-    return this.walletsService.remove(+id);
+    return {
+      data: wallets,
+      meta,
+    };
   }
 }

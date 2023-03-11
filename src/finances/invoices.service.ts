@@ -2,18 +2,17 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as moment from 'moment-timezone';
 import { Repository } from 'typeorm';
-import { CreateInvoiceDto } from './dto/create-invoice.dto';
 import { InvoiceFiltersDto } from './dto/invoice-filter.dto';
 import { Invoice } from './entities/invoice.entity';
 
 @Injectable()
-export class InvoiceService {
+export class InvoicesService {
   constructor(
     @InjectRepository(Invoice)
     private readonly invoiceRepo: Repository<Invoice>,
   ) {}
 
-  async create(payload: CreateInvoiceDto) {
+  async create(payload: Partial<Invoice>) {
     const setData = this.invoiceRepo.create(payload);
     setData.code = '';
     let invoice = await this.invoiceRepo.save(setData);

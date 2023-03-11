@@ -1,13 +1,17 @@
-import { User } from 'src/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
+  OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { ChapterMeta } from './chapter-meta.entity';
+import { ChapterVote } from './chapter-vote.entity';
 import { Story } from './story.entity';
 
 type StoryType = 'draft' | 'published';
@@ -32,8 +36,17 @@ export class Chapter {
   updatedAt: Date;
   @DeleteDateColumn()
   deletedAt?: Date;
-  @ManyToOne(() => User, (user) => user.stories)
-  user: User;
-  @ManyToOne(() => Story, (story) => story.chapters)
+  @ManyToOne(() => Story, (story) => story.chapters, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
   story: Story;
+  @OneToOne(() => ChapterMeta, (meta) => meta.chapter, {
+    eager: true,
+    nullable: true,
+  })
+  meta?: ChapterMeta;
+  @OneToMany(() => ChapterVote, (vote) => vote.chapter)
+  votes: ChapterVote[];
 }

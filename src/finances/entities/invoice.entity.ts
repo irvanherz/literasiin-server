@@ -12,18 +12,23 @@ export class Invoice {
   id: number;
   @Column({ type: 'varchar', length: 255 })
   code: string;
-  @Column({ type: 'int' })
+  @Column()
   userId: number;
-  @Column({ type: 'decimal', precision: 10, scale: 4, default: 0 })
+  @Column({ type: 'decimal', precision: 20, scale: 2, default: 0 })
   amount: number;
   @Column({ type: 'json', default: {} })
   meta: any;
   @Column({
     type: 'enum',
-    enum: ['unpaid', 'pending', 'paid', 'expired', 'canceled'],
+    enum: ['deposit', 'payment'],
+  })
+  type: 'deposit' | 'payment';
+  @Column({
+    type: 'enum',
+    enum: ['unpaid', 'pending', 'paid', 'challenge', 'failed', 'canceled'],
     default: 'unpaid',
   })
-  status: string;
+  status: 'unpaid' | 'pending' | 'paid' | 'challenge' | 'failed' | 'canceled';
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()

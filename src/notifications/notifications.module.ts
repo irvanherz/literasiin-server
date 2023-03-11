@@ -13,9 +13,7 @@ import { NotificationsService } from './notifications.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([EmailTemplate]),
-    BullModule.registerQueue({
-      name: 'mails',
-    }),
+    BullModule.registerQueue({ name: 'mails' }, { name: 'invoices' }),
   ],
   controllers: [EmailTemplatesController, NotificationsController],
   providers: [

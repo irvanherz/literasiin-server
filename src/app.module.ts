@@ -23,8 +23,11 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { PublicationStatus } from './publications/entities/publication-status.entity';
 import { Publication } from './publications/entities/publication.entity';
 import { PublicationsModule } from './publications/publications.module';
+import { ChapterMeta } from './stories/entities/chapter-meta.entity';
+import { ChapterVote } from './stories/entities/chapter-vote.entity';
 import { Chapter } from './stories/entities/chapter.entity';
 import { StoryCategory } from './stories/entities/story-category.entity';
+import { StoryMeta } from './stories/entities/story-meta.entity';
 import { StoryTag } from './stories/entities/story-tag.entity';
 import { Story } from './stories/entities/story.entity';
 import { StoriesModule } from './stories/stories.module';
@@ -69,7 +72,10 @@ import { WalletsModule } from './wallets/wallets.module';
           UserDevice,
           Identity,
           Story,
+          StoryMeta,
           Chapter,
+          ChapterVote,
+          ChapterMeta,
           StoryCategory,
           StoryTag,
           Publication,
