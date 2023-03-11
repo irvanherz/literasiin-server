@@ -33,8 +33,8 @@ export class AuthController {
   ) {}
 
   @Post('/signup')
-  async signupWithEmail(@Body() signupWithEmailDto: SignupWithEmailDto) {
-    const user = await this.authService.signupWithEmail(signupWithEmailDto);
+  async signupWithEmail(@Body() payload: SignupWithEmailDto) {
+    const user = await this.authService.signupWithEmail(payload);
     const auth = await this.authService.signin({
       id: user.id,
       username: user.username,

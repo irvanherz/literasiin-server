@@ -12,6 +12,7 @@ import { User } from 'src/users/entities/user.entity';
 import { IdentitiesService } from 'src/users/identities.service';
 import { UsersModule } from 'src/users/users.module';
 import { UsersService } from 'src/users/users.service';
+import { Wallet } from 'src/wallets/entities/wallet.entity';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { GoogleStrategy } from './google.strategy';
@@ -36,6 +37,7 @@ import { LocalStrategy } from './local.strategy';
       UserFollow,
       PasswordResetToken,
       UserDevice,
+      Wallet,
     ]),
   ],
   controllers: [AuthController],

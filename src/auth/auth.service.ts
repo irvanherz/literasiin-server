@@ -12,6 +12,7 @@ import { PasswordResetToken } from 'src/users/entities/password-reset-token.enti
 import { UserDevice } from 'src/users/entities/user-device.entity';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
+import { Wallet } from 'src/wallets/entities/wallet.entity';
 import { DataSource, Repository } from 'typeorm';
 import * as uuid from 'uuid';
 import { ResetPasswordDto } from './dto/reset-password.dto';
@@ -31,6 +32,8 @@ export class AuthService {
     private identitiesRepo: Repository<Identity>,
     @InjectRepository(UserDevice)
     private readonly deviceRepo: Repository<UserDevice>,
+    @InjectRepository(Wallet)
+    private walletsRepo: Repository<Wallet>,
   ) {}
 
   async signin(user: any) {
@@ -69,6 +72,7 @@ export class AuthService {
       userId: user.id,
       key,
     });
+    const wallet = this.walletsRepo.create();
     let createdUser: User = null;
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -76,7 +80,9 @@ export class AuthService {
     try {
       const created = await queryRunner.manager.save<User>(user);
       identity.userId = created.id;
+      wallet.userId = created.id;
       await queryRunner.manager.save<Identity>(identity);
+      await queryRunner.manager.save<Wallet>(wallet);
       await queryRunner.commitTransaction();
       createdUser = created;
     } catch (err) {
