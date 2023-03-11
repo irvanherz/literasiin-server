@@ -15,7 +15,9 @@ export class WalletsService {
     const take = filter.limit || 1;
     const skip = (filter.page - 1) * take;
     const result = this.walletsRepo.findAndCount({
-      where: {},
+      where: {
+        userId: filter.userId ? Number(filter.userId) : undefined,
+      },
       relations: {
         user: true,
       },
