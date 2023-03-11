@@ -1,11 +1,10 @@
 import {
   Column,
   CreateDateColumn,
-  DeleteDateColumn,
   Entity,
+  JoinTable,
   ManyToMany,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from 'typeorm';
 import { Story } from './story.entity';
 
@@ -15,14 +14,14 @@ export class StoryTag {
   id: number;
   @Column({ type: 'varchar', length: 255 })
   name: string;
-  @Column()
-  priority: number;
   @CreateDateColumn()
   createdAt: Date;
-  @UpdateDateColumn()
-  updatedAt: Date;
-  @DeleteDateColumn()
-  deletedAt?: Date;
   @ManyToMany(() => Story, (story) => story.tags)
+  @JoinTable({
+    synchronize: false,
+    name: 'story_tag_map',
+    joinColumn: { name: 'tagId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'storyId', referencedColumnName: 'id' },
+  })
   stories: Story[];
 }

@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-inferrable-types */
 import { IsNumber, IsOptional, IsString } from 'class-validator';
 
-export class StoryTagFiltersDto {
+export class StoryTagFilterDto {
   @IsOptional()
-  @IsNumber()
-  userId?: number;
+  @IsString()
+  search?: string;
   @IsOptional()
   @IsNumber()
   page: number = 1;

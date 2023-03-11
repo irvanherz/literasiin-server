@@ -25,7 +25,7 @@ export class StoryCategoriesService {
     const skip = (filters.page - 1) * take;
     const result = await this.categoriesRepository.findAndCount({
       where: {
-        name: filters?.search ? ILike(`${filters.search}`) : undefined,
+        name: filters?.search ? ILike(`%${filters.search}%`) : undefined,
       },
       skip,
       take,

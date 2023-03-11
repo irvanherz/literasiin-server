@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -54,6 +55,20 @@ export class StoriesController {
     return { data: story };
   }
 
+  @Post(':id/tags/:tag')
+  async assignTag(@Param('id') id: number, @Param('tag') tag: string) {
+    const story = await this.storiesService.findById(id);
+    if (!story) throw new NotFoundException();
+    await this.storiesService.assignTag(id, tag);
+  }
+
+  @Delete(':id/tags/:tag')
+  async unassignTag(@Param('id') id: number, @Param('tag') tag: string) {
+    const story = await this.storiesService.findById(id);
+    if (!story) throw new NotFoundException();
+    await this.storiesService.unassignTag(id, tag);
+  }
+
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
   async updateById(
@@ -61,6 +76,12 @@ export class StoriesController {
     @Body() setData: UpdateStoryDto,
     @User() currentUser,
   ) {
+    if (
+      setData.userId &&
+      setData.userId !== currentUser.id &&
+      currentUser.role !== 'admin'
+    )
+      throw new BadRequestException();
     const story = await this.storiesService.findById(id);
     if (!story) throw new NotFoundException();
     if (currentUser.id !== story.userId && currentUser.role !== 'admin')

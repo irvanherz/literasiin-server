@@ -17,5 +17,5 @@ export class CreateStoryDto {
   coverId?: number;
   @IsOptional()
   @IsEnum(['draft', 'published'])
-  status?: 'draft' | 'published' = 'draft';
+  status?: 'draft' | 'published';
 }

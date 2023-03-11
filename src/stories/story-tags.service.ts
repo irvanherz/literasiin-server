@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, ILike, Repository } from 'typeorm';
 import { CreateTagDto } from './dto/create-tag.dto';
+import { StoryTagFilterDto } from './dto/story-tag-filter.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
 import { StoryTag } from './entities/story-tag.entity';
 
@@ -18,8 +19,17 @@ export class StoryTagsService {
     return await this.tagsRepository.save(tag);
   }
 
-  async findMany() {
-    const result = await this.tagsRepository.findAndCount();
+  async findMany(filter: StoryTagFilterDto) {
+    const take = filter.limit || 1;
+    const skip = (filter.page - 1) * take;
+    const result = await this.tagsRepository.findAndCount({
+      where: {
+        name: filter?.search ? ILike(`${filter.search}%`) : undefined,
+      },
+      skip,
+      take,
+      order: { [filter.sortBy]: filter.sortOrder },
+    });
     return result;
   }
 
@@ -28,8 +38,8 @@ export class StoryTagsService {
     return result;
   }
 
-  async updateById(id: number, updateTagDto: UpdateTagDto) {
-    const result = await this.tagsRepository.update(id, updateTagDto);
+  async updateById(id: number, payload: UpdateTagDto) {
+    const result = await this.tagsRepository.update(id, payload);
     return result.affected;
   }
 

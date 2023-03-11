@@ -7,10 +7,12 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { CreateTagDto } from './dto/create-tag.dto';
+import { StoryTagFilterDto } from './dto/story-tag-filter.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
 import { StoryTagsService } from './story-tags.service';
 
@@ -25,8 +27,8 @@ export class StoryTagsController {
   }
 
   @Get()
-  async findMany() {
-    const [data, count] = await this.tagsService.findMany();
+  async findMany(@Query() filter: StoryTagFilterDto) {
+    const [data, count] = await this.tagsService.findMany(filter);
     const meta = {
       numItems: count,
     };

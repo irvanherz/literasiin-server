@@ -12,6 +12,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { OptionalJwtAuthGuard } from 'src/auth/optional-jwt-auth.guard';
 import { User } from 'src/auth/user.decorator';
 import { Mixed } from 'src/mixed.decorator';
 import { ChaptersService } from './chapters.service';
@@ -71,6 +72,21 @@ export class ChaptersController {
     await this.storiesService.incrementNumViews(chapter.storyId);
     await this.chaptersService.incrementNumViews(id);
     return;
+  }
+
+  @UseGuards(OptionalJwtAuthGuard)
+  @Get('/stories/chapters/:id/action-context')
+  async getActionContext(@Param('id') id: number) {
+    const chapter = await this.chaptersService.findById(id);
+    if (!chapter) throw new NotFoundException();
+    await this.storiesService.incrementNumViews(chapter.storyId);
+    await this.chaptersService.incrementNumViews(id);
+    return {
+      previousChapter: {},
+      nextChapter: {},
+      vote: {},
+      hasRead: false,
+    };
   }
 
   @UseGuards(JwtAuthGuard)

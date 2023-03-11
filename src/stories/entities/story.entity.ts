@@ -6,6 +6,7 @@ import {
   DeleteDateColumn,
   Entity,
   JoinColumn,
+  JoinTable,
   ManyToMany,
   ManyToOne,
   OneToMany,
@@ -39,6 +40,8 @@ export class Story {
   description?: string;
   @Column({ type: 'int', nullable: true })
   coverId?: number;
+  @Column({ type: 'int', nullable: true })
+  categoryId: number;
   @Column({ type: 'enum', enum: ['draft', 'published'], default: 'draft' })
   status: StoryType;
   @CreateDateColumn()
@@ -47,6 +50,31 @@ export class Story {
   updatedAt: Date;
   @DeleteDateColumn()
   deletedAt?: Date;
+  @ManyToOne(() => User, (user) => user.stories)
+  user: User;
+  @OneToMany(() => Chapter, (chapter) => chapter.story)
+  chapters: Chapter[];
+  @ManyToOne(() => StoryCategory, (category) => category.stories, {
+    eager: true,
+    nullable: true,
+  })
+  category: StoryCategory;
+  @ManyToMany(() => StoryTag, (tag) => tag.stories, { eager: true })
+  @JoinTable({
+    synchronize: false,
+    name: 'story_tag_map',
+    joinColumn: { name: 'storyId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'tagId', referencedColumnName: 'id' },
+  })
+  tags: StoryTag[];
+  @OneToOne(() => Media)
+  @JoinColumn()
+  cover: Media;
+  @OneToOne(() => StoryMeta, (meta) => meta.story, {
+    eager: true,
+    nullable: true,
+  })
+  meta: StoryMeta;
 
   @VirtualColumn({
     type: 'int',
@@ -62,21 +90,4 @@ export class Story {
     transformer: NumberTransformer,
   })
   numPublishedChapters: number;
-
-  @ManyToOne(() => User, (user) => user.stories)
-  user: User;
-  @OneToMany(() => Chapter, (chapter) => chapter.story)
-  chapters: Chapter[];
-  @ManyToOne(() => StoryCategory, (category) => category.stories)
-  category: StoryCategory;
-  @ManyToMany(() => StoryTag, (tag) => tag.stories)
-  tags: StoryTag[];
-  @OneToOne(() => Media)
-  @JoinColumn()
-  cover: Media;
-  @OneToOne(() => StoryMeta, (meta) => meta.story, {
-    eager: true,
-    nullable: true,
-  })
-  meta: StoryMeta;
 }
