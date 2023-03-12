@@ -15,6 +15,9 @@ import { ConfigurationsModule } from './configurations/configurations.module';
 import { Configuration } from './configurations/entities/configuration.entity';
 import { Invoice } from './finances/entities/invoice.entity';
 import { FinancesModule } from './finances/finances.module';
+import { KbCategory } from './kbs/entities/kb-category.entity';
+import { Kb } from './kbs/entities/kb.entity';
+import { KbsModule } from './kbs/kbs.module';
 import { Media } from './media/entities/media.entity';
 import { MediaModule } from './media/media.module';
 import { MidtransModule } from './midtrans/midtrans.module';
@@ -93,6 +96,8 @@ import { WalletsModule } from './wallets/wallets.module';
           Wallet,
           WalletTransaction,
           Invoice,
+          Kb,
+          KbCategory,
         ],
       }),
     }),
@@ -146,6 +151,7 @@ import { WalletsModule } from './wallets/wallets.module';
     ArticlesModule,
     ConfigurationsModule,
     FinancesModule,
+    KbsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
