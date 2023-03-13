@@ -1,14 +1,15 @@
 import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './http-exception.filter';
-
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: ['error', 'debug', 'log'],
     rawBody: true,
   });
+  const configService = app.get(ConfigService);
   const config = new DocumentBuilder()
     .setTitle('Literasiin')
     .setDescription('Literasiin API documentation')
@@ -30,6 +31,6 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
   app.enableCors({ origin: '*', credentials: true });
   // initializeApp();
-  await app.listen(5000);
+  await app.listen(configService.get<number>('APP_PORT'));
 }
 bootstrap();
