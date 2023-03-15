@@ -36,7 +36,7 @@ export class Story {
   userId: number;
   @Column({ type: 'varchar', length: 255 })
   title: string;
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   description?: string;
   @Column({ type: 'int', nullable: true })
   coverId?: number;

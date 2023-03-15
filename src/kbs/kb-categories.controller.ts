@@ -17,18 +17,18 @@ import { KbCategoryFilterDto } from './dto/kb-category-filter.dto';
 import { UpdateKbCategoryDto } from './dto/update-kb-category.dto';
 import { KbCategoriesService } from './kb-categories.service';
 
-@Controller('/kbs/categories')
+@Controller()
 export class KbCategoriesController {
   constructor(private readonly categoriesService: KbCategoriesService) {}
 
   @UseGuards(JwtAuthGuard)
-  @Post()
+  @Post('/kbs/categories')
   async create(@Body() payload: CreateKbCategoryDto) {
     const data = await this.categoriesService.create(payload);
     return { data };
   }
 
-  @Get()
+  @Get('/kbs/categories')
   async findMany(@Query() filter: KbCategoryFilterDto) {
     const [data, count] = await this.categoriesService.findMany(filter);
     const meta = {
@@ -37,7 +37,7 @@ export class KbCategoriesController {
     return { data, meta };
   }
 
-  @Get(':id')
+  @Get('/kbs/categories/:id')
   async findById(@Param('id') id: number) {
     const category = await this.categoriesService.findById(id);
     if (!category) throw new NotFoundException();
@@ -45,7 +45,7 @@ export class KbCategoriesController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Patch('bulk-update')
+  @Patch('/kbs/categories/bulk-update')
   async bulkUpdate(@Body() payload: BulkUpdateKbCategoryDto) {
     console.log('OK');
 
@@ -54,7 +54,7 @@ export class KbCategoriesController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Patch(':id')
+  @Patch('/kbs/categories/:id')
   async updateById(
     @Param('id') id: number,
     @Body() setData: UpdateKbCategoryDto,
@@ -66,7 +66,7 @@ export class KbCategoriesController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Delete(':id')
+  @Delete('/kbs/categories/:id')
   async deleteById(@Param('id') id: number) {
     const category = await this.categoriesService.findById(id);
     if (!category) throw new NotFoundException();

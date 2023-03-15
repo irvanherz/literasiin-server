@@ -20,22 +20,23 @@ import { StoryFiltersDto } from './dto/story-filters.dto';
 import { UpdateStoryDto } from './dto/update-story.dto';
 import { StoriesService } from './stories.service';
 
-@Controller('stories')
+@Controller()
 export class StoriesController {
   constructor(private readonly storiesService: StoriesService) {}
 
   @UseGuards(JwtAuthGuard)
-  @Post()
+  @Post('stories')
   async create(@Body() setData: CreateStoryDto, @Request() req) {
     const user = req.user;
     setData.userId = setData.userId || user.id;
 
     if (setData.userId !== user.id && user.role !== 'admin')
       throw new ForbiddenException();
-    return await this.storiesService.create(setData);
+    const data = await this.storiesService.create(setData);
+    return { data };
   }
 
-  @Get()
+  @Get('stories')
   async findMany(@Query() filters: StoryFiltersDto) {
     const [data, count] = await this.storiesService.findMany(filters);
     const numPages = Math.ceil(count / filters.limit);
@@ -48,21 +49,21 @@ export class StoriesController {
     return { data, meta };
   }
 
-  @Get(':id')
+  @Get('stories/:id')
   async findById(@Param('id') id: number) {
     const story = await this.storiesService.findById(id);
     if (!story) throw new NotFoundException();
     return { data: story };
   }
 
-  @Post(':id/tags/:tag')
+  @Post('stories/:id/tags/:tag')
   async assignTag(@Param('id') id: number, @Param('tag') tag: string) {
     const story = await this.storiesService.findById(id);
     if (!story) throw new NotFoundException();
     await this.storiesService.assignTag(id, tag);
   }
 
-  @Delete(':id/tags/:tag')
+  @Delete('stories/:id/tags/:tag')
   async unassignTag(@Param('id') id: number, @Param('tag') tag: string) {
     const story = await this.storiesService.findById(id);
     if (!story) throw new NotFoundException();
@@ -70,7 +71,7 @@ export class StoriesController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Patch(':id')
+  @Patch('stories/:id')
   async updateById(
     @Param('id') id: number,
     @Body() setData: UpdateStoryDto,
@@ -92,7 +93,7 @@ export class StoriesController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Delete(':id')
+  @Delete('stories/:id')
   async deleteById(@Param('id') id: number, @Request() req) {
     const story = await this.storiesService.findById(id);
     const user = req.user;

@@ -9,7 +9,7 @@ import { KbsService } from './kbs.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Kb, KbCategory])],
-  controllers: [KbsController, KbCategoriesController],
+  controllers: [KbCategoriesController, KbsController],
   providers: [KbsService, KbCategoriesService],
 })
 export class KbsModule {}

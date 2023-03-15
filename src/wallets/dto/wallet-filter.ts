@@ -11,7 +11,12 @@ import {
 @ValidatorConstraint({ name: 'user-id-filter', async: false })
 export class UserIdValidatorConstraint implements ValidatorConstraintInterface {
   validate(text: any) {
-    return typeof text === 'number' || text === 'any' || text === 'me';
+    return (
+      typeof text === 'number' ||
+      /[0-9]+/.test(text) ||
+      text === 'any' ||
+      text === 'me'
+    );
   }
 
   defaultMessage(args: ValidationArguments) {
