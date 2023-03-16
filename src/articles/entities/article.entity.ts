@@ -17,17 +17,17 @@ type ArticleStatus = 'draft' | 'published';
 export class Article {
   @PrimaryGeneratedColumn()
   id: number;
-  @Column()
+  @Column({ type: 'int' })
   userId: number;
-  @Column({ type: 'varchar', length: 255, nullable: true })
+  @Column({ type: 'varchar', length: 255 })
   title: string;
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   description?: string;
   @Column({ type: 'text', nullable: true })
   content?: string;
   @Column({ type: 'int', nullable: true })
   imageId?: number;
-  @Column({ type: 'int' })
+  @Column({ type: 'int', nullable: true })
   categoryId: number;
   @Column({ type: 'enum', enum: ['draft', 'published'], default: 'draft' })
   status: ArticleStatus;

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { CreateKbDto } from './dto/create-kb.dto';
 import { KbFilterDto } from './dto/kb-filter.dto';
 import { UpdateKbDto } from './dto/update-kb.dto';
@@ -23,7 +23,9 @@ export class KbsService {
     const skip = (filter.page - 1) * take;
     const result = await this.kbsRepository.findAndCount({
       where: {
+        title: filter.search ? Like(`%${filter.search}%`) : undefined,
         categoryId: filter.categoryId || undefined,
+        status: (filter.status as any) || undefined,
       },
       skip,
       take,

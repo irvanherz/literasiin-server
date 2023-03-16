@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-inferrable-types */
 import { IsNumber, IsOptional, IsString } from 'class-validator';
 
-export class ArticleFiltersDto {
+export class ArticleFilterDto {
   @IsOptional()
   @IsString()
   search?: string;

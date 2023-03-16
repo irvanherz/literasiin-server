@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { ArticleFiltersDto } from './dto/article-filters.dto';
+import { ILike, Repository } from 'typeorm';
+import { ArticleFilterDto } from './dto/article-filter.dto';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import { Article } from './entities/article.entity';
@@ -18,18 +18,19 @@ export class ArticlesService {
     return await this.articlesRepository.save(article);
   }
 
-  async findMany(filters: ArticleFiltersDto) {
-    const take = filters.limit;
-    const skip = (filters.page - 1) * take;
+  async findMany(filter: ArticleFilterDto) {
+    const take = filter.limit;
+    const skip = (filter.page - 1) * take;
     const result = await this.articlesRepository.findAndCount({
       where: {
-        userId: filters.userId || undefined,
-        categoryId: filters.categoryId || undefined,
+        title: filter.search ? ILike(`%${filter.search}%`) : undefined,
+        userId: filter.userId || undefined,
+        categoryId: filter.categoryId || undefined,
       },
       relations: { image: true },
       skip,
       take,
-      order: { [filters.sortBy]: filters.sortOrder },
+      order: { [filter.sortBy]: filter.sortOrder },
     });
     return result;
   }

@@ -13,5 +13,5 @@ export class CreateChapterDto {
   content?: string;
   @IsOptional()
   @IsString()
-  status: 'draft' | 'published' = 'draft';
+  status: 'draft' | 'published';
 }

@@ -94,11 +94,12 @@ export class StoriesController {
 
   @UseGuards(JwtAuthGuard)
   @Delete('stories/:id')
-  async deleteById(@Param('id') id: number, @Request() req) {
+  async deleteById(@Param('id') id: number, @User() currentUser) {
     const story = await this.storiesService.findById(id);
-    const user = req.user;
+
     if (!story) throw new NotFoundException();
-    if (user.id !== story.userId) throw new ForbiddenException();
+    if (currentUser?.id !== story.userId && currentUser?.role !== 'admin')
+      throw new ForbiddenException();
     await this.storiesService.deleteById(id);
     return;
   }

@@ -6,6 +6,9 @@ export class KbFilterDto {
   @IsString()
   search?: string;
   @IsOptional()
+  @IsString()
+  status?: string;
+  @IsOptional()
   @IsNumber()
   categoryId?: number;
   @IsOptional()

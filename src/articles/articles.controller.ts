@@ -14,7 +14,7 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ArticlesService } from './articles.service';
-import { ArticleFiltersDto } from './dto/article-filters.dto';
+import { ArticleFilterDto } from './dto/article-filter.dto';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 
@@ -30,11 +30,12 @@ export class ArticlesController {
 
     if (setData.userId !== user.id && user.role !== 'admin')
       throw new ForbiddenException();
-    return await this.articlesService.create(setData);
+    const data = await this.articlesService.create(setData);
+    return { data };
   }
 
   @Get()
-  async findMany(@Query() filters: ArticleFiltersDto) {
+  async findMany(@Query() filters: ArticleFilterDto) {
     const [data, count] = await this.articlesService.findMany(filters);
     const numPages = Math.ceil(count / filters.limit);
     const meta = {
