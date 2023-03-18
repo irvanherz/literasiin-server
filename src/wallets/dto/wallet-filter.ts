@@ -1,33 +1,13 @@
+import { IsNumber, IsOptional, IsString, Validate } from 'class-validator';
 import {
-  IsNumber,
-  IsOptional,
-  IsString,
-  Validate,
-  ValidationArguments,
-  ValidatorConstraint,
-  ValidatorConstraintInterface,
-} from 'class-validator';
-
-@ValidatorConstraint({ name: 'user-id-filter', async: false })
-export class UserIdValidatorConstraint implements ValidatorConstraintInterface {
-  validate(text: any) {
-    return (
-      typeof text === 'number' ||
-      /[0-9]+/.test(text) ||
-      text === 'any' ||
-      text === 'me'
-    );
-  }
-
-  defaultMessage(args: ValidationArguments) {
-    return `${args.property} has invalid value`;
-  }
-}
+  IdFilter,
+  UserIdFilterValidatorConstraint,
+} from 'src/libs/validations';
 
 export class WalletFilterDto {
   @IsOptional()
-  @Validate(UserIdValidatorConstraint)
-  userId?: number | 'any' | 'me';
+  @Validate(UserIdFilterValidatorConstraint)
+  userId?: IdFilter;
   @IsOptional()
   @IsNumber()
   page?: number = 1;

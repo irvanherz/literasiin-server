@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Media } from 'src/media/entities/media.entity';
 import { MediaModule } from 'src/media/media.module';
+import { SharedRabbitMQModule } from 'src/shared-rabbitmq/shared-rabbitmq.module';
 import { Identity } from './entities/identity.entity';
 import { PasswordResetToken } from './entities/password-reset-token.entity';
 import { UserDevice } from './entities/user-device.entity';
@@ -22,6 +23,7 @@ import { UsersService } from './users.service';
       UserDevice,
       Media,
     ]),
+    SharedRabbitMQModule,
     MediaModule,
   ],
   controllers: [IdentitiesController, UsersController],

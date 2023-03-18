@@ -7,14 +7,9 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { User } from 'src/auth/user.decorator';
+import { sanitizeFilter } from 'src/libs/validations';
 import { WalletFilterDto } from './dto/wallet-filter';
 import { WalletsService } from './wallets.service';
-
-function sanitizeFilter(value: any, options: any) {
-  if (value === 'me') return options?.currentUser?.id;
-  if (value === 'any') return undefined;
-  return value;
-}
 
 @Controller('wallets')
 export class WalletsController {

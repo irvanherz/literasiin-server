@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-inferrable-types */
 import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { ExtendedFilter } from 'src/libs/validations';
 
 export class ArticleFilterDto {
   @IsOptional()
@@ -11,6 +12,9 @@ export class ArticleFilterDto {
   @IsOptional()
   @IsNumber()
   userId?: number;
+  @IsOptional()
+  @IsString()
+  status?: ExtendedFilter<'draft' | 'published'> = 'published';
   @IsOptional()
   @IsNumber()
   page: number = 1;

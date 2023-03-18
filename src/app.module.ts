@@ -130,6 +130,15 @@ import { WalletsModule } from './wallets/wallets.module';
         },
       }),
     }),
+    // RabbitMQModule.forRootAsync(RabbitMQModule, {
+    //   imports: [ConfigModule],
+    //   inject: [ConfigService],
+    //   useFactory: (configService: ConfigService) => ({
+    //     uri: configService.get<string>('RABBITMQ_SERVER'),
+    //     enableControllerDiscovery: true,
+    //   }),
+    //   exports: [RabbitMQModule],
+    // }),
     BullModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

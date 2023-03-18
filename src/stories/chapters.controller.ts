@@ -14,12 +14,13 @@ import {
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { OptionalJwtAuthGuard } from 'src/auth/optional-jwt-auth.guard';
 import { User } from 'src/auth/user.decorator';
+import { sanitizeFilter } from 'src/libs/validations';
 import { Mixed } from 'src/mixed.decorator';
 import { ChaptersService } from './chapters.service';
 import {
-  ChapterFiltersDto,
+  ChapterFilterDto,
   FindChapterByIdOptions,
-} from './dto/chapter-filters.dto';
+} from './dto/chapter-filter.dto';
 import { CreateChapterDto } from './dto/create-chapter.dto';
 import { UpdateChapterDto } from './dto/update-chapter.dto';
 import { StoriesService } from './stories.service';
@@ -39,8 +40,9 @@ export class ChaptersController {
   }
 
   @Get('/stories/chapters')
-  async findMany(@Query() filters: ChapterFiltersDto) {
-    const [data, count] = await this.chaptersService.findMany(filters);
+  async findMany(@Query() filter: ChapterFilterDto) {
+    filter.status = sanitizeFilter(filter.status);
+    const [data, count] = await this.chaptersService.findMany(filter);
     const meta = {
       numItems: count,
     };

@@ -37,10 +37,12 @@ export class Article {
   updatedAt: Date;
   @DeleteDateColumn()
   deletedAt?: Date;
-  @ManyToOne(() => User, (user) => user.stories)
+  @ManyToOne(() => User, (user) => user.stories, { eager: true })
   user: User;
   @ManyToOne(() => Media)
   image: Media;
-  @ManyToOne(() => ArticleCategory, (category) => category.articles)
+  @ManyToOne(() => ArticleCategory, (category) => category.articles, {
+    eager: true,
+  })
   category: ArticleCategory;
 }

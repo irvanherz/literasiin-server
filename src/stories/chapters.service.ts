@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import {
-  ChapterFiltersDto,
+  ChapterFilterDto,
   FindChapterByIdOptions,
-} from './dto/chapter-filters.dto';
+} from './dto/chapter-filter.dto';
 import { CreateChapterDto } from './dto/create-chapter.dto';
 import { UpdateChapterDto } from './dto/update-chapter.dto';
 import { ChapterMeta } from './entities/chapter-meta.entity';
@@ -28,16 +28,17 @@ export class ChaptersService {
     return result;
   }
 
-  async findMany(filters: ChapterFiltersDto) {
-    const take = filters.limit;
-    const skip = (filters.page - 1) * take;
+  async findMany(filter: ChapterFilterDto) {
+    const take = filter.limit;
+    const skip = (filter.page - 1) * take;
     const result = await this.chaptersRepo.findAndCount({
       where: {
-        storyId: filters.storyId ? filters.storyId : undefined,
+        storyId: filter.storyId ? filter.storyId : undefined,
+        status: (filter.status || undefined) as any,
       },
       skip,
       take,
-      order: { [filters.sortBy]: filters.sortOrder },
+      order: { [filter.sortBy]: filter.sortOrder },
     });
     return result;
   }

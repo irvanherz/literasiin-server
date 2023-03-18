@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-inferrable-types */
 import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { ExtendedFilter } from 'src/libs/validations';
 
-export class StoryFiltersDto {
+export class StoryFilterDto {
   @IsOptional()
   @IsString()
   search?: string;
   @IsOptional()
   @IsString()
-  status?: 'draft' | 'published';
+  status?: ExtendedFilter<'draft' | 'published'> = 'published';
   @IsOptional()
   @IsNumber()
   userId?: number;

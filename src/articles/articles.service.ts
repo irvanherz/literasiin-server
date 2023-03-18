@@ -24,6 +24,7 @@ export class ArticlesService {
     const result = await this.articlesRepository.findAndCount({
       where: {
         title: filter.search ? ILike(`%${filter.search}%`) : undefined,
+        status: (filter.status || undefined) as any,
         userId: filter.userId || undefined,
         categoryId: filter.categoryId || undefined,
       },

@@ -65,7 +65,7 @@ export class User {
   following: User[];
   @OneToMany(() => Wallet, (wallet) => wallet.user)
   wallets: Wallet[];
-  @OneToOne(() => Media)
+  @OneToOne(() => Media, { eager: true, nullable: true })
   @JoinColumn()
   photo: Media;
 }

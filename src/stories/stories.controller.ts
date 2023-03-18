@@ -15,8 +15,9 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { User } from 'src/auth/user.decorator';
+import { sanitizeFilter } from 'src/libs/validations';
 import { CreateStoryDto } from './dto/create-story.dto';
-import { StoryFiltersDto } from './dto/story-filters.dto';
+import { StoryFilterDto } from './dto/story-filter.dto';
 import { UpdateStoryDto } from './dto/update-story.dto';
 import { StoriesService } from './stories.service';
 
@@ -37,12 +38,13 @@ export class StoriesController {
   }
 
   @Get('stories')
-  async findMany(@Query() filters: StoryFiltersDto) {
-    const [data, count] = await this.storiesService.findMany(filters);
-    const numPages = Math.ceil(count / filters.limit);
+  async findMany(@Query() filter: StoryFilterDto) {
+    filter.status = sanitizeFilter(filter.status);
+    const [data, count] = await this.storiesService.findMany(filter);
+    const numPages = Math.ceil(count / filter.limit);
     const meta = {
-      page: filters.page,
-      limit: filters.limit,
+      page: filter.page,
+      limit: filter.limit,
       numItems: count,
       numPages,
     };

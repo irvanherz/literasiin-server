@@ -13,6 +13,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { sanitizeFilter } from 'src/libs/validations';
 import { ArticlesService } from './articles.service';
 import { ArticleFilterDto } from './dto/article-filter.dto';
 import { CreateArticleDto } from './dto/create-article.dto';
@@ -35,12 +36,13 @@ export class ArticlesController {
   }
 
   @Get()
-  async findMany(@Query() filters: ArticleFilterDto) {
-    const [data, count] = await this.articlesService.findMany(filters);
-    const numPages = Math.ceil(count / filters.limit);
+  async findMany(@Query() filter: ArticleFilterDto) {
+    filter.status = sanitizeFilter(filter.status);
+    const [data, count] = await this.articlesService.findMany(filter);
+    const numPages = Math.ceil(count / filter.limit);
     const meta = {
-      page: filters.page,
-      limit: filters.limit,
+      page: filter.page,
+      limit: filter.limit,
       numItems: count,
       numPages,
     };

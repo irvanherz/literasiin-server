@@ -1,3 +1,4 @@
+import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
 import {
   Body,
   Controller,
@@ -21,7 +22,10 @@ import { UsersService } from './users.service';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly amqpConnection: AmqpConnection,
+  ) {}
 
   @UseGuards(OptionalJwtAuthGuard)
   @Post()
@@ -86,13 +90,15 @@ export class UsersController {
   ) {
     if (id !== currentUser?.id && currentUser?.role !== 'admin')
       throw new ForbiddenException();
-    console.log(payload);
 
     if (currentUser?.role !== 'admin' && (payload.email || payload.role))
       throw new ForbiddenException();
     const user = await this.usersService.findById(id);
     if (!user) throw new NotFoundException();
-    await this.usersService.updateById(id, payload);
+    const updated = await this.usersService.updateById(id, payload);
+
+    this.amqpConnection.publish('users.updated', '', updated);
+
     return true;
   }
 
@@ -113,19 +119,31 @@ export class UsersController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post(':userId/unfollow')
+  @Delete(':userId/unfollow')
   async unfollowUser(@Param('userId') followingId, @User() currentUser) {
     const followerId = currentUser.id;
     await this.usersService.unfollowUser(followerId, followingId);
   }
 
+  @UseGuards(OptionalJwtAuthGuard)
+  @Get(':userId/context')
+  async context(@Param('userId') userId, @User() currentUser) {
+    const data = await this.usersService.findContextByUserId(
+      userId,
+      currentUser?.id,
+    );
+    return { data };
+  }
+
   @Get(':userId/following')
   async findManyFollowing(@Param('userId') userId: number) {
-    return await this.usersService.findManyFollowing(userId);
+    const [data] = await this.usersService.findManyFollowing(userId);
+    return { data };
   }
 
   @Get(':userId/followers')
   async findManyFollowers(@Param('userId') userId: number) {
-    return await this.usersService.findManyFollowers(userId);
+    const [data] = await this.usersService.findManyFollowers(userId);
+    return { data };
   }
 }

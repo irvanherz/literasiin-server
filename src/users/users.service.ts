@@ -89,10 +89,13 @@ export class UsersService {
     return result;
   }
 
-  async updateById(id: number, data: UpdateUserDto) {
+  async updateById(id: number, payload: UpdateUserDto) {
     if (!id) throw new BadRequestException();
-    const result = await this.usersRepository.update(id, data);
-    return result.affected;
+    const result = await this.usersRepository.save({
+      id,
+      ...payload,
+    });
+    return result;
   }
 
   async deleteById(id: number) {
@@ -125,30 +128,43 @@ export class UsersService {
     return result.affected;
   }
 
-  async findManyFollowing(userId: number) {
-    const [data, numItems] = await this.usersRepository.findAndCount({
-      where: { followers: { id: userId } },
+  async findContextByUserId(userId: number, currentUserId: number) {
+    const hasFollowing = currentUserId
+      ? await this.userFollowRepo.exist({
+          where: { followerId: currentUserId, followingId: userId },
+        })
+      : false;
+    const hasFollowed = currentUserId
+      ? await this.userFollowRepo.exist({
+          where: { followerId: userId, followingId: currentUserId },
+        })
+      : false;
+    const numFollowers = await this.userFollowRepo.count({
+      where: { followingId: userId },
     });
-
-    const meta = {
-      numItems,
-    };
+    const numFollowing = await this.userFollowRepo.count({
+      where: { followerId: userId },
+    });
     return {
-      data,
-      meta,
+      hasFollowing,
+      hasFollowed,
+      numFollowers,
+      numFollowing,
     };
   }
 
+  async findManyFollowing(userId: number) {
+    const result = await this.usersRepository.findAndCount({
+      where: { followers: { id: userId } },
+    });
+
+    return result;
+  }
+
   async findManyFollowers(userId: number) {
-    const [data, numItems] = await this.usersRepository.findAndCount({
+    const result = await this.usersRepository.findAndCount({
       where: { following: { id: userId } },
     });
-    const meta = {
-      numItems,
-    };
-    return {
-      data,
-      meta,
-    };
+    return result;
   }
 }
