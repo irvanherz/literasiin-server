@@ -1,33 +1,29 @@
 /* eslint-disable @typescript-eslint/no-inferrable-types */
 import { IsNumber, IsOptional, IsString, Validate } from 'class-validator';
 import {
+  IdFilter,
+  IdFilterValidatorConstraint,
   UserIdFilter,
   UserIdFilterValidatorConstraint,
 } from 'src/libs/validations';
 
-export class MediaFiltersDto {
+export class StoryWriterFilterDto {
+  @IsOptional()
+  @Validate(IdFilterValidatorConstraint)
+  storyId: IdFilter;
   @IsOptional()
   @Validate(UserIdFilterValidatorConstraint)
-  userId: UserIdFilter = 'me';
-  @IsOptional()
-  @IsString()
-  type?: string;
-  @IsOptional()
-  @IsString()
-  tag?: string;
-  @IsOptional()
-  @IsString()
-  search?: string;
+  userId: UserIdFilter;
   @IsOptional()
   @IsNumber()
-  page?: number = 1;
+  page: number = 1;
   @IsOptional()
   @IsNumber()
-  limit?: number = 16;
+  limit: number = 10;
   @IsOptional()
   @IsString()
-  sortBy?: string = 'createdAt';
+  sortBy: string = 'createdAt';
   @IsOptional()
   @IsString()
-  sortOrder?: string = 'desc';
+  sortOrder: string = 'desc';
 }

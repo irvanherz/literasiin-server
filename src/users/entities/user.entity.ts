@@ -1,5 +1,4 @@
 import { Media } from 'src/media/entities/media.entity';
-import { Story } from 'src/stories/entities/story.entity';
 import { Wallet } from 'src/wallets/entities/wallet.entity';
 import {
   Column,
@@ -51,8 +50,6 @@ export class User {
   identities: Identity[];
   @OneToMany(() => PasswordResetToken, (prt) => prt.user)
   passwordResetTokens: PasswordResetToken[];
-  @OneToMany(() => Story, (story) => story.user)
-  stories: Story[];
   @ManyToMany(() => User, (user) => user.following)
   followers: User[];
   @ManyToMany(() => User, (user) => user.followers)

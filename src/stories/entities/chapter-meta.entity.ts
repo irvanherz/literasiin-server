@@ -15,6 +15,8 @@ export class ChapterMeta {
   chapterId: number;
   @Column({ type: 'int', default: 0 })
   numViews: number;
+  @Column({ type: 'int', default: 0 })
+  numVotes: number;
   @Column({ type: 'decimal', precision: 20, scale: 2, default: 0 })
   price: number;
 

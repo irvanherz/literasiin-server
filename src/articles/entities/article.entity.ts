@@ -37,7 +37,7 @@ export class Article {
   updatedAt: Date;
   @DeleteDateColumn()
   deletedAt?: Date;
-  @ManyToOne(() => User, (user) => user.stories, { eager: true })
+  @ManyToOne(() => User, { eager: true })
   user: User;
   @ManyToOne(() => Media)
   image: Media;

@@ -43,7 +43,7 @@ export class IdFilterValidatorConstraint
 export function sanitizeFilter(value: any, options: any = {}) {
   if (value === 'me') return options?.currentUser?.id;
   if (value === 'any') return undefined;
-  return value;
+  return options?.toNumber ? Number(value) || 0 : value;
 }
 
 export type UserIdFilter = number | 'any' | 'me';

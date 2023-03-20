@@ -1,26 +1,68 @@
 import { Injectable } from '@nestjs/common';
-import { CreateChatDto } from './dto/create-chat.dto';
-import { UpdateChatDto } from './dto/update-chat.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { DataSource, Repository } from 'typeorm';
+import { ChatMember } from './entities/chat-member.entity';
+import { ChatMessage } from './entities/chat-message.entity';
+import { ChatRoom } from './entities/chat-room.entity';
 
 @Injectable()
 export class ChatsService {
-  create(createChatDto: CreateChatDto) {
-    return 'This action adds a new chat';
+  constructor(
+    private readonly dataSource: DataSource,
+    @InjectRepository(ChatRoom)
+    private readonly roomsRepo: Repository<ChatRoom>,
+    @InjectRepository(ChatMessage)
+    private readonly messagesRepo: Repository<ChatMessage>,
+  ) {}
+
+  async createRoom(type: 'personal' | 'group', userIds: number[]) {
+    if (userIds.length < 2) return null;
+    if (type === 'personal' && userIds.length !== 2) return null;
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const roomPayload = queryRunner.manager.create(ChatRoom, {
+        type,
+      });
+      const room = await queryRunner.manager.save(roomPayload);
+      const roomId = room.id;
+      const membersPayload = userIds.map((userId) =>
+        queryRunner.manager.create(ChatMember, { roomId, userId }),
+      );
+      await queryRunner.manager.save(membersPayload);
+      await queryRunner.commitTransaction();
+      return room;
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+    } finally {
+      await queryRunner.release();
+    }
+    return null;
   }
 
-  findAll() {
-    return `This action returns all chats`;
+  async createMessage(payload: Partial<ChatMessage>) {
+    const result = await this.messagesRepo.save(payload);
+    return result;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} chat`;
+  async updateMessage(payload: Partial<ChatMessage>) {
+    const result = await this.messagesRepo.save(payload);
+    return result;
   }
 
-  update(id: number, updateChatDto: UpdateChatDto) {
-    return `This action updates a #${id} chat`;
+  async updateMessageById(id: number, payload: Partial<ChatMessage>) {
+    const result = await this.messagesRepo.save({ ...payload, id });
+    return result;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} chat`;
+  async findManyRooms(filter: any) {
+    const result = await this.roomsRepo.findAndCount();
+    return result;
+  }
+
+  async findManyMessages(filter: any) {
+    const result = await this.messagesRepo.findAndCount();
+    return result;
   }
 }

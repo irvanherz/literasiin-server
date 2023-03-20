@@ -15,6 +15,8 @@ export class StoryMeta {
   storyId: number;
   @Column({ type: 'int', default: 0 })
   numViews: number;
+  @Column({ type: 'int', default: 0 })
+  numVotes: number;
 
   @OneToOne(() => Story, (story) => story.meta, {
     cascade: true,

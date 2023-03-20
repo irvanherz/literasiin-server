@@ -11,6 +11,9 @@ import { ArticleCategory } from './articles/entities/article-category.entity';
 import { Article } from './articles/entities/article.entity';
 import { AuthModule } from './auth/auth.module';
 import { ChatsModule } from './chats/chats.module';
+import { ChatMember } from './chats/entities/chat-member.entity';
+import { ChatMessage } from './chats/entities/chat-message.entity';
+import { ChatRoom } from './chats/entities/chat-room.entity';
 import { ConfigurationsModule } from './configurations/configurations.module';
 import { Configuration } from './configurations/entities/configuration.entity';
 import { Invoice } from './finances/entities/invoice.entity';
@@ -27,12 +30,13 @@ import { PublicationStatus } from './publications/entities/publication-status.en
 import { Publication } from './publications/entities/publication.entity';
 import { PublicationsModule } from './publications/publications.module';
 import { ChapterMeta } from './stories/entities/chapter-meta.entity';
-import { ChapterVote } from './stories/entities/chapter-vote.entity';
+import { ChapterReader } from './stories/entities/chapter-reader.entity';
 import { Chapter } from './stories/entities/chapter.entity';
 import { StoryCategory } from './stories/entities/story-category.entity';
 import { StoryMeta } from './stories/entities/story-meta.entity';
 import { StoryTagMap } from './stories/entities/story-tag-map.entity';
 import { StoryTag } from './stories/entities/story-tag.entity';
+import { StoryWriter } from './stories/entities/story-writer';
 import { Story } from './stories/entities/story.entity';
 import { StoriesModule } from './stories/stories.module';
 import { Identity } from './users/entities/identity.entity';
@@ -76,11 +80,12 @@ import { WalletsModule } from './wallets/wallets.module';
           UserDevice,
           Identity,
           Story,
+          StoryWriter,
           StoryTagMap,
           StoryTag,
           StoryMeta,
           Chapter,
-          ChapterVote,
+          ChapterReader,
           ChapterMeta,
           StoryCategory,
           StoryTag,
@@ -98,6 +103,9 @@ import { WalletsModule } from './wallets/wallets.module';
           Invoice,
           Kb,
           KbCategory,
+          ChatRoom,
+          ChatMember,
+          ChatMessage,
         ],
       }),
     }),
@@ -130,15 +138,6 @@ import { WalletsModule } from './wallets/wallets.module';
         },
       }),
     }),
-    // RabbitMQModule.forRootAsync(RabbitMQModule, {
-    //   imports: [ConfigModule],
-    //   inject: [ConfigService],
-    //   useFactory: (configService: ConfigService) => ({
-    //     uri: configService.get<string>('RABBITMQ_SERVER'),
-    //     enableControllerDiscovery: true,
-    //   }),
-    //   exports: [RabbitMQModule],
-    // }),
     BullModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

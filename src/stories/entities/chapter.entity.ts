@@ -5,13 +5,11 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { ChapterMeta } from './chapter-meta.entity';
-import { ChapterVote } from './chapter-vote.entity';
 import { Story } from './story.entity';
 
 type StoryType = 'draft' | 'published';
@@ -47,6 +45,4 @@ export class Chapter {
     nullable: true,
   })
   meta?: ChapterMeta;
-  @OneToMany(() => ChapterVote, (vote) => vote.chapter)
-  votes: ChapterVote[];
 }

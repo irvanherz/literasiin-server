@@ -50,8 +50,6 @@ export class Story {
   updatedAt: Date;
   @DeleteDateColumn()
   deletedAt?: Date;
-  @ManyToOne(() => User, (user) => user.stories)
-  user: User;
   @OneToMany(() => Chapter, (chapter) => chapter.story)
   chapters: Chapter[];
   @ManyToOne(() => StoryCategory, (category) => category.stories, {
@@ -75,6 +73,14 @@ export class Story {
     nullable: true,
   })
   meta: StoryMeta;
+  @ManyToMany(() => User, { cascade: true, onDelete: 'CASCADE' })
+  @JoinTable({
+    synchronize: false,
+    name: 'story_writer',
+    joinColumn: { name: 'storyId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'userId', referencedColumnName: 'id' },
+  })
+  writers: StoryTag[];
 
   @VirtualColumn({
     type: 'int',

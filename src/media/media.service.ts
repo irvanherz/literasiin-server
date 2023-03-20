@@ -158,6 +158,7 @@ export class MediaService {
         type: (filters?.type as any) || undefined,
         tags: filters?.tag ? ArrayContains([filters.tag as any]) : undefined,
         name: filters?.search ? ILike(`%${filters.search}%`) : undefined,
+        userId: filters.userId ? (filters.userId as any) : undefined,
       },
       skip,
       take,

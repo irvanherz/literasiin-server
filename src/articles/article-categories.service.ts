@@ -45,8 +45,6 @@ export class ArticleCategoriesService {
   }
 
   async bulkUpdate(payload: BulkUpdateCategoryEntryDto[]) {
-    console.log('OOOK');
-
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();

@@ -34,7 +34,17 @@ export class ChaptersController {
 
   @UseGuards(JwtAuthGuard)
   @Post(['/stories/chapters', 'stories/:storyId/chapters'])
-  async create(@Mixed(['body', 'params']) payload: CreateChapterDto) {
+  async create(
+    @Mixed(['body', 'params']) payload: CreateChapterDto,
+    @User() currentUser,
+  ) {
+    const story = await this.storiesService.findById(payload.storyId);
+    if (!story) throw new NotFoundException();
+    if (
+      !story.writers.some((w) => w.id === currentUser?.id) &&
+      currentUser?.role !== 'admin'
+    )
+      throw new ForbiddenException();
     const data = await this.chaptersService.create(payload);
     return { data };
   }
@@ -59,14 +69,6 @@ export class ChaptersController {
     return { data: chapter };
   }
 
-  @Post('/stories/chapters/:id/vote')
-  async vote(@Param('id') id: number) {
-    // const chapter = await this.chaptersService.findById(id);
-    // if (!chapter) throw new NotFoundException();
-    // await this.chaptersService.incrementNumViews(id);
-    // return;
-  }
-
   @Post('/stories/chapters/:id/view')
   async view(@Param('id') id: number) {
     const chapter = await this.chaptersService.findById(id);
@@ -77,18 +79,15 @@ export class ChaptersController {
   }
 
   @UseGuards(OptionalJwtAuthGuard)
-  @Get('/stories/chapters/:id/action-context')
-  async getActionContext(@Param('id') id: number) {
+  @Get('/stories/chapters/:id/context')
+  async getActionContext(@Param('id') id: number, @User() currentUser) {
     const chapter = await this.chaptersService.findById(id);
     if (!chapter) throw new NotFoundException();
-    await this.storiesService.incrementNumViews(chapter.storyId);
-    await this.chaptersService.incrementNumViews(id);
-    return {
-      previousChapter: {},
-      nextChapter: {},
-      vote: {},
-      hasRead: false,
-    };
+    const data = await this.chaptersService.findContextById(
+      id,
+      currentUser?.id,
+    );
+    return { data };
   }
 
   @UseGuards(JwtAuthGuard)
@@ -102,7 +101,10 @@ export class ChaptersController {
     if (!chapter) throw new NotFoundException();
     const story = await this.storiesService.findById(chapter.storyId);
     if (!story) throw new NotFoundException();
-    if (story.userId !== currentUser?.id && currentUser?.role !== 'admin')
+    if (
+      !story.writers.some((w) => w.id === currentUser?.id) &&
+      currentUser?.role !== 'admin'
+    )
       throw new ForbiddenException();
     await this.chaptersService.updateById(id, setData);
     return;
@@ -115,7 +117,10 @@ export class ChaptersController {
     if (!chapter) throw new NotFoundException();
     const story = await this.storiesService.findById(chapter.storyId);
     if (!story) throw new NotFoundException();
-    if (story.userId !== currentUser?.id && currentUser?.role !== 'admin')
+    if (
+      !story.writers.some((w) => w.id === currentUser?.id) &&
+      currentUser?.role !== 'admin'
+    )
       throw new ForbiddenException();
     await this.chaptersService.deleteById(id);
     return;

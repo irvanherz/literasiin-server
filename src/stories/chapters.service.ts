@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { LessThan, MoreThan, Repository } from 'typeorm';
 import {
   ChapterFilterDto,
   FindChapterByIdOptions,
@@ -8,6 +8,7 @@ import {
 import { CreateChapterDto } from './dto/create-chapter.dto';
 import { UpdateChapterDto } from './dto/update-chapter.dto';
 import { ChapterMeta } from './entities/chapter-meta.entity';
+import { ChapterReader } from './entities/chapter-reader.entity';
 import { Chapter } from './entities/chapter.entity';
 
 @Injectable()
@@ -17,6 +18,8 @@ export class ChaptersService {
     private chaptersRepo: Repository<Chapter>,
     @InjectRepository(ChapterMeta)
     private chapterMetaRepo: Repository<ChapterMeta>,
+    @InjectRepository(ChapterReader)
+    private readersRepo: Repository<ChapterReader>,
   ) {}
 
   async create(payload: CreateChapterDto) {
@@ -49,9 +52,36 @@ export class ChaptersService {
 
     const result = await this.chaptersRepo.findOne({
       where: { id },
-      relations: { story: includeStory ? { user: true } : undefined },
+      relations: { story: includeStory ? true : undefined },
     });
     return result;
+  }
+
+  async findContextById(id: number, userId: number) {
+    const read = userId
+      ? await this.readersRepo.findOne({ where: { chapterId: id, userId } })
+      : undefined;
+    const vote = read?.vote || 0;
+    const currentChapter = await this.chaptersRepo.findOne({ where: { id } });
+    const prevChapter = await this.chaptersRepo.findOne({
+      where: {
+        id: LessThan(id),
+        storyId: currentChapter.storyId,
+        status: 'published',
+      },
+    });
+    const nextChapter = await this.chaptersRepo.findOne({
+      where: {
+        id: MoreThan(id),
+        storyId: currentChapter.storyId,
+        status: 'published',
+      },
+    });
+    return {
+      vote,
+      prevChapter,
+      nextChapter,
+    };
   }
 
   async updateById(id: number, updateChapterDto: UpdateChapterDto) {
@@ -72,4 +102,31 @@ export class ChaptersService {
     );
     return result.affected;
   }
+
+  async incrementNumVotes(chapterId: number) {
+    const result = await this.chapterMetaRepo.increment(
+      { chapterId },
+      'numVotes',
+      1,
+    );
+    return result.affected;
+  }
+
+  async decrementNumVotes(chapterId: number) {
+    const result = await this.chapterMetaRepo.increment(
+      { chapterId },
+      'numVotes',
+      -1,
+    );
+    return result.affected;
+  }
+
+  // async trackViewById(chapterId: number) {
+  //   const result = await this.chapterMetaRepo.increment(
+  //     { chapterId },
+  //     'numViews',
+  //     1,
+  //   );
+  //   return result.affected;
+  // }
 }

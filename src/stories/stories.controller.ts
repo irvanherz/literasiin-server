@@ -87,7 +87,11 @@ export class StoriesController {
       throw new BadRequestException();
     const story = await this.storiesService.findById(id);
     if (!story) throw new NotFoundException();
-    if (currentUser.id !== story.userId && currentUser.role !== 'admin')
+
+    if (
+      !story.writers.some((w) => w.id === currentUser?.id) &&
+      currentUser?.role !== 'admin'
+    )
       throw new ForbiddenException();
 
     await this.storiesService.updateById(id, setData);
@@ -98,10 +102,14 @@ export class StoriesController {
   @Delete('stories/:id')
   async deleteById(@Param('id') id: number, @User() currentUser) {
     const story = await this.storiesService.findById(id);
-
     if (!story) throw new NotFoundException();
-    if (currentUser?.id !== story.userId && currentUser?.role !== 'admin')
+
+    if (
+      !story.writers.some((w) => w.id === currentUser?.id) &&
+      currentUser?.role !== 'admin'
+    )
       throw new ForbiddenException();
+
     await this.storiesService.deleteById(id);
     return;
   }
