@@ -49,9 +49,14 @@ export class ChapterReadersController {
 
   @UseGuards(OptionalJwtAuthGuard)
   @Post('stories/chapters/:chapterId/readers/track')
-  async track(@Param('chapterId') chapterId: number, @User() currentUser) {
+  async track(@Param('chapterId') id: number, @User() currentUser) {
     const userId = currentUser.id;
-    await this.readersService.track(chapterId, userId);
+    const chapter = await this.chaptersService.findById(id);
+    if (!chapter) throw new NotFoundException();
+
+    await this.readersService.track(id, userId);
+    await this.storiesService.incrementNumViews(chapter.storyId);
+    await this.chaptersService.incrementNumViews(id);
     return;
   }
 }
