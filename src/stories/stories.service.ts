@@ -4,6 +4,7 @@ import { DataSource, Repository } from 'typeorm';
 import { StoryFilterDto } from './dto/story-filter.dto';
 import { UpdateStoryDto } from './dto/update-story.dto';
 import { StoryMeta } from './entities/story-meta.entity';
+import { StoryReader } from './entities/story-reader';
 import { StoryTagMap } from './entities/story-tag-map.entity';
 import { StoryTag } from './entities/story-tag.entity';
 import { StoryWriter } from './entities/story-writer';
@@ -21,6 +22,8 @@ export class StoriesService {
     private storyTagsRepo: Repository<StoryTag>,
     @InjectRepository(StoryTagMap)
     private storyTagMapRepo: Repository<StoryTagMap>,
+    @InjectRepository(StoryReader)
+    private readonly readersRepo: Repository<StoryReader>,
   ) {}
 
   async create(payload: Partial<Story>) {
@@ -61,11 +64,21 @@ export class StoriesService {
         'sw',
         "sw.storyId=story.id AND sw.status='approved'",
       )
-      .leftJoinAndMapMany('story.writers', 'user', 'u', 'u.id=sw.userId')
-      .orderBy(
-        `story.${filters.sortBy}`,
-        filters.sortOrder.toUpperCase() as any,
+      .leftJoinAndMapMany('story.writers', 'user', 'u', 'u.id=sw.userId');
+
+    if (filters.bookmarkedByUserId) {
+      query = query.innerJoinAndMapOne(
+        'story.reader',
+        'story_reader',
+        'reader',
+        'reader.storyId=story.id AND reader.userId=:userId AND reader.bookmark=true',
+        { userId: filters.bookmarkedByUserId },
       );
+    }
+    query = query.orderBy(
+      filters.sortBy.includes('.') ? filters.sortBy : `story.${filters.sortBy}`,
+      filters.sortOrder.toUpperCase() as any,
+    );
     if (filters.search) {
       query = query.andWhere('story.title like :search', {
         search: `%${filters.search}%`,
@@ -83,22 +96,6 @@ export class StoriesService {
     }
 
     const result = query.skip(skip).take(take).getManyAndCount();
-
-    // const result = await this.storiesRepo.findAndCount({
-    //   where: {
-    //     title: filters.search ? ILike(`%${filters.search}%`) : undefined,
-    //     userId: filters.userId || undefined,
-    //     status: (filters.status || undefined) as any,
-    //     writers: {},
-    //   },
-    //   skip,
-    //   take,
-    //   order: { [filters.sortBy]: filters.sortOrder },
-    //   relations: { user: true, cover: true },
-    //   select: {
-    //     user: { id: true, username: true, fullName: true },
-    //   },
-    // });
     return result;
   }
 
@@ -127,12 +124,16 @@ export class StoriesService {
     return result;
   }
 
-  async findContextById(id: number) {
-    const hasBookmarked = false;
-    const lastChapterRead = null;
+  async findContextById(storyId: number, userId?: number) {
+    let hasBookmarked = false;
+    if (userId) {
+      const reader = await this.readersRepo.findOne({
+        where: { storyId, userId },
+      });
+      hasBookmarked = reader?.bookmark || false;
+    }
     return {
       hasBookmarked,
-      lastChapterRead,
     };
   }
 

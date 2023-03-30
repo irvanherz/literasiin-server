@@ -24,7 +24,6 @@ export class ChapterReadersService {
         .orUpdate(['updatedAt'], ['chapterId', 'userId'])
         .execute();
     }
-    await this.chapterMetaRepo.increment({ chapterId }, 'numViews', 1);
     return true;
   }
 

@@ -12,25 +12,15 @@ import { Story } from './story.entity';
 
 @Entity()
 @Unique(['storyId', 'userId'])
-export class StoryWriter {
+export class StoryReader {
   @PrimaryGeneratedColumn()
   id: number;
   @Column()
   storyId: number;
   @Column()
   userId: number;
-  @Column({
-    type: 'enum',
-    enum: ['owner', 'writer', 'mentor'],
-    default: 'writer',
-  })
-  role: 'owner' | 'writer' | 'mentor';
-  @Column({
-    type: 'enum',
-    enum: ['unapproved', 'approved', 'rejected'],
-    default: 'unapproved',
-  })
-  status: 'unapproved' | 'approved' | 'rejected';
+  @Column({ type: 'boolean', default: false })
+  bookmark: boolean;
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()

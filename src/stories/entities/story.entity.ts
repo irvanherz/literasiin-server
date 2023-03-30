@@ -44,6 +44,8 @@ export class Story {
   categoryId: number;
   @Column({ type: 'enum', enum: ['draft', 'published'], default: 'draft' })
   status: StoryType;
+  @Column({ type: 'boolean', default: false })
+  hasCompleted: boolean;
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()

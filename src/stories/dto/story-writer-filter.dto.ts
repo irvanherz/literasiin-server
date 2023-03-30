@@ -19,7 +19,7 @@ export class StoryWriterFilterDto {
   page: number = 1;
   @IsOptional()
   @IsNumber()
-  limit: number = 10;
+  limit: number = 100;
   @IsOptional()
   @IsString()
   sortBy: string = 'createdAt';

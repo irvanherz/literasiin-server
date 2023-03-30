@@ -2,23 +2,22 @@
 import { IsNumber, IsOptional, IsString, Validate } from 'class-validator';
 import {
   ExtendedFilter,
+  IdFilter,
+  IdFilterValidatorConstraint,
   UserIdFilter,
   UserIdFilterValidatorConstraint,
 } from 'src/libs/validations';
 
-export class StoryFilterDto {
+export class StoryWriterInvitationFilterDto {
   @IsOptional()
-  @IsString()
-  search?: string;
-  @IsOptional()
-  @IsString()
-  status?: ExtendedFilter<'draft' | 'published'> = 'published';
+  @Validate(IdFilterValidatorConstraint)
+  storyId: IdFilter;
   @IsOptional()
   @Validate(UserIdFilterValidatorConstraint)
   userId: UserIdFilter;
   @IsOptional()
-  @Validate(UserIdFilterValidatorConstraint)
-  bookmarkedByUserId?: UserIdFilter;
+  @IsString()
+  status: ExtendedFilter<'approved' | 'unapproved'>;
   @IsOptional()
   @IsNumber()
   page: number = 1;

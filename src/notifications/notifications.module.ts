@@ -1,6 +1,8 @@
 import { BullModule } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { SocketJwtAuthGuard } from 'src/auth/socket-jwt-auth.guard';
+import { SharedJwtModule } from 'src/shared-jwt/shared-jwt.module';
 import { EmailTemplatesController } from './email-templates.controller';
 import { EmailTemplatesService } from './email-templates.service';
 import { EmailTemplate } from './entities/email-template.entity';
@@ -16,6 +18,7 @@ import { NotificationsSubscriber } from './notifications.subscriber';
   imports: [
     TypeOrmModule.forFeature([EmailTemplate, Notification]),
     BullModule.registerQueue({ name: 'mails' }, { name: 'invoices' }),
+    SharedJwtModule,
   ],
   controllers: [EmailTemplatesController, NotificationsController],
   providers: [
@@ -25,6 +28,7 @@ import { NotificationsSubscriber } from './notifications.subscriber';
     EmailTemplatesService,
     MailsProcessor,
     NotificationsSubscriber,
+    SocketJwtAuthGuard,
   ],
   exports: [MailsService, NotificationsService],
 })

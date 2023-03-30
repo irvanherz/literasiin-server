@@ -97,7 +97,7 @@ export class UsersController {
     if (!user) throw new NotFoundException();
     const updated = await this.usersService.updateById(id, payload);
 
-    this.amqpConnection.publish('users.updated', '', updated);
+    // this.amqpConnection.publish('users.updated', '', updated);
 
     return true;
   }

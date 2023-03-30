@@ -1,9 +1,9 @@
 import { BullModule } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { NotificationsModule } from 'src/notifications/notifications.module';
+import { SharedJwtModule } from 'src/shared-jwt/shared-jwt.module';
 import { Identity } from 'src/users/entities/identity.entity';
 import { PasswordResetToken } from 'src/users/entities/password-reset-token.entity';
 import { UserDevice } from 'src/users/entities/user-device.entity';
@@ -18,14 +18,12 @@ import { AuthService } from './auth.service';
 import { GoogleStrategy } from './google.strategy';
 import { JwtStrategy } from './jwt.strategy';
 import { LocalStrategy } from './local.strategy';
+import { SocketJwtAuthGuard } from './socket-jwt-auth.guard';
 
 @Module({
   imports: [
     PassportModule,
-    JwtModule.register({
-      secret: '1234',
-      signOptions: { expiresIn: '1h' },
-    }),
+    SharedJwtModule,
     BullModule.registerQueue({
       name: 'mails',
     }),
@@ -48,6 +46,8 @@ import { LocalStrategy } from './local.strategy';
     JwtStrategy,
     UsersService,
     IdentitiesService,
+    SocketJwtAuthGuard,
   ],
+  exports: [SharedJwtModule, SocketJwtAuthGuard],
 })
 export class AuthModule {}

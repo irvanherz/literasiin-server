@@ -1,4 +1,10 @@
-import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreateStoryDto {
   @IsOptional()
@@ -15,6 +21,9 @@ export class CreateStoryDto {
   @IsOptional()
   @IsNumber()
   coverId?: number;
+  @IsOptional()
+  @IsBoolean()
+  hasCompleted?: boolean;
   @IsOptional()
   @IsEnum(['draft', 'published'])
   status?: 'draft' | 'published';

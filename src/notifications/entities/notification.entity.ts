@@ -12,9 +12,9 @@ export class Notification {
   id: number;
   @Column('int')
   userId: number;
-  @Column({ type: 'varchar', length: 50 })
+  @Column({ type: 'varchar', length: 100 })
   type: string;
-  @Column({ type: 'varchar', length: 50 })
+  @Column({ type: 'varchar', length: 100 })
   subType: string;
   @Column({ type: 'json', default: {} })
   meta: any;

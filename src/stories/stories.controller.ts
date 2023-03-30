@@ -10,10 +10,10 @@ import {
   Patch,
   Post,
   Query,
-  Request,
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { OptionalJwtAuthGuard } from 'src/auth/optional-jwt-auth.guard';
 import { User } from 'src/auth/user.decorator';
 import { sanitizeFilter } from 'src/libs/validations';
 import { CreateStoryDto } from './dto/create-story.dto';
@@ -27,19 +27,22 @@ export class StoriesController {
 
   @UseGuards(JwtAuthGuard)
   @Post('stories')
-  async create(@Body() setData: CreateStoryDto, @Request() req) {
-    const user = req.user;
-    setData.userId = setData.userId || user.id;
+  async create(@Body() setData: CreateStoryDto, @User() currentUser: any) {
+    setData.userId = setData.userId || currentUser.id;
 
-    if (setData.userId !== user.id && user.role !== 'admin')
+    if (setData.userId !== currentUser.id && currentUser.role !== 'admin')
       throw new ForbiddenException();
     const data = await this.storiesService.create(setData);
     return { data };
   }
 
+  @UseGuards(OptionalJwtAuthGuard)
   @Get('stories')
-  async findMany(@Query() filter: StoryFilterDto) {
+  async findMany(@Query() filter: StoryFilterDto, @User() currentUser: any) {
     filter.status = sanitizeFilter(filter.status);
+    filter.bookmarkedByUserId = sanitizeFilter(filter.bookmarkedByUserId, {
+      currentUser,
+    });
     const [data, count] = await this.storiesService.findMany(filter);
     const numPages = Math.ceil(count / filter.limit);
     const meta = {
@@ -112,5 +115,14 @@ export class StoriesController {
 
     await this.storiesService.deleteById(id);
     return;
+  }
+
+  @UseGuards(OptionalJwtAuthGuard)
+  @Get('/stories/:id/context')
+  async getActionContext(@Param('id') id: number, @User() currentUser) {
+    const chapter = await this.storiesService.findById(id);
+    if (!chapter) throw new NotFoundException();
+    const data = await this.storiesService.findContextById(id, currentUser?.id);
+    return { data };
   }
 }

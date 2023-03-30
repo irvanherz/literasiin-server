@@ -1,24 +1,19 @@
 /* eslint-disable @typescript-eslint/no-inferrable-types */
 import { IsNumber, IsOptional, IsString, Validate } from 'class-validator';
 import {
-  ExtendedFilter,
+  IdFilter,
+  IdFilterValidatorConstraint,
   UserIdFilter,
   UserIdFilterValidatorConstraint,
 } from 'src/libs/validations';
 
-export class StoryFilterDto {
+export class StoryReaderFilterDto {
   @IsOptional()
-  @IsString()
-  search?: string;
-  @IsOptional()
-  @IsString()
-  status?: ExtendedFilter<'draft' | 'published'> = 'published';
+  @Validate(IdFilterValidatorConstraint)
+  storyId: IdFilter;
   @IsOptional()
   @Validate(UserIdFilterValidatorConstraint)
   userId: UserIdFilter;
-  @IsOptional()
-  @Validate(UserIdFilterValidatorConstraint)
-  bookmarkedByUserId?: UserIdFilter;
   @IsOptional()
   @IsNumber()
   page: number = 1;

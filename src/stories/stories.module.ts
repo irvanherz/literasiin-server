@@ -10,6 +10,7 @@ import { ChapterReader } from './entities/chapter-reader.entity';
 import { Chapter } from './entities/chapter.entity';
 import { StoryCategory } from './entities/story-category.entity';
 import { StoryMeta } from './entities/story-meta.entity';
+import { StoryReader } from './entities/story-reader';
 import { StoryTagMap } from './entities/story-tag-map.entity';
 import { StoryTag } from './entities/story-tag.entity';
 import { StoryWriter } from './entities/story-writer';
@@ -18,6 +19,8 @@ import { StoriesController } from './stories.controller';
 import { StoriesService } from './stories.service';
 import { StoryCategoriesController } from './story-categories.controller';
 import { StoryCategoriesService } from './story-categories.service';
+import { StoryReadersController } from './story-readers.controller';
+import { StoryReadersService } from './story-readers.service';
 import { StoryTagsController } from './story-tags.controller';
 import { StoryTagsService } from './story-tags.service';
 import { StoryWritersController } from './story-writers.controller';
@@ -31,6 +34,7 @@ import { StoryWritersService } from './story-writers.service';
       ChapterReader,
       Story,
       StoryWriter,
+      StoryReader,
       StoryMeta,
       StoryCategory,
       StoryTag,
@@ -40,6 +44,7 @@ import { StoryWritersService } from './story-writers.service';
   ],
   controllers: [
     StoryWritersController,
+    StoryReadersController,
     StoryTagsController,
     StoryCategoriesController,
     ChapterReadersController,
@@ -48,6 +53,7 @@ import { StoryWritersService } from './story-writers.service';
   ],
   providers: [
     StoryWritersService,
+    StoryReadersService,
     StoriesService,
     StoryTagsService,
     StoryCategoriesService,
