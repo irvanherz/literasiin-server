@@ -3,11 +3,14 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   JoinTable,
   ManyToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { ChatMessage } from './chat-message.entity';
 
 @Entity()
 export class ChatRoom {
@@ -24,7 +27,7 @@ export class ChatRoom {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToMany(() => User, { eager: true })
+  @ManyToMany(() => User, { eager: true, cascade: true })
   @JoinTable({
     synchronize: false,
     name: 'chat_member',
@@ -32,4 +35,7 @@ export class ChatRoom {
     inverseJoinColumn: { name: 'userId', referencedColumnName: 'id' },
   })
   members: User[];
+  @OneToOne(() => ChatMessage, { eager: true, nullable: true })
+  @JoinColumn({ name: 'lastMessageId' })
+  lastMessage: ChatMessage;
 }

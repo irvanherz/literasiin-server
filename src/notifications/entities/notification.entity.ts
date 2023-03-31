@@ -15,7 +15,7 @@ export class Notification {
   @Column({ type: 'varchar', length: 100 })
   type: string;
   @Column({ type: 'varchar', length: 100 })
-  subType: string;
+  subtype: string;
   @Column({ type: 'json', default: {} })
   meta: any;
   @Column({ type: 'boolean', default: false })

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as moment from 'moment-timezone';
 import { DataSource, LessThan, Repository } from 'typeorm';
 import { ChatMessage } from './entities/chat-message.entity';
 import { ChatRoom } from './entities/chat-room.entity';
@@ -19,18 +20,55 @@ export class ChatMessagesService {
     return result;
   }
 
-  async findMany(filter: any) {
-    console.log(filter);
+  async sendMessage(payload: any) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const roomId = payload.roomId;
+      const messagePayload = queryRunner.manager.create(ChatMessage, payload);
+      const createdMessage = await queryRunner.manager.save(messagePayload);
+      await queryRunner.manager.update(
+        ChatRoom,
+        { id: roomId },
+        { lastMessageId: createdMessage.id },
+      );
+      const room = await queryRunner.manager.findOne(ChatRoom, {
+        where: { id: roomId },
+      });
+      const message = await queryRunner.manager.findOne(ChatMessage, {
+        where: { id: createdMessage.id },
+      });
+      await queryRunner.commitTransaction();
+      return { room, message };
+    } catch (err) {
+      // since we have errors lets rollback the changes we made
+      await queryRunner.rollbackTransaction();
+    } finally {
+      // you need to release a queryRunner which was manually instantiated
+      await queryRunner.release();
+    }
+    const result = await this.messagesRepo.save(payload);
+    return result;
+  }
 
-    const result = await this.messagesRepo.findAndCount({
+  async findNext(filter: any) {
+    const data = await this.messagesRepo.find({
       where: {
         roomId: filter?.roomId ? filter.roomId : undefined,
-        id: filter?.afterId ? LessThan(filter.afterId) : undefined,
+        createdAt: filter?.after
+          ? LessThan(moment(filter.after).toDate())
+          : undefined,
       },
       take: filter?.limit || 5,
       order: { createdAt: 'desc' },
     });
-    return result;
+    const count = await this.messagesRepo.count({
+      where: {
+        roomId: filter?.roomId ? filter.roomId : undefined,
+      },
+    });
+    return [data, count] as [ChatMessage[], number];
   }
 
   async findById(id: number) {

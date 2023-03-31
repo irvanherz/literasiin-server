@@ -1,3 +1,4 @@
+import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
 import {
   Body,
   Controller,
@@ -20,7 +21,10 @@ import { StoryWritersService } from './story-writers.service';
 
 @Controller('/stories/writers')
 export class StoryWritersController {
-  constructor(private readonly writersService: StoryWritersService) {}
+  constructor(
+    private readonly writersService: StoryWritersService,
+    private readonly amqpConnection: AmqpConnection,
+  ) {}
 
   @UseGuards(JwtAuthGuard)
   @Get('invitations')
@@ -62,7 +66,11 @@ export class StoryWritersController {
   @UseGuards(JwtAuthGuard)
   @Post()
   async create(@Body() payload: CreateStoryWriterDto) {
-    return await this.writersService.create(payload);
+    const invitation = await this.writersService.create(payload);
+    this.amqpConnection.publish('stories.writers.invitations.created', '', {
+      invitation,
+    });
+    return { data: invitation };
   }
 
   @UseGuards(OptionalJwtAuthGuard)

@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { SharedRabbitMQModule } from 'src/shared-rabbitmq/shared-rabbitmq.module';
 import { User } from 'src/users/entities/user.entity';
 import { ChapterReadersController } from './chapter-readers.controller';
 import { ChapterReadersService } from './chapter-readers.service';
@@ -28,6 +29,7 @@ import { StoryWritersService } from './story-writers.service';
 
 @Module({
   imports: [
+    SharedRabbitMQModule,
     TypeOrmModule.forFeature([
       Chapter,
       ChapterMeta,

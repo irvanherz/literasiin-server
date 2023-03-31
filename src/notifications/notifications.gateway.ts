@@ -4,8 +4,9 @@ import {
   MessageBody,
   SubscribeMessage,
   WebSocketGateway,
+  WebSocketServer,
 } from '@nestjs/websockets';
-import { Socket } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { SocketJwtAuthGuard } from 'src/auth/socket-jwt-auth.guard';
 import { NotificationsService } from './notifications.service';
 
@@ -13,13 +14,17 @@ import { NotificationsService } from './notifications.service';
 export class NotificationsGateway {
   constructor(private readonly notifService: NotificationsService) {}
 
+  @WebSocketServer()
+  public server: Server;
+
   @UseGuards(SocketJwtAuthGuard)
   @SubscribeMessage('notifications.findNext')
-  async handleSendChatMessage(
+  async handleFindNext(
     @MessageBody() payload: any,
     @ConnectedSocket() client: Socket,
   ) {
     const { filter } = payload;
+    filter.userId = client.data.user.id;
 
     const [data, numItems] = await this.notifService.findNextList(filter);
     const lastId = data.at(-1)?.id;

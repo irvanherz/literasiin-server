@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, MoreThan, Repository } from 'typeorm';
+import { DataSource, IsNull, MoreThan, Not, Repository } from 'typeorm';
 import { ChatMember } from './entities/chat-member.entity';
 import { ChatMessage } from './entities/chat-message.entity';
 import { ChatRoom } from './entities/chat-room.entity';
@@ -52,19 +52,33 @@ export class ChatRoomsService {
     return null;
   }
 
-  async findMany(filter: any) {
-    const result = await this.roomsRepo.findAndCount({
+  async findNext(filter: any) {
+    const data = await this.roomsRepo.find({
       where: {
-        id: filter?.afterId ? MoreThan(filter.afterId) : undefined,
+        updatedAt: filter?.afterUpdatedAt
+          ? MoreThan(filter.afterUpdatedAt)
+          : undefined,
+        lastMessageId: Not(IsNull()),
+        members: { id: filter.userId },
       },
       take: filter?.limit || 5,
       order: { updatedAt: 'DESC' },
     });
-    return result;
+    const count = await this.roomsRepo.count({
+      where: {
+        lastMessageId: Not(IsNull()),
+      },
+    });
+    return [data, count] as [ChatRoom[], number];
   }
 
   async findById(id: number) {
     const result = await this.roomsRepo.findOne({ where: { id } });
+    return result;
+  }
+
+  async save(room: ChatRoom) {
+    const result = await this.roomsRepo.save(room);
     return result;
   }
 }

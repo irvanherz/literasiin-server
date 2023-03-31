@@ -20,6 +20,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
             name: 'users.followed',
             type: 'fanout',
           },
+          {
+            name: 'stories.writers.invitations.created',
+            type: 'fanout',
+          },
           //FINANCE
           {
             name: 'finances.invoices.created',
