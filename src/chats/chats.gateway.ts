@@ -6,12 +6,15 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
+import * as dotenv from 'dotenv';
 import { Server, Socket } from 'socket.io';
 import { SocketJwtAuthGuard } from 'src/auth/socket-jwt-auth.guard';
 import { ChatMessagesService } from './chat-messages.service';
 import { ChatRoomsService } from './chat-rooms.service';
 
-@WebSocketGateway(7777, { cors: '*' })
+dotenv.config();
+
+@WebSocketGateway(+process.env.GATEWAY_PORT, { cors: '*' })
 export class ChatsGateway {
   constructor(
     private readonly messagesService: ChatMessagesService,

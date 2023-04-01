@@ -40,6 +40,7 @@ specifiers:
   bull: ^4.10.3
   class-transformer: ^0.5.1
   class-validator: ^0.14.0
+  dotenv: ^16.0.3
   ejs: ^3.1.8
   eslint: ^8.0.1
   eslint-config-prettier: ^8.3.0
@@ -93,6 +94,7 @@ dependencies:
   bull: 4.10.3
   class-transformer: 0.5.1
   class-validator: 0.14.0
+  dotenv: 16.0.3
   ejs: 3.1.8
   firebase-admin: 11.5.0
   lodash: 4.17.21
