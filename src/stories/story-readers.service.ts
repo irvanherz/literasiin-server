@@ -18,7 +18,7 @@ export class StoryReadersService {
     if (!reader) {
       reader = await this.readersRepo.save({ storyId, userId });
     }
-    await this.storyMetaRepo.increment({ storyId }, 'numViews', 1);
+    // await this.storyMetaRepo.increment({ storyId }, 'numViews', 1);
     return reader;
   }
 
