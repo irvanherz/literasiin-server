@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, Repository } from 'typeorm';
+import { DataSource, ILike, Repository } from 'typeorm';
 import { ArticleFilterDto } from './dto/article-filter.dto';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
+import { ArticleMeta } from './entities/article-meta.entity';
 import { ArticleReader } from './entities/article-reader.entity';
 import { Article } from './entities/article.entity';
 
@@ -14,11 +15,28 @@ export class ArticlesService {
     private readonly articlesRepository: Repository<Article>,
     @InjectRepository(ArticleReader)
     private readonly readersRepo: Repository<ArticleReader>,
+    private readonly dataSource: DataSource,
   ) {}
 
-  async create(createArticleDto: CreateArticleDto) {
-    const article = this.articlesRepository.create(createArticleDto);
-    return await this.articlesRepository.save(article);
+  async create(payload: CreateArticleDto) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const articleP = queryRunner.manager.create<Article>(Article, payload);
+      const article = await queryRunner.manager.save(articleP);
+      const metaP = queryRunner.manager.create(ArticleMeta, {
+        articleId: article.id,
+      });
+      await queryRunner.manager.save(metaP);
+      await queryRunner.commitTransaction();
+      return article;
+    } catch (err) {
+      console.log(err);
+      await queryRunner.rollbackTransaction();
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async findMany(filter: ArticleFilterDto) {
