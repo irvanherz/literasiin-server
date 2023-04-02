@@ -35,8 +35,8 @@ export class StoryWriter {
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt?: Date;
-  @ManyToOne(() => Story)
+  @ManyToOne(() => Story, { onDelete: 'CASCADE' })
   story: Story;
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
   user: User;
 }

@@ -33,11 +33,16 @@ export class StoriesService {
     try {
       const storyPayload = queryRunner.manager.create(Story, payload);
       const story = await queryRunner.manager.save(storyPayload);
-      const writerPayload = new StoryWriter();
-      writerPayload.storyId = story.id;
-      writerPayload.userId = payload.userId;
-      writerPayload.role = 'owner';
-      writerPayload.status = 'approved';
+      const writerPayload = queryRunner.manager.create(StoryWriter, {
+        storyId: story.id,
+        userId: payload.userId,
+        role: 'owner',
+        status: 'approved',
+      });
+      const metaPayload = queryRunner.manager.create(StoryMeta, {
+        storyId: story.id,
+      });
+      await queryRunner.manager.save(metaPayload);
       await queryRunner.manager.save(writerPayload);
       await queryRunner.commitTransaction();
       return story;
@@ -64,7 +69,8 @@ export class StoriesService {
         'sw',
         "sw.storyId=story.id AND sw.status='approved'",
       )
-      .leftJoinAndMapMany('story.writers', 'user', 'u', 'u.id=sw.userId');
+      .leftJoinAndSelect('story.writers', 'user', 'user.id=sw.userId')
+      .leftJoinAndSelect('user.photo', 'up');
 
     if (filters.bookmarkedByUserId) {
       query = query.innerJoinAndMapOne(
@@ -94,6 +100,11 @@ export class StoriesService {
         status: filters.status,
       });
     }
+    if (filters.categoryId) {
+      query = query.andWhere('story.categoryId=:categoryId', {
+        categoryId: filters.categoryId,
+      });
+    }
 
     const result = query.skip(skip).take(take).getManyAndCount();
     return result;
@@ -111,16 +122,10 @@ export class StoriesService {
         'sw',
         "sw.storyId=story.id AND sw.status='approved'",
       )
-      .leftJoinAndMapMany('story.writers', 'user', 'u', 'u.id=sw.userId')
+      .leftJoinAndSelect('story.writers', 'user', 'user.id=sw.userId')
+      .leftJoinAndSelect('user.photo', 'up')
       .where('story.id=:id', { id })
       .getOne();
-    // const result = await this.storiesRepo.findOne({
-    //   where: { id },
-    //   relations: { user: true, cover: true },
-    //   select: {
-    //     user: { id: true, username: true, fullName: true },
-    //   },
-    // });
     return result;
   }
 

@@ -14,7 +14,6 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   ValueTransformer,
-  VirtualColumn,
 } from 'typeorm';
 import { Chapter } from './chapter.entity';
 import { StoryCategory } from './story-category.entity';
@@ -83,19 +82,4 @@ export class Story {
     inverseJoinColumn: { name: 'userId', referencedColumnName: 'id' },
   })
   writers: StoryTag[];
-
-  @VirtualColumn({
-    type: 'int',
-    query: (alias) =>
-      `SELECT COUNT(id) FROM "chapter" WHERE "storyId"=${alias}.id`,
-    transformer: NumberTransformer,
-  })
-  numChapters: number;
-  @VirtualColumn({
-    type: 'int',
-    query: (alias) =>
-      `SELECT COUNT(id) FROM "chapter" WHERE "storyId"=${alias}.id AND status='published'`,
-    transformer: NumberTransformer,
-  })
-  numPublishedChapters: number;
 }

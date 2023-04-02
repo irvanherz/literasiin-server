@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { LessThan, MoreThan, Repository } from 'typeorm';
+import { DataSource, LessThan, MoreThan, Repository } from 'typeorm';
 import {
   ChapterFilterDto,
   FindChapterByIdOptions,
@@ -15,20 +15,36 @@ import { Chapter } from './entities/chapter.entity';
 export class ChaptersService {
   constructor(
     @InjectRepository(Chapter)
-    private chaptersRepo: Repository<Chapter>,
+    private readonly chaptersRepo: Repository<Chapter>,
     @InjectRepository(ChapterMeta)
-    private chapterMetaRepo: Repository<ChapterMeta>,
+    private readonly chapterMetaRepo: Repository<ChapterMeta>,
     @InjectRepository(ChapterReader)
-    private readersRepo: Repository<ChapterReader>,
+    private readonly readersRepo: Repository<ChapterReader>,
+    private readonly dataSource: DataSource,
   ) {}
 
   async create(payload: CreateChapterDto) {
-    const chapter = this.chaptersRepo.create(payload);
-    const result = await this.chaptersRepo.save(chapter);
-    const meta = new ChapterMeta();
-    meta.chapter = chapter;
-    await this.chapterMetaRepo.save(meta);
-    return result;
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const chapterPayload = queryRunner.manager.create<Chapter>(
+        Chapter,
+        payload,
+      );
+      const chapter = await queryRunner.manager.save(chapterPayload);
+      const metaPayload = queryRunner.manager.create(ChapterMeta, {
+        chapterId: chapter.id,
+      });
+      await queryRunner.manager.save(metaPayload);
+      await queryRunner.commitTransaction();
+      return chapter;
+    } catch (err) {
+      console.log(err);
+      await queryRunner.rollbackTransaction();
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async findMany(filter: ChapterFilterDto) {

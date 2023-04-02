@@ -1,3 +1,4 @@
+import { User } from 'src/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
@@ -7,23 +8,27 @@ import {
   Unique,
   UpdateDateColumn,
 } from 'typeorm';
-import { Chapter } from './chapter.entity';
+import { Article } from './article.entity';
 
 @Entity()
-@Unique(['chapterId', 'userId'])
-export class ChapterReader {
+@Unique(['articleId', 'userId'])
+export class ArticleReader {
   @PrimaryGeneratedColumn()
   id: number;
   @Column()
-  chapterId: number;
+  articleId: number;
   @Column()
   userId: number;
+  @Column({ type: 'boolean', default: false })
+  bookmark: boolean;
   @Column({ type: 'int', default: 0 })
   vote: number;
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt?: Date;
-  @ManyToOne(() => Chapter, { onDelete: 'CASCADE' })
-  chapter: Chapter;
+  @ManyToOne(() => Article, { onDelete: 'CASCADE' })
+  article: Article;
+  @ManyToOne(() => User)
+  user: User;
 }

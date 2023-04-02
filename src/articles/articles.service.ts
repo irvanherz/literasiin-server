@@ -4,13 +4,16 @@ import { ILike, Repository } from 'typeorm';
 import { ArticleFilterDto } from './dto/article-filter.dto';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
+import { ArticleReader } from './entities/article-reader.entity';
 import { Article } from './entities/article.entity';
 
 @Injectable()
 export class ArticlesService {
   constructor(
     @InjectRepository(Article)
-    private articlesRepository: Repository<Article>,
+    private readonly articlesRepository: Repository<Article>,
+    @InjectRepository(ArticleReader)
+    private readonly readersRepo: Repository<ArticleReader>,
   ) {}
 
   async create(createArticleDto: CreateArticleDto) {
@@ -52,5 +55,21 @@ export class ArticlesService {
   async deleteById(id: number) {
     const result = await this.articlesRepository.delete(id);
     return result.affected;
+  }
+
+  async findContextById(articleId: number, userId?: number) {
+    let hasBookmarked = false;
+    let vote = 0;
+    if (userId) {
+      const reader = await this.readersRepo.findOne({
+        where: { articleId, userId },
+      });
+      hasBookmarked = reader?.bookmark || false;
+      vote = reader?.vote || 0;
+    }
+    return {
+      hasBookmarked,
+      vote,
+    };
   }
 }

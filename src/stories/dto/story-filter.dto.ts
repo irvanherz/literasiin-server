@@ -2,6 +2,8 @@
 import { IsNumber, IsOptional, IsString, Validate } from 'class-validator';
 import {
   ExtendedFilter,
+  IdFilter,
+  IdFilterValidatorConstraint,
   UserIdFilter,
   UserIdFilterValidatorConstraint,
 } from 'src/libs/validations';
@@ -19,6 +21,9 @@ export class StoryFilterDto {
   @IsOptional()
   @Validate(UserIdFilterValidatorConstraint)
   bookmarkedByUserId?: UserIdFilter;
+  @IsOptional()
+  @Validate(IdFilterValidatorConstraint)
+  categoryId?: IdFilter;
   @IsOptional()
   @IsNumber()
   page: number = 1;

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
+import { StoryMeta } from './entities/story-meta.entity';
 import { StoryReader } from './entities/story-reader';
 
 @Injectable()
@@ -9,8 +9,8 @@ export class StoryReadersService {
   constructor(
     @InjectRepository(StoryReader)
     private readersRepo: Repository<StoryReader>,
-    @InjectRepository(User)
-    private usersRepo: Repository<User>,
+    @InjectRepository(StoryMeta)
+    private storyMetaRepo: Repository<StoryMeta>,
   ) {}
 
   async track(storyId: number, userId: number) {
@@ -18,6 +18,7 @@ export class StoryReadersService {
     if (!reader) {
       reader = await this.readersRepo.save({ storyId, userId });
     }
+    await this.storyMetaRepo.increment({ storyId }, 'numViews', 1);
     return reader;
   }
 

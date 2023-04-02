@@ -13,6 +13,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { OptionalJwtAuthGuard } from 'src/auth/optional-jwt-auth.guard';
+import { User } from 'src/auth/user.decorator';
 import { sanitizeFilter } from 'src/libs/validations';
 import { ArticlesService } from './articles.service';
 import { ArticleFilterDto } from './dto/article-filter.dto';
@@ -82,5 +84,17 @@ export class ArticlesController {
     if (user.id !== article.userId) throw new ForbiddenException();
     await this.articlesService.deleteById(id);
     return;
+  }
+
+  @UseGuards(OptionalJwtAuthGuard)
+  @Get(':id/context')
+  async getActionContext(@Param('id') id: number, @User() currentUser) {
+    const chapter = await this.articlesService.findById(id);
+    if (!chapter) throw new NotFoundException();
+    const data = await this.articlesService.findContextById(
+      id,
+      currentUser?.id,
+    );
+    return { data };
   }
 }

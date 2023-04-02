@@ -6,10 +6,12 @@ import {
   DeleteDateColumn,
   Entity,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { ArticleCategory } from './article-category.entity';
+import { ArticleMeta } from './article-meta.entity';
 
 type ArticleStatus = 'draft' | 'published';
 
@@ -45,4 +47,9 @@ export class Article {
     eager: true,
   })
   category: ArticleCategory;
+  @OneToOne(() => ArticleMeta, (meta) => meta.article, {
+    eager: true,
+    nullable: true,
+  })
+  meta: ArticleMeta;
 }
