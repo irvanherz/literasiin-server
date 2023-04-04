@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, ILike, Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { ArticleFilterDto } from './dto/article-filter.dto';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
@@ -42,18 +42,50 @@ export class ArticlesService {
   async findMany(filter: ArticleFilterDto) {
     const take = filter.limit;
     const skip = (filter.page - 1) * take;
-    const result = await this.articlesRepository.findAndCount({
-      where: {
-        title: filter.search ? ILike(`%${filter.search}%`) : undefined,
-        status: (filter.status || undefined) as any,
-        userId: filter.userId || undefined,
-        categoryId: filter.categoryId || undefined,
-      },
-      relations: { image: true },
-      skip,
-      take,
-      order: { [filter.sortBy]: filter.sortOrder },
-    });
+
+    let query = await this.articlesRepository
+      .createQueryBuilder('article')
+      .leftJoinAndSelect('article.image', 'media')
+      .leftJoinAndSelect('article.meta', 'article_meta')
+      .leftJoinAndSelect('article.category', 'article_category')
+      .leftJoinAndSelect('article.user', 'user')
+      .leftJoinAndSelect('user.photo', 'up');
+
+    if (filter.bookmarkedByUserId) {
+      query = query.innerJoinAndMapOne(
+        'article.reader',
+        'article_reader',
+        'reader',
+        'reader.articleId=article.id AND reader.userId=:userId AND reader.bookmark=true',
+        { userId: filter.bookmarkedByUserId },
+      );
+    }
+    query = query.orderBy(
+      filter.sortBy.includes('.') ? filter.sortBy : `article.${filter.sortBy}`,
+      filter.sortOrder.toUpperCase() as any,
+    );
+    if (filter.search) {
+      query = query.andWhere('article.title like :search', {
+        title: `%${filter.search}%`,
+      });
+    }
+    if (filter.userId) {
+      query = query.andWhere('article.userId=:userId', {
+        userId: filter.userId,
+      });
+    }
+    if (filter.status) {
+      query = query.andWhere('article.status=:status', {
+        status: filter.status,
+      });
+    }
+    if (filter.categoryId) {
+      query = query.andWhere('article.categoryId=:categoryId', {
+        categoryId: filter.categoryId,
+      });
+    }
+
+    const result = query.skip(skip).take(take).getManyAndCount();
     return result;
   }
 

@@ -10,13 +10,13 @@ import {
 import { Publication } from './publication.entity';
 
 @Entity()
-export class PublicationStatus {
+export class PublicationFile {
   @PrimaryGeneratedColumn()
   id: number;
   @Column()
   publicationId: number;
-  @Column({ type: 'varchar', length: 50, default: 'created' })
-  type: string;
+  @Column({ type: 'varchar', length: 255 })
+  name: string;
   @Column({ type: 'json', default: {} })
   meta: any;
   @CreateDateColumn()

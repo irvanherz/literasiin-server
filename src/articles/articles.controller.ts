@@ -37,9 +37,15 @@ export class ArticlesController {
     return { data };
   }
 
+  @UseGuards(OptionalJwtAuthGuard)
   @Get()
-  async findMany(@Query() filter: ArticleFilterDto) {
+  async findMany(@Query() filter: ArticleFilterDto, @User() currentUser) {
+    filter.userId = sanitizeFilter(filter.userId, { currentUser });
+    filter.categoryId = sanitizeFilter(filter.categoryId);
     filter.status = sanitizeFilter(filter.status);
+    filter.bookmarkedByUserId = sanitizeFilter(filter.bookmarkedByUserId, {
+      currentUser,
+    });
     const [data, count] = await this.articlesService.findMany(filter);
     const numPages = Math.ceil(count / filter.limit);
     const meta = {

@@ -1,13 +1,11 @@
+/* eslint-disable @typescript-eslint/no-inferrable-types */
 import { IsNumber, IsOptional, IsString, Validate } from 'class-validator';
-import {
-  UserIdFilter,
-  UserIdFilterValidatorConstraint,
-} from 'src/libs/validations';
+import { IdFilter, IdFilterValidatorConstraint } from 'src/libs/validations';
 
-export class WalletFilterDto {
+export class WalletTransactionFilter {
   @IsOptional()
-  @Validate(UserIdFilterValidatorConstraint)
-  userId?: UserIdFilter;
+  @Validate(IdFilterValidatorConstraint)
+  walletId?: IdFilter;
   @IsOptional()
   @IsNumber()
   page?: number = 1;

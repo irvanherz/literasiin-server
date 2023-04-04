@@ -1,11 +1,8 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
+import { TokenPayload } from 'google-auth-library';
 import * as moment from 'moment-timezone';
 import { Identity } from 'src/users/entities/identity.entity';
 import { PasswordResetToken } from 'src/users/entities/password-reset-token.entity';
@@ -85,15 +82,13 @@ export class AuthService {
       await queryRunner.manager.save<Wallet>(wallet);
       await queryRunner.commitTransaction();
       createdUser = created;
+      return createdUser;
     } catch (err) {
-      console.log(err);
       await queryRunner.rollbackTransaction();
+      throw err;
     } finally {
       await queryRunner.release();
     }
-
-    if (!createdUser) throw new InternalServerErrorException();
-    return createdUser;
   }
 
   async saveDevice(payload: any) {
@@ -141,5 +136,62 @@ export class AuthService {
     const match = await bcrypt.compare(password, identity.key);
     if (!match) return null;
     return user;
+  }
+
+  private randomPassword() {
+    let result = '';
+    const characters =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const charactersLength = characters.length;
+    let counter = 0;
+    while (counter < 10) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      counter += 1;
+    }
+    return result;
+  }
+
+  private randomUsername() {
+    let result = '';
+    const characters = 'abcdefghijklmnopqrstuvwxyz';
+    const charactersLength = characters.length;
+    let counter = 0;
+    while (counter < 7) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      counter += 1;
+    }
+    return 'user' + result + Date.now().toString();
+  }
+
+  async validateUserWithGoogle(payload: TokenPayload) {
+    const email = payload.email;
+    const sub = payload.sub;
+    let identity = await this.identitiesRepo.findOne({
+      where: { type: 'google', key: sub },
+    });
+    let user = await this.usersRepo.findOne({ where: { email } });
+    if (identity) {
+      if (!user) throw new Error('User not found');
+      if (identity.userId !== user.id)
+        throw new Error(
+          'Something went wrong. Please contact customer service',
+        );
+      return user;
+    } else {
+      if (!user) {
+        user = await this.signupWithEmail({
+          email,
+          fullName: payload?.name || 'User',
+          password: this.randomPassword(),
+          username: this.randomUsername(),
+        } as any);
+      }
+      identity = await this.identitiesRepo.save({
+        type: 'google',
+        key: sub,
+        userId: user.id,
+      });
+      return user;
+    }
   }
 }

@@ -1,15 +1,16 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
+import { WalletTransactionFilter } from './dto/wallet-transaction-filter.dto';
 import { WalletTransaction } from './entities/wallet-transaction.entity';
 import { Wallet } from './entities/wallet.entity';
 
 @Injectable()
 export class WalletTransactionsService {
   constructor(
-    private dataSource: DataSource,
-    @InjectRepository(Wallet)
-    private walletsRepo: Repository<Wallet>,
+    private readonly dataSource: DataSource,
+    @InjectRepository(WalletTransaction)
+    private readonly trxRepo: Repository<WalletTransaction>,
   ) {}
 
   async create(payload: Partial<WalletTransaction>) {
@@ -43,5 +44,22 @@ export class WalletTransactionsService {
       await queryRunner.release();
     }
     throw new BadRequestException();
+  }
+
+  async findByQuery(filter: WalletTransactionFilter = {}) {
+    const take = filter.limit || 1;
+    const skip = (filter.page - 1) * take;
+    const result = this.trxRepo.findAndCount({
+      where: {
+        walletId: (filter?.walletId || undefined) as any,
+      },
+      relations: {
+        wallet: true,
+      },
+      skip,
+      take,
+      order: { [filter.sortBy]: filter.sortOrder },
+    });
+    return result;
   }
 }

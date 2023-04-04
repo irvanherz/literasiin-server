@@ -1,20 +1,29 @@
 /* eslint-disable @typescript-eslint/no-inferrable-types */
-import { IsNumber, IsOptional, IsString } from 'class-validator';
-import { ExtendedFilter } from 'src/libs/validations';
+import { IsNumber, IsOptional, IsString, Validate } from 'class-validator';
+import {
+  ExtendedFilter,
+  IdFilter,
+  IdFilterValidatorConstraint,
+  UserIdFilter,
+  UserIdFilterValidatorConstraint,
+} from 'src/libs/validations';
 
 export class ArticleFilterDto {
   @IsOptional()
   @IsString()
   search?: string;
   @IsOptional()
-  @IsNumber()
-  categoryId?: number;
-  @IsOptional()
-  @IsNumber()
-  userId?: number;
-  @IsOptional()
   @IsString()
   status?: ExtendedFilter<'draft' | 'published'> = 'published';
+  @IsOptional()
+  @Validate(UserIdFilterValidatorConstraint)
+  userId: UserIdFilter = 'any';
+  @IsOptional()
+  @Validate(UserIdFilterValidatorConstraint)
+  bookmarkedByUserId?: UserIdFilter;
+  @IsOptional()
+  @Validate(IdFilterValidatorConstraint)
+  categoryId?: IdFilter;
   @IsOptional()
   @IsNumber()
   page: number = 1;

@@ -29,6 +29,7 @@ import { MidtransModule } from './midtrans/midtrans.module';
 import { EmailTemplate } from './notifications/entities/email-template.entity';
 import { Notification } from './notifications/entities/notification.entity';
 import { NotificationsModule } from './notifications/notifications.module';
+import { PublicationFile } from './publications/entities/publication-file';
 import { PublicationStatus } from './publications/entities/publication-status.entity';
 import { Publication } from './publications/entities/publication.entity';
 import { PublicationsModule } from './publications/publications.module';
@@ -37,7 +38,7 @@ import { ChapterReader } from './stories/entities/chapter-reader.entity';
 import { Chapter } from './stories/entities/chapter.entity';
 import { StoryCategory } from './stories/entities/story-category.entity';
 import { StoryMeta } from './stories/entities/story-meta.entity';
-import { StoryReader } from './stories/entities/story-reader';
+import { StoryReader } from './stories/entities/story-reader.entity';
 import { StoryTagMap } from './stories/entities/story-tag-map.entity';
 import { StoryTag } from './stories/entities/story-tag.entity';
 import { StoryWriter } from './stories/entities/story-writer';
@@ -96,6 +97,7 @@ import { WalletsModule } from './wallets/wallets.module';
           StoryTag,
           Publication,
           PublicationStatus,
+          PublicationFile,
           PasswordResetToken,
           Notification,
           EmailTemplate,

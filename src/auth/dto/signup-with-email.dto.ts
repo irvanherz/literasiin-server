@@ -27,4 +27,12 @@ export class SignupWithEmailDto {
   dob?: Date;
   @MinLength(6)
   password: string;
+  //device
+  @IsString()
+  deviceType: string;
+  @IsString()
+  deviceId: string;
+  @IsOptional()
+  @IsString()
+  notificationToken?: string;
 }

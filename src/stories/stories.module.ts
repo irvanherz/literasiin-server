@@ -11,7 +11,7 @@ import { ChapterReader } from './entities/chapter-reader.entity';
 import { Chapter } from './entities/chapter.entity';
 import { StoryCategory } from './entities/story-category.entity';
 import { StoryMeta } from './entities/story-meta.entity';
-import { StoryReader } from './entities/story-reader';
+import { StoryReader } from './entities/story-reader.entity';
 import { StoryTagMap } from './entities/story-tag-map.entity';
 import { StoryTag } from './entities/story-tag.entity';
 import { StoryWriter } from './entities/story-writer';

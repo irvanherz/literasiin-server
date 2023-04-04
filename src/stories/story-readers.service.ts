@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { StoryMeta } from './entities/story-meta.entity';
-import { StoryReader } from './entities/story-reader';
+import { StoryReader } from './entities/story-reader.entity';
 
 @Injectable()
 export class StoryReadersService {

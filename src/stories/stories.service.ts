@@ -4,7 +4,7 @@ import { DataSource, Repository } from 'typeorm';
 import { StoryFilterDto } from './dto/story-filter.dto';
 import { UpdateStoryDto } from './dto/update-story.dto';
 import { StoryMeta } from './entities/story-meta.entity';
-import { StoryReader } from './entities/story-reader';
+import { StoryReader } from './entities/story-reader.entity';
 import { StoryTagMap } from './entities/story-tag-map.entity';
 import { StoryTag } from './entities/story-tag.entity';
 import { StoryWriter } from './entities/story-writer';
@@ -87,7 +87,7 @@ export class StoriesService {
     );
     if (filters.search) {
       query = query.andWhere('story.title like :search', {
-        search: `%${filters.search}%`,
+        title: `%${filters.search}%`,
       });
     }
     if (filters.userId) {

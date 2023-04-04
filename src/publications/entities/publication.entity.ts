@@ -7,6 +7,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { PublicationFile } from './publication-file';
 import { PublicationStatus } from './publication-status.entity';
 
 @Entity()
@@ -26,4 +27,6 @@ export class Publication {
 
   @OneToMany(() => PublicationStatus, (status) => status.publication)
   statuses: PublicationStatus[];
+  @OneToMany(() => PublicationFile, (file) => file.publication)
+  files: PublicationStatus[];
 }
