@@ -18,7 +18,6 @@ import { MailsService } from 'src/notifications/mails.service';
 import { UsersService } from 'src/users/users.service';
 import { AuthService } from './auth.service';
 import { AuthWithGoogleDto } from './dto/auth-with-google.dto';
-import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { SigninDto } from './dto/sigin.dto';
 import { SignOutDto } from './dto/signout.dto';
@@ -127,35 +126,27 @@ export class AuthController {
     };
   }
 
-  @Post('/forgot-password')
-  async forgotPassword(@Body() body: ForgotPasswordDto) {
-    const user = await this.usersService.findByEmail(body.email);
-    if (!user) throw new NotFoundException();
+  @Post('/reset-password-request')
+  async forgotPassword(@Body('username') username) {
+    const user = await this.usersService.findByEmailOrUsername(username);
+    if (!user) throw new NotFoundException('Invalid email or username');
     const prt = await this.authService.createPasswordResetToken(user);
-    if (!prt) throw new NotFoundException();
-    this.mailsQueue.add('send', {
-      to: user.email,
-      template: {
-        name: 'reset-password-request',
-        parameters: { user, prt: prt },
-      },
+    if (!prt) throw new BadRequestException();
+
+    this.amqpConnection.publish('users.passwordResetTokens.created', '', {
+      user,
+      prt,
     });
-    // await this.mailsSevice.send({
-    //   to: user.email,
-    //   template: {
-    //     name: 'reset-password-request',
-    //     parameters: { user, prt: prt },
-    //   },
-    // });
+
     return {
-      data: { user, prt },
+      data: { user: { email: user.email } },
     };
   }
 
   @Post('/reset-password')
   async resetPassword(@Body() body: ResetPasswordDto) {
-    const ok = await this.authService.resetPassword(body);
-    if (!ok) throw new NotFoundException();
+    const result = await this.authService.resetPassword(body);
+    if (!result) throw new BadRequestException();
     return;
   }
 

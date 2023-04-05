@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
@@ -103,27 +103,56 @@ export class AuthService {
   }
 
   async createPasswordResetToken(user: User) {
-    const token = uuid.v4();
-    const expiredAt = moment().add(10, 'minutes').toDate();
-    const prt = await this.prtRepo.save({ userId: user.id, token, expiredAt });
-    return prt;
+    const userId = user.id;
+    const prt = await this.prtRepo.findOne({
+      where: { userId },
+      order: { createdAt: 'desc' },
+    });
+    //exist and not expired?
+    if (prt && moment(prt.expiredAt).isAfter(moment())) {
+      const expiredAt = moment().add(10, 'minutes').toDate();
+      prt.expiredAt = expiredAt;
+      const result = await this.prtRepo.save(prt);
+      return result;
+    }
+    // expired or not exist
+    else {
+      const token = uuid.v4();
+      const expiredAt = moment().add(10, 'minutes').toDate();
+      const result = await this.prtRepo.save({
+        userId: user.id,
+        token,
+        expiredAt,
+      });
+      return result;
+    }
   }
 
   async resetPassword(payload: ResetPasswordDto) {
-    const { token, password } = payload;
-    console.log(payload);
+    const { email, token, password } = payload;
 
-    const prt = await this.prtRepo.findOne({ where: { token } });
-    console.log(prt);
-    if (!prt) throw new NotFoundException();
+    const prt = await this.prtRepo.findOne({
+      where: { token, user: { email } },
+    });
+    if (!prt) throw new BadRequestException('Invalid password reset token');
+    if (moment(prt.expiredAt).isBefore(moment()))
+      throw new BadRequestException('Password reset token has expired');
     const identity = await this.identitiesRepo.findOne({
       where: { userId: prt.userId, type: 'password' },
     });
-    if (!identity) throw new NotFoundException();
     const key = await bcrypt.hash(password, 5);
-    await this.identitiesRepo.update(identity.id, { key });
-    await this.prtRepo.delete(prt.id);
-    return true;
+    if (!identity) {
+      const result = await this.identitiesRepo.save({
+        userId: prt.userId,
+        type: 'password',
+        key,
+      });
+      return result;
+    } else {
+      identity.key = key;
+      const result = await this.identitiesRepo.save(identity);
+      return result;
+    }
   }
 
   async validateUser(username: string, password: string) {

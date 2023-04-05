@@ -11,7 +11,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       useFactory: (configService: ConfigService) => ({
         uri: configService.get<string>('RABBITMQ_SERVER'),
         exchanges: [
-          // USER
+          //USER
           {
             name: 'users.created',
             type: 'fanout',
@@ -20,6 +20,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
             name: 'users.followed',
             type: 'fanout',
           },
+          {
+            name: 'users.passwordResetTokens.created',
+            type: 'fanout',
+          },
+          //STORIES
           {
             name: 'stories.writers.invitations.created',
             type: 'fanout',
