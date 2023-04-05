@@ -147,10 +147,14 @@ export class AuthService {
         type: 'password',
         key,
       });
+      prt.expiredAt = moment().toDate();
+      await this.prtRepo.save(prt);
       return result;
     } else {
       identity.key = key;
       const result = await this.identitiesRepo.save(identity);
+      prt.expiredAt = moment().toDate();
+      await this.prtRepo.save(prt);
       return result;
     }
   }

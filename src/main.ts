@@ -31,6 +31,6 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
   app.enableCors({ origin: '*', credentials: true });
   // initializeApp();
-  await app.listen(configService.get<number>('APP_PORT'));
+  await app.listen(configService.get<number>('PORT'));
 }
 bootstrap();
