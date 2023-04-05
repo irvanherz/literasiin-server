@@ -2,10 +2,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn,
 } from 'typeorm';
+import { User } from './user.entity';
 
 @Entity()
 @Unique(['userId', 'deviceId'])
@@ -28,4 +30,6 @@ export class UserDevice {
   createdAt?: Date;
   @UpdateDateColumn()
   updatedAt?: Date;
+  @ManyToOne(() => User, { cascade: true, onDelete: 'CASCADE' })
+  user: User;
 }

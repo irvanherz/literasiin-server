@@ -1,3 +1,4 @@
+import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
 import { InjectQueue } from '@nestjs/bull';
 import {
   BadRequestException,
@@ -34,7 +35,13 @@ export class AuthController {
     private readonly mailsSevice: MailsService,
     @InjectQueue('mails')
     private readonly mailsQueue: Queue,
+    private readonly amqpConnection: AmqpConnection,
   ) {}
+
+  @Get('test')
+  async sdsa() {
+    this.amqpConnection.publish('users.created', '', {});
+  }
 
   @Post('/signup')
   async signupWithEmail(@Body() payload: SignupWithEmailDto) {
@@ -46,6 +53,11 @@ export class AuthController {
         email: user.email,
         role: user.role,
       });
+
+      this.amqpConnection.publish('users.created', '', {
+        user,
+      });
+
       const device = await this.authService.saveDevice({
         userId: user.id,
         deviceType: payload?.deviceType || 'other',
@@ -61,7 +73,8 @@ export class AuthController {
         },
       };
     } catch (err) {
-      console.log('AAAAAAAAAAAAAAAAAAAAA', err);
+      console.log(err);
+
       if (err?.code === '23505')
         throw new BadRequestException('Email or username already used');
       throw new InternalServerErrorException();
@@ -165,7 +178,15 @@ export class AuthController {
     });
     const payload = ticket.getPayload();
 
-    const user = await this.authService.validateUserWithGoogle(payload);
+    const [user, isNewUser] = await this.authService.validateUserWithGoogle(
+      payload,
+    );
+
+    if (isNewUser) {
+      this.amqpConnection.publish('users.created', '', {
+        user,
+      });
+    }
 
     const auth = await this.authService.signin({
       id: user.id,

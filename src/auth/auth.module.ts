@@ -4,6 +4,7 @@ import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { NotificationsModule } from 'src/notifications/notifications.module';
 import { SharedJwtModule } from 'src/shared-jwt/shared-jwt.module';
+import { SharedRabbitMQModule } from 'src/shared-rabbitmq/shared-rabbitmq.module';
 import { Identity } from 'src/users/entities/identity.entity';
 import { PasswordResetToken } from 'src/users/entities/password-reset-token.entity';
 import { UserDevice } from 'src/users/entities/user-device.entity';
@@ -24,6 +25,7 @@ import { SocketJwtAuthGuard } from './socket-jwt-auth.guard';
   imports: [
     PassportModule,
     SharedJwtModule,
+    SharedRabbitMQModule,
     BullModule.registerQueue({
       name: 'mails',
     }),

@@ -32,6 +32,7 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { PublicationFile } from './publications/entities/publication-file';
 import { PublicationStatus } from './publications/entities/publication-status.entity';
 import { Publication } from './publications/entities/publication.entity';
+import { Publisher } from './publications/entities/publisher.entity';
 import { PublicationsModule } from './publications/publications.module';
 import { ChapterMeta } from './stories/entities/chapter-meta.entity';
 import { ChapterReader } from './stories/entities/chapter-reader.entity';
@@ -96,6 +97,7 @@ import { WalletsModule } from './wallets/wallets.module';
           StoryCategory,
           StoryTag,
           Publication,
+          Publisher,
           PublicationStatus,
           PublicationFile,
           PasswordResetToken,

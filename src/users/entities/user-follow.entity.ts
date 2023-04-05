@@ -18,9 +18,15 @@ export class UserFollow {
   @CreateDateColumn()
   createdAt: Date;
 
-  @ManyToOne(() => User, (user) => user.followers)
+  @ManyToOne(() => User, (user) => user.followers, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   follower: User;
 
-  @ManyToOne(() => User, (user) => user.following)
+  @ManyToOne(() => User, (user) => user.following, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   following: User;
 }

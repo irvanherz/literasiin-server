@@ -29,6 +29,9 @@ export class Identity {
   updatedAt: Date;
   @DeleteDateColumn()
   deletedAt?: Date;
-  @ManyToOne(() => User, (user) => user.identities)
+  @ManyToOne(() => User, (user) => user.identities, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   user: User;
 }

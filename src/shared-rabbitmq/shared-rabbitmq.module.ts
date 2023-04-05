@@ -37,6 +37,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
             name: 'finances.invoices.canceled',
             type: 'fanout',
           },
+          //NOTIF
+          {
+            name: 'notifications.emails.queues',
+            type: 'direct',
+          },
         ],
       }),
     }),

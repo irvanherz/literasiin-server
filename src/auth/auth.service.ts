@@ -176,7 +176,7 @@ export class AuthService {
         throw new Error(
           'Something went wrong. Please contact customer service',
         );
-      return user;
+      return [user, false] as [User, boolean];
     } else {
       if (!user) {
         user = await this.signupWithEmail({
@@ -191,7 +191,7 @@ export class AuthService {
         key: sub,
         userId: user.id,
       });
-      return user;
+      return [user, true] as [User, boolean];
     }
   }
 }

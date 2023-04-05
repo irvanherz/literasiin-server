@@ -25,6 +25,9 @@ export class Wallet {
 
   @OneToMany(() => WalletTransaction, (trx) => trx.wallet)
   transactions: WalletTransaction[];
-  @ManyToOne(() => User, (user) => user.wallets)
+  @ManyToOne(() => User, (user) => user.wallets, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   user: User;
 }

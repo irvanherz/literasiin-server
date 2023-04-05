@@ -26,6 +26,9 @@ export class WalletTransaction {
   @CreateDateColumn()
   createdAt: Date;
 
-  @ManyToOne(() => Wallet, (wallet) => wallet.transactions)
+  @ManyToOne(() => Wallet, (wallet) => wallet.transactions, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   wallet: Wallet;
 }

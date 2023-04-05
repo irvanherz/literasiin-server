@@ -21,6 +21,9 @@ export class PasswordResetToken {
   createdAt: Date;
   @Column()
   expiredAt: Date;
-  @ManyToOne(() => User, (user) => user.passwordResetTokens)
+  @ManyToOne(() => User, (user) => user.passwordResetTokens, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   user: User;
 }
