@@ -10,6 +10,7 @@ import { ChapterMeta } from './entities/chapter-meta.entity';
 import { ChapterReader } from './entities/chapter-reader.entity';
 import { Chapter } from './entities/chapter.entity';
 import { StoryCategory } from './entities/story-category.entity';
+import { StoryComment } from './entities/story-comment.entity';
 import { StoryMeta } from './entities/story-meta.entity';
 import { StoryReader } from './entities/story-reader.entity';
 import { StoryTagMap } from './entities/story-tag-map.entity';
@@ -20,6 +21,8 @@ import { StoriesController } from './stories.controller';
 import { StoriesService } from './stories.service';
 import { StoryCategoriesController } from './story-categories.controller';
 import { StoryCategoriesService } from './story-categories.service';
+import { StoryCommentsController } from './story-comments.controller';
+import { StoryCommentsService } from './story-comments.service';
 import { StoryReadersController } from './story-readers.controller';
 import { StoryReadersService } from './story-readers.service';
 import { StoryTagsController } from './story-tags.controller';
@@ -41,10 +44,12 @@ import { StoryWritersService } from './story-writers.service';
       StoryCategory,
       StoryTag,
       StoryTagMap,
+      StoryComment,
       User,
     ]),
   ],
   controllers: [
+    StoryCommentsController,
     StoryWritersController,
     StoryReadersController,
     StoryTagsController,
@@ -54,6 +59,7 @@ import { StoryWritersService } from './story-writers.service';
     StoriesController,
   ],
   providers: [
+    StoryCommentsService,
     StoryWritersService,
     StoryReadersService,
     StoriesService,

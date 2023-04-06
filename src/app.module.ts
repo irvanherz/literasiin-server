@@ -38,6 +38,7 @@ import { ChapterMeta } from './stories/entities/chapter-meta.entity';
 import { ChapterReader } from './stories/entities/chapter-reader.entity';
 import { Chapter } from './stories/entities/chapter.entity';
 import { StoryCategory } from './stories/entities/story-category.entity';
+import { StoryComment } from './stories/entities/story-comment.entity';
 import { StoryMeta } from './stories/entities/story-meta.entity';
 import { StoryReader } from './stories/entities/story-reader.entity';
 import { StoryTagMap } from './stories/entities/story-tag-map.entity';
@@ -96,6 +97,7 @@ import { WalletsModule } from './wallets/wallets.module';
           ChapterMeta,
           StoryCategory,
           StoryTag,
+          StoryComment,
           Publication,
           Publisher,
           PublicationStatus,

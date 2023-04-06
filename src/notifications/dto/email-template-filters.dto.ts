@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-inferrable-types */
 import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class EmailTemplateFiltersDto {
@@ -6,10 +7,10 @@ export class EmailTemplateFiltersDto {
   search: string;
   @IsOptional()
   @IsNumber()
-  page = 1;
+  page: number = 1;
   @IsOptional()
   @IsNumber()
-  limit = 10;
+  limit: number = 10;
   @IsOptional()
   @IsString()
   sortBy = 'createdAt';
