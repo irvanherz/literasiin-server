@@ -162,6 +162,8 @@ export class MediaService {
       const url = `${baseUrl}/${bucket}/${objectName}`;
       uploads.push({
         ...size,
+        width: meta?.width || size?.width,
+        height: meta?.height || size?.height,
         url,
         name: objectName,
         meta,
