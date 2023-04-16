@@ -2,35 +2,35 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { OrderItem } from './order-item.entity';
+import { Payment } from './payment.entity';
 
 @Entity()
-export class Invoice {
+export class Order {
   @PrimaryGeneratedColumn()
   id: number;
-  @Column({ type: 'varchar', length: 255 })
-  code: string;
   @Column()
   userId: number;
+  @Column({ type: 'int', nullable: true })
+  paymentId: number | null;
   @Column({ type: 'decimal', precision: 20, scale: 2, default: 0 })
   amount: number;
   @Column({ type: 'json', default: {} })
   meta: any;
-  @Column({
-    type: 'enum',
-    enum: ['deposit', 'payment'],
-  })
-  type: 'deposit' | 'payment';
-  @Column({
-    type: 'enum',
-    enum: ['unpaid', 'pending', 'paid', 'challenge', 'failed', 'canceled'],
-    default: 'unpaid',
-  })
-  status: 'unpaid' | 'pending' | 'paid' | 'challenge' | 'failed' | 'canceled';
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt: Date;
+  @ManyToOne(() => Payment, {
+    eager: true,
+    nullable: true,
+  })
+  payment: Payment;
+  @OneToMany(() => OrderItem, (item) => item.order)
+  items: OrderItem[];
 }

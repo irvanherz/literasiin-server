@@ -1,8 +1,10 @@
+import { User } from 'src/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -27,4 +29,6 @@ export class Media {
   updatedAt: Date;
   @DeleteDateColumn()
   deletedAt?: Date;
+  @ManyToOne(() => User)
+  user: User;
 }

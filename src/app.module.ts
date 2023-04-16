@@ -18,7 +18,9 @@ import { ChatMessage } from './chats/entities/chat-message.entity';
 import { ChatRoom } from './chats/entities/chat-room.entity';
 import { ConfigurationsModule } from './configurations/configurations.module';
 import { Configuration } from './configurations/entities/configuration.entity';
-import { Invoice } from './finances/entities/invoice.entity';
+import { OrderItem } from './finances/entities/order-item.entity';
+import { Order } from './finances/entities/order.entity';
+import { Payment } from './finances/entities/payment.entity';
 import { FinancesModule } from './finances/finances.module';
 import { KbCategory } from './kbs/entities/kb-category.entity';
 import { Kb } from './kbs/entities/kb.entity';
@@ -114,7 +116,9 @@ import { WalletsModule } from './wallets/wallets.module';
           Configuration,
           Wallet,
           WalletTransaction,
-          Invoice,
+          Order,
+          OrderItem,
+          Payment,
           Kb,
           KbCategory,
           ChatRoom,

@@ -8,7 +8,7 @@ import {
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { User } from 'src/auth/user.decorator';
 import { sanitizeFilter } from 'src/libs/validations';
-import { WalletTransactionFilter } from './dto/wallet-transaction-filter.dto';
+import { WalletTransactionFilter } from './dto/wallets.dto';
 import { WalletTransactionsService } from './wallet-transactions.service';
 import { WalletsService } from './wallets.service';
 

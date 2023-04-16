@@ -1,9 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like, Repository } from 'typeorm';
-import { CreateKbDto } from './dto/create-kb.dto';
-import { KbFilterDto } from './dto/kb-filter.dto';
-import { UpdateKbDto } from './dto/update-kb.dto';
+import { CreateKbDto, KbFilterDto, UpdateKbDto } from './dto/kbs.dto';
 import { Kb } from './entities/kb.entity';
 
 @Injectable()
@@ -41,8 +39,8 @@ export class KbsService {
     return result;
   }
 
-  async updateById(id: number, updateKbDto: UpdateKbDto) {
-    const result = await this.kbsRepository.update(id, updateKbDto);
+  async updateById(id: number, payload: UpdateKbDto) {
+    const result = await this.kbsRepository.update(id, payload);
     return result.affected;
   }
 

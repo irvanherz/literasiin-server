@@ -5,11 +5,9 @@ import {
   Get,
   NotFoundException,
   Param,
-  Patch,
   Post,
 } from '@nestjs/common';
-import { CreatePublicationDto } from './dto/create-publication.dto';
-import { UpdatePublicationDto } from './dto/update-publication.dto';
+import { CreatePublicationFileDto } from './dto/publication-files.dto';
 import { PublicationsService } from './publications.service';
 
 @Controller('publications')
@@ -17,8 +15,8 @@ export class PublicationFilesController {
   constructor(private readonly publicationsService: PublicationsService) {}
 
   @Post()
-  create(@Body() createPublicationDto: CreatePublicationDto) {
-    return this.publicationsService.create(createPublicationDto);
+  create(@Body() payload: CreatePublicationFileDto) {
+    return this.publicationsService.create(payload);
   }
 
   @Get()
@@ -33,16 +31,6 @@ export class PublicationFilesController {
     return {
       data: pub,
     };
-  }
-
-  @Patch(':id')
-  async updateById(
-    @Param('id') id: number,
-    @Body() setData: UpdatePublicationDto,
-  ) {
-    const result = await this.publicationsService.updateById(id, setData);
-    if (!result) throw new NotFoundException();
-    return;
   }
 
   @Delete(':id')

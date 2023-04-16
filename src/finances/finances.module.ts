@@ -1,23 +1,32 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { SharedRabbitMQModule } from 'src/shared-rabbitmq/shared-rabbitmq.module';
 import { User } from 'src/users/entities/user.entity';
 import { WalletTransaction } from 'src/wallets/entities/wallet-transaction.entity';
 import { Wallet } from 'src/wallets/entities/wallet.entity';
-import { WalletTransactionsService } from 'src/wallets/wallet-transactions.service';
-import { WalletsModule } from 'src/wallets/wallets.module';
-import { WalletsService } from 'src/wallets/wallets.service';
-import { Invoice } from './entities/invoice.entity';
+import { OrderItem } from './entities/order-item.entity';
+import { Order } from './entities/order.entity';
+import { Payment } from './entities/payment.entity';
 import { FinancesController } from './finances.controller';
-import { InvoicesController } from './invoices.controller';
-import { InvoicesService } from './invoices.service';
+import { FinancesSubscriber } from './finances.subscriber';
 import { MidtransController } from './midtrans.controller';
+import { OrdersController } from './orders.controller';
+import { OrdersService } from './orders.service';
+import { PaymentsService } from './payments.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Invoice, Wallet, WalletTransaction, User]),
-    WalletsModule,
+    TypeOrmModule.forFeature([
+      Order,
+      OrderItem,
+      Wallet,
+      WalletTransaction,
+      User,
+      Payment,
+    ]),
+    SharedRabbitMQModule,
   ],
-  controllers: [FinancesController, InvoicesController, MidtransController],
-  providers: [InvoicesService, WalletsService, WalletTransactionsService],
+  controllers: [FinancesController, OrdersController, MidtransController],
+  providers: [OrdersService, PaymentsService, FinancesSubscriber],
 })
 export class FinancesModule {}

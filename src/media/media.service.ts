@@ -1,13 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Request } from 'express';
 import { MinioService } from 'nestjs-minio-client';
 import * as path from 'path';
 import * as sharp from 'sharp';
 import slugify from 'slugify';
 import { ArrayContains, ILike, Repository } from 'typeorm';
-import { MediaFiltersDto } from './dto/media-filters.dto';
+import { CreateMediaDto, MediaFilterDto } from './dto/media.dto';
 import { Media } from './entities/media.entity';
 
 const PHOTO_SIZES = [
@@ -64,6 +63,29 @@ const ARTICLE_IMAGE_SIZES = [
   },
 ];
 
+const ASSET_IMAGE_SIZES = [
+  {
+    id: 'lg',
+    width: 900,
+    height: undefined,
+  },
+  {
+    id: 'md',
+    width: 600,
+    height: undefined,
+  },
+  {
+    id: 'sm',
+    width: 300,
+    height: undefined,
+  },
+  {
+    id: 'original',
+    width: undefined,
+    height: undefined,
+  },
+];
+
 const PRESETS = {
   photo: {
     sizes: PHOTO_SIZES,
@@ -86,6 +108,13 @@ const PRESETS = {
       tags: ['article-image'],
     },
   },
+  asset: {
+    sizes: ASSET_IMAGE_SIZES,
+    data: {
+      type: 'image',
+      tags: ['asset'],
+    },
+  },
 };
 
 @Injectable()
@@ -97,10 +126,9 @@ export class MediaService {
     private readonly mediaRepo: Repository<Media>,
   ) {}
 
-  async uploadImage(file: Express.Multer.File, request: Request) {
-    const user = request.user as any;
-    const userId = user?.id;
-    const presetId = request.body.preset;
+  async uploadImage(payload: CreateMediaDto, file: Express.Multer.File) {
+    const userId = payload?.userId;
+    const presetId = payload.preset;
     const preset: any = PRESETS[presetId];
     if (!preset) throw new BadRequestException();
     const baseUrl =
@@ -118,14 +146,15 @@ export class MediaService {
     const uploads = [];
     for await (const size of preset.sizes) {
       const objectName = `${nameBase}_${size.id}.jpg`;
-      const output = sharp(file.buffer)
-        .resize({
+      let output = sharp(file.buffer);
+      if (size.width || size.height) {
+        output = output.resize({
           width: size.width,
           height: size.height,
           fit: 'cover',
-        })
-        .toFormat('jpg')
-        .pipe(sharp());
+        });
+      }
+      output = output.toFormat('jpg').pipe(sharp());
       const meta = await output.metadata();
       await this.minioService.client.putObject(bucket, objectName, output, {
         'Content-Type': 'image/jpeg',
@@ -150,20 +179,34 @@ export class MediaService {
     return media;
   }
 
-  async findMany(filters: MediaFiltersDto) {
-    const take = filters.limit || 1;
-    const skip = (filters.page - 1) * take;
+  async findMany(filter: MediaFilterDto) {
+    const take = filter.limit || 1;
+    const skip = (filter.page - 1) * take;
     const result = this.mediaRepo.findAndCount({
       where: {
-        type: (filters?.type as any) || undefined,
-        tags: filters?.tag ? ArrayContains([filters.tag as any]) : undefined,
-        name: filters?.search ? ILike(`%${filters.search}%`) : undefined,
-        userId: filters.userId ? (filters.userId as any) : undefined,
+        type: (filter?.type as any) || undefined,
+        tags: filter?.tag ? ArrayContains([filter.tag as any]) : undefined,
+        name: filter?.search ? ILike(`%${filter.search}%`) : undefined,
+        userId: filter.userId ? (filter.userId as any) : undefined,
       },
+      relations: { user: true },
       skip,
       take,
-      order: { [filters.sortBy]: filters.sortOrder },
+      order: { [filter.sortBy]: filter.sortOrder },
     });
     return result;
+  }
+
+  async findById(id: number) {
+    const result = await this.mediaRepo.findOne({
+      where: { id },
+      relations: { user: true },
+    });
+    return result;
+  }
+
+  async deleteById(id: number) {
+    const result = await this.mediaRepo.delete(id);
+    return result.affected;
   }
 }

@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { WalletFilterDto } from './dto/wallet-filter';
+import { WalletFilterDto } from './dto/wallets.dto';
 import { Wallet } from './entities/wallet.entity';
 
 @Injectable()

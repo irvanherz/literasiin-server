@@ -19,22 +19,22 @@ export class Publication {
   id: number;
   @Column()
   userId: number;
-  @Column()
+  @Column({ type: 'int', nullable: true })
   publisherId: number;
+  @Column({ type: 'varchar', length: 255 })
+  title: string;
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  author: string;
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  address: string;
+  @Column({ type: 'enum', enum: ['a4', 'a5'], nullable: true })
+  size: string;
   @Column({
     type: 'enum',
     enum: ['draft', 'process', 'published'],
     default: 'draft',
   })
   status: number;
-  @Column({ type: 'varchar', length: 255 })
-  title: string;
-  @Column({ type: 'varchar', length: 255 })
-  author: string;
-  @Column({ type: 'varchar', length: 500 })
-  address: string;
-  @Column({ type: 'enum', enum: ['a4', 'a5'] })
-  size: string;
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()
@@ -42,7 +42,7 @@ export class Publication {
   @DeleteDateColumn()
   deletedAt?: Date;
 
-  @ManyToOne(() => Publisher, { eager: true })
+  @ManyToOne(() => Publisher, { eager: true, nullable: true })
   publisher: Publisher;
   @ManyToOne(() => User, { eager: true })
   user: User;

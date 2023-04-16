@@ -1,10 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, ILike, Repository } from 'typeorm';
-import { BulkUpdateKbCategoryEntryDto } from './dto/bulk-update-kb-category.dto';
-import { CreateKbCategoryDto } from './dto/create-kb-category.dto';
-import { KbCategoryFilterDto } from './dto/kb-category-filter.dto';
-import { UpdateKbCategoryDto } from './dto/update-kb-category.dto';
+import {
+  BulkUpdateKbCategoryEntryDto,
+  CreateKbCategoryDto,
+  KbCategoryFilterDto,
+  UpdateKbCategoryDto,
+} from './dto/kbs.dto';
 import { KbCategory } from './entities/kb-category.entity';
 
 @Injectable()

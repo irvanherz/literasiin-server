@@ -91,9 +91,12 @@ export class StoriesService {
       });
     }
     if (filters.userId) {
-      query = query.andWhere('sw.userId=:userId', {
-        userId: filters.userId,
-      });
+      query = query.andWhere(
+        `(SELECT COUNT(*) FROM story_writer sw2 WHERE sw2."storyId"=story.id AND sw2."userId"=:userId AND sw2.status='approved')=1`,
+        {
+          userId: filters.userId,
+        },
+      );
     }
     if (filters.status) {
       query = query.andWhere('story.status=:status', {

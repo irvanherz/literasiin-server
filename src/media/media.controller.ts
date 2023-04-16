@@ -1,9 +1,13 @@
 import {
+  Body,
   Controller,
+  Delete,
+  ForbiddenException,
   Get,
+  NotFoundException,
+  Param,
   Post,
   Query,
-  Request,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -13,7 +17,7 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { OptionalJwtAuthGuard } from 'src/auth/optional-jwt-auth.guard';
 import { User } from 'src/auth/user.decorator';
 import { sanitizeFilter } from 'src/libs/validations';
-import { MediaFiltersDto } from './dto/media-filters.dto';
+import { CreateMediaDto, MediaFilterDto } from './dto/media.dto';
 import { MediaService } from './media.service';
 
 @UseGuards(JwtAuthGuard)
@@ -23,16 +27,18 @@ export class MediaController {
 
   @UseGuards(OptionalJwtAuthGuard)
   @Get()
-  async findMany(@Query() filters: MediaFiltersDto, @User() currentUser) {
-    filters.userId = sanitizeFilter(filters.userId, {
+  async findMany(@Query() filter: MediaFilterDto, @User() currentUser) {
+    filter.userId = sanitizeFilter(filter.userId, {
       currentUser,
       toNumber: true,
     });
-    const [users, count] = await this.mediaService.findMany(filters);
-    const numPages = Math.ceil(count / filters.limit);
+    filter.type = sanitizeFilter(filter.type);
+
+    const [users, count] = await this.mediaService.findMany(filter);
+    const numPages = Math.ceil(count / filter.limit);
     const meta = {
-      page: filters.page,
-      limit: filters.limit,
+      page: filter.page,
+      limit: filter.limit,
       numItems: count,
       numPages,
     };
@@ -43,12 +49,33 @@ export class MediaController {
     };
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadPhoto(@UploadedFile() file: Express.Multer.File, @Request() req) {
-    const res = await this.mediaService.uploadImage(file, req);
+  async uploadPhoto(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() payload: CreateMediaDto,
+    @User() currentUser,
+  ) {
+    console.log(payload);
+
+    payload.userId = sanitizeFilter(payload.userId || 'me', { currentUser });
+    const res = await this.mediaService.uploadImage(payload, file);
     return {
       data: res,
     };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  async deleteById(@Param('id') id: number, @User() currentUser) {
+    const media = await this.mediaService.findById(id);
+    if (!media) throw new NotFoundException();
+
+    if (!media.userId !== currentUser?.id && currentUser?.role !== 'admin')
+      throw new ForbiddenException();
+
+    await this.mediaService.deleteById(id);
+    return;
   }
 }

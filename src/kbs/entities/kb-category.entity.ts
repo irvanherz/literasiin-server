@@ -1,8 +1,10 @@
+import { Media } from 'src/media/entities/media.entity';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -17,6 +19,8 @@ export class KbCategory {
   name: string;
   @Column({ type: 'text', nullable: true })
   description?: string;
+  @Column({ type: 'int', nullable: true })
+  imageId: number;
   @Column({ type: 'int', default: 0 })
   priority: number;
   @CreateDateColumn()
@@ -27,4 +31,6 @@ export class KbCategory {
   deletedAt?: Date;
   @OneToMany(() => Kb, (kb) => kb.category)
   kbs: Kb[];
+  @ManyToOne(() => Media, { eager: true, nullable: true })
+  image: Media;
 }

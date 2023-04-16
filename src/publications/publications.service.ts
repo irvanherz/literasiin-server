@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreatePublicationDto } from './dto/create-publication.dto';
-import { UpdatePublicationDto } from './dto/update-publication.dto';
 import { Publication } from './entities/publication.entity';
 
 @Injectable()
@@ -12,13 +10,13 @@ export class PublicationsService {
     private publicationsRepository: Repository<Publication>,
   ) {}
 
-  async create(createPublicationDto: CreatePublicationDto) {
-    const user = this.publicationsRepository.create(createPublicationDto);
+  async create(payload: Partial<Publication>) {
+    const user = this.publicationsRepository.create(payload);
     const result = await this.publicationsRepository.save(user);
     return result;
   }
 
-  async findMany(filters: any = {}) {
+  async findMany(filter: any = {}) {
     const result = this.publicationsRepository.findAndCount({});
     return result;
   }
@@ -28,11 +26,8 @@ export class PublicationsService {
     return result;
   }
 
-  async updateById(id: number, updatePublicationDto: UpdatePublicationDto) {
-    const result = await this.publicationsRepository.update(
-      id,
-      updatePublicationDto,
-    );
+  async updateById(id: number, payload: Partial<Publication>) {
+    const result = await this.publicationsRepository.update(id, payload);
     return result.affected;
   }
 

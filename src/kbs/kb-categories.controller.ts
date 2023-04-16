@@ -11,10 +11,12 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { BulkUpdateKbCategoryDto } from './dto/bulk-update-kb-category.dto';
-import { CreateKbCategoryDto } from './dto/create-kb-category.dto';
-import { KbCategoryFilterDto } from './dto/kb-category-filter.dto';
-import { UpdateKbCategoryDto } from './dto/update-kb-category.dto';
+import {
+  BulkUpdateKbCategoryDto,
+  CreateKbCategoryDto,
+  KbCategoryFilterDto,
+  UpdateKbCategoryDto,
+} from './dto/kbs.dto';
 import { KbCategoriesService } from './kb-categories.service';
 
 @Controller()

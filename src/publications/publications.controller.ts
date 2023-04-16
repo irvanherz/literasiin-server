@@ -2,28 +2,41 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   NotFoundException,
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
-import { CreatePublicationDto } from './dto/create-publication.dto';
-import { UpdatePublicationDto } from './dto/update-publication.dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { User } from 'src/auth/user.decorator';
+import { sanitizeFilter } from 'src/libs/validations';
+import {
+  CreatePublicationDto,
+  UpdatePublicationDto,
+} from './dto/publications.dto';
 import { PublicationsService } from './publications.service';
 
 @Controller('publications')
 export class PublicationsController {
   constructor(private readonly publicationsService: PublicationsService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() createPublicationDto: CreatePublicationDto) {
-    return this.publicationsService.create(createPublicationDto);
+  create(@Body() payload: CreatePublicationDto, @User() currentUser) {
+    payload.userId = sanitizeFilter(payload.userId || 'me', { currentUser });
+    if (payload.userId !== currentUser?.id && currentUser?.role !== 'admin')
+      throw new ForbiddenException();
+    return this.publicationsService.create(payload as any);
   }
 
   @Get()
   async findMany() {
-    return this.publicationsService.findMany();
+    const [data, numItems] = await this.publicationsService.findMany();
+    const meta = { numItems };
+    return { data, meta };
   }
 
   @Get(':id')
@@ -38,9 +51,12 @@ export class PublicationsController {
   @Patch(':id')
   async updateById(
     @Param('id') id: number,
-    @Body() setData: UpdatePublicationDto,
+    @Body() payload: UpdatePublicationDto,
   ) {
-    const result = await this.publicationsService.updateById(id, setData);
+    const result = await this.publicationsService.updateById(
+      id,
+      payload as any,
+    );
     if (!result) throw new NotFoundException();
     return;
   }

@@ -13,9 +13,7 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { User } from 'src/auth/user.decorator';
-import { CreateKbDto } from './dto/create-kb.dto';
-import { KbFilterDto } from './dto/kb-filter.dto';
-import { UpdateKbDto } from './dto/update-kb.dto';
+import { CreateKbDto, KbFilterDto, UpdateKbDto } from './dto/kbs.dto';
 import { KbsService } from './kbs.service';
 
 @Controller()

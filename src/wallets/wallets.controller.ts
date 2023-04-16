@@ -1,19 +1,27 @@
 import {
   BadRequestException,
+  Body,
   Controller,
   Get,
+  Post,
   Query,
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { User } from 'src/auth/user.decorator';
+import { OrdersService } from 'src/finances/orders.service';
 import { sanitizeFilter } from 'src/libs/validations';
-import { WalletFilterDto } from './dto/wallet-filter';
+import { WalletDepositDto, WalletFilterDto } from './dto/wallets.dto';
 import { WalletsService } from './wallets.service';
+
+const COIN_PRICE = 1000;
 
 @Controller('wallets')
 export class WalletsController {
-  constructor(private readonly walletsService: WalletsService) {}
+  constructor(
+    private readonly walletsService: WalletsService,
+    private readonly ordersService: OrdersService,
+  ) {}
 
   @UseGuards(JwtAuthGuard)
   @Get()
@@ -39,5 +47,43 @@ export class WalletsController {
       data: wallets,
       meta,
     };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':walletId/deposit-order')
+  async createDepositOrder(
+    @Body() payload: WalletDepositDto,
+    @User() currentUser,
+  ) {
+    const wallet = await this.walletsService.findUserCoinWallet(currentUser.id);
+
+    const qtyCoins = payload.amount;
+    const amountIdr = qtyCoins * COIN_PRICE;
+    const feeIdr = 10000;
+    const finalAmount = amountIdr + feeIdr;
+
+    if (!wallet) throw new BadRequestException();
+    const order = await this.ordersService.createWithDetails(
+      {
+        userId: wallet.userId,
+        amount: finalAmount,
+      },
+      [
+        {
+          qty: qtyCoins,
+          type: 'coin',
+          meta: { id: wallet.id, name: 'DEPOSIT', price: COIN_PRICE },
+          amount: amountIdr,
+        },
+        {
+          qty: 1,
+          type: 'fee',
+          meta: { id: null, name: 'FEE', price: feeIdr },
+          amount: feeIdr,
+        },
+      ],
+    );
+
+    return { data: order };
   }
 }

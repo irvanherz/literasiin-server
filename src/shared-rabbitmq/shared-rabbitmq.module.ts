@@ -31,15 +31,15 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
           },
           //FINANCE
           {
-            name: 'finances.invoices.created',
+            name: 'finances.payments.created',
             type: 'fanout',
           },
           {
-            name: 'finances.invoices.paid',
+            name: 'finances.payments.updated',
             type: 'fanout',
           },
           {
-            name: 'finances.invoices.canceled',
+            name: 'finances.orders.items.paid',
             type: 'fanout',
           },
           //NOTIF

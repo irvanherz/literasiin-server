@@ -69,13 +69,12 @@ export class ArticlesController {
   async updateById(
     @Param('id') id: number,
     @Body() setData: UpdateArticleDto,
-    @Request() req,
+    @User() currentUser,
   ) {
-    const user = req.user;
-
     const article = await this.articlesService.findById(id);
     if (!article) throw new NotFoundException();
-    if (user.id !== article.userId) throw new ForbiddenException();
+    if (currentUser.id !== article.userId && currentUser.role !== 'admin')
+      throw new ForbiddenException();
 
     await this.articlesService.updateById(id, setData);
     return;
@@ -83,11 +82,11 @@ export class ArticlesController {
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  async deleteById(@Param('id') id: number, @Request() req) {
+  async deleteById(@Param('id') id: number, @User() currentUser) {
     const article = await this.articlesService.findById(id);
-    const user = req.user;
     if (!article) throw new NotFoundException();
-    if (user.id !== article.userId) throw new ForbiddenException();
+    if (currentUser.id !== article.userId && currentUser.role !== 'admin')
+      throw new ForbiddenException();
     await this.articlesService.deleteById(id);
     return;
   }
