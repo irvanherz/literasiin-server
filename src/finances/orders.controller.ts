@@ -7,6 +7,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import dayjs from 'dayjs';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { User } from 'src/auth/user.decorator';
 import { sanitizeFilter } from 'src/libs/validations';
@@ -49,6 +50,7 @@ export class OrdersController {
     let payment = await this.paymentsService.save({
       amount: order.amount,
       code: Date.now().toString(),
+      expiredAt: dayjs().add(1, 'hour').toDate(),
     });
     //
     const params = {

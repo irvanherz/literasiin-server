@@ -26,6 +26,8 @@ export class Payment {
   meta: any;
   @CreateDateColumn()
   createdAt: Date;
+  @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+  expiredAt: Date;
   @UpdateDateColumn()
   updatedAt: Date;
   @OneToMany(() => Order, (order) => order.payment)

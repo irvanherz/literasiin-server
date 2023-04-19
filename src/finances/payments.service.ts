@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { Cron } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { LessThan, Repository } from 'typeorm';
 import { Payment } from './entities/payment.entity';
 
 @Injectable()
@@ -34,5 +35,20 @@ export class PaymentsService {
   async save(payment: Partial<Payment>) {
     const result = await this.paymentsRepo.save(payment);
     return result;
+  }
+
+  @Cron('* * * * *')
+  async handleAutoExpire() {
+    console.log('[SCHEDULER] Expiring unpaid payment');
+
+    await this.paymentsRepo.update(
+      {
+        status: 'unpaid',
+        expiredAt: LessThan(new Date()),
+      },
+      {
+        status: 'canceled',
+      },
+    );
   }
 }

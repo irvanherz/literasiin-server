@@ -14,6 +14,7 @@ specifiers:
   '@nestjs/passport': ^9.0.0
   '@nestjs/platform-express': ^9.0.0
   '@nestjs/platform-socket.io': ^9.2.1
+  '@nestjs/schedule': ^2.2.1
   '@nestjs/schematics': ^9.0.0
   '@nestjs/swagger': ^6.1.4
   '@nestjs/testing': ^9.0.0
@@ -21,6 +22,7 @@ specifiers:
   '@nestjs/websockets': ^9.2.1
   '@types/bcrypt': ^5.0.0
   '@types/bull': ^4.10.0
+  '@types/cron': ^2.0.1
   '@types/ejs': ^3.1.1
   '@types/express': ^4.17.13
   '@types/jest': 28.1.8
@@ -40,6 +42,7 @@ specifiers:
   bull: ^4.10.3
   class-transformer: ^0.5.1
   class-validator: ^0.14.0
+  dayjs: ^1.11.7
   dotenv: ^16.0.3
   ejs: ^3.1.8
   eslint: ^8.0.1
@@ -88,6 +91,7 @@ dependencies:
   '@nestjs/passport': 9.0.0_6o47igfla2pj7yzh7agpvpttka
   '@nestjs/platform-express': 9.2.1_hjcqpoaebdr7gdo5hgc22hthbe
   '@nestjs/platform-socket.io': 9.2.1_75thavexiqyxpvcxom3j44gxby
+  '@nestjs/schedule': 2.2.1_dntc3uqqknzoduyjojusds5kla
   '@nestjs/swagger': 6.1.4_4fhhxyztwhblafku3krlstrun4
   '@nestjs/typeorm': 9.0.1_rq3e63xrdnihep2b3mxfcpnrny
   '@nestjs/websockets': 9.2.1_cbx4gblrpxxed5smhozfworgty
@@ -95,6 +99,7 @@ dependencies:
   bull: 4.10.3
   class-transformer: 0.5.1
   class-validator: 0.14.0
+  dayjs: 1.11.7
   dotenv: 16.0.3
   ejs: 3.1.8
   firebase-admin: 11.5.0
@@ -124,6 +129,7 @@ devDependencies:
   '@nestjs/testing': 9.2.1_wdbvfsxfdwzlwdfiyh2gynjl4m
   '@types/bcrypt': 5.0.0
   '@types/bull': 4.10.0
+  '@types/cron': 2.0.1
   '@types/ejs': 3.1.1
   '@types/express': 4.17.15
   '@types/jest': 28.1.8
@@ -1405,6 +1411,20 @@ packages:
       - supports-color
       - utf-8-validate
 
+  /@nestjs/schedule/2.2.1_dntc3uqqknzoduyjojusds5kla:
+    resolution: {integrity: sha512-7jev9Q3aFnRajKAi/At+9rzwflZNN10SA5PcdCvxc35GFfTdM2a6O5GA7tiIbLuOOzdjPYPbC3RxP4tpXOHVWw==}
+    peerDependencies:
+      '@nestjs/common': ^7.0.0 || ^8.0.0 || ^9.0.0
+      '@nestjs/core': ^7.0.0 || ^8.0.0 || ^9.0.0
+      reflect-metadata: ^0.1.12
+    dependencies:
+      '@nestjs/common': 9.2.1_welcnyot5bzd5wa2aovbkxpi4i
+      '@nestjs/core': 9.2.1_w3aokaw6dj62wscfwgppttd7ii
+      cron: 2.3.0
+      reflect-metadata: 0.1.13
+      uuid: 9.0.0
+    dev: false
+
   /@nestjs/schematics/9.0.4_bpd7edbl7imd2lxcmdt57tn7ne:
     resolution: {integrity: sha512-egurCfAc4e5i1r2TmeAF0UrOKejFmT5oTdv4b7HcOVPupc3QGU7CbEfGleL3mkM5AjrixTQeMxU9bJ00ttAbGg==}
     peerDependencies:
@@ -1726,6 +1746,13 @@ packages:
     dependencies:
       '@types/node': 16.18.11
 
+  /@types/cron/2.0.1:
+    resolution: {integrity: sha512-WHa/1rtNtD2Q/H0+YTTZoty+/5rcE66iAFX2IY+JuUoOACsevYyFkSYu/2vdw+G5LrmO7Lxowrqm0av4k3qWNQ==}
+    dependencies:
+      '@types/luxon': 3.3.0
+      '@types/node': 16.18.11
+    dev: true
+
   /@types/ejs/3.1.1:
     resolution: {integrity: sha512-RQul5wEfY7BjWm0sYY86cmUN/pcXWGyVxWX93DFFJvcrxax5zKlieLwA3T77xJGwNcZW0YW6CYG70p1m8xPFmA==}
 
@@ -1823,6 +1850,10 @@ packages:
     resolution: {integrity: sha512-MqTGEo5bj5t157U6fA/BiDynNkn0YknVdh48CMPkTSpFTVmvao5UQmm7uEF6xBEo7qIMAlY/JSleYaE6VOdpaA==}
     dev: false
     optional: true
+
+  /@types/luxon/3.3.0:
+    resolution: {integrity: sha512-uKRI5QORDnrGFYgcdAVnHvEIvEZ8noTpP/Bg+HeUzZghwinDlIS87DEenV5r1YoOF9G4x600YsUXLWZ19rmTmg==}
+    dev: true
 
   /@types/markdown-it/12.2.3:
     resolution: {integrity: sha512-GKMHFfv3458yYy+v/N8gjufHO6MSZKCOXpZc5GXIWWy8uldwfmPn98vp81gZ5f9SVw8YYBctgfJ22a2d7AOMeQ==}
@@ -3284,6 +3315,12 @@ packages:
     engines: {node: '>=12.0.0'}
     dependencies:
       luxon: 3.2.1
+
+  /cron/2.3.0:
+    resolution: {integrity: sha512-ZN5HP8zDY41sJolMsbc+GksRATcbvkPKF5wR/qc8FrV4NBVi9ORQa1HmYa5GydaysUB80X9XpRlRkooa5uEtTA==}
+    dependencies:
+      luxon: 3.2.1
+    dev: false
 
   /cross-spawn/7.0.3:
     resolution: {integrity: sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==}

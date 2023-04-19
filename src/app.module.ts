@@ -2,6 +2,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { BullModule } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MinioModule } from 'nestjs-minio-client';
 import { AppController } from './app.controller';
@@ -54,6 +55,8 @@ import { UserDevice } from './users/entities/user-device.entity';
 import { UserFollow } from './users/entities/user-follow.entity';
 import { User } from './users/entities/user.entity';
 import { UsersModule } from './users/users.module';
+import { Waiter } from './waiters/entities/waiter.entity';
+import { WaitersModule } from './waiters/waiters.module';
 import { WalletTransaction } from './wallets/entities/wallet-transaction.entity';
 import { Wallet } from './wallets/entities/wallet.entity';
 import { WalletsModule } from './wallets/wallets.module';
@@ -61,6 +64,7 @@ import { WalletsModule } from './wallets/wallets.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    ScheduleModule.forRoot(),
     MinioModule.registerAsync({
       isGlobal: true,
       imports: [ConfigModule],
@@ -84,6 +88,7 @@ import { WalletsModule } from './wallets/wallets.module';
         database: configService.get<string>('DATABASE_NAME'),
         synchronize: true,
         entities: [
+          Waiter,
           UserFollow,
           User,
           UserDevice,
@@ -178,6 +183,7 @@ import { WalletsModule } from './wallets/wallets.module';
     ConfigurationsModule,
     FinancesModule,
     KbsModule,
+    WaitersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
