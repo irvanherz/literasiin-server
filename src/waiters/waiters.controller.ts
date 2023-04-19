@@ -8,6 +8,8 @@ export class WaitersController {
 
   @Post()
   async create(@Body() payload: CreateWaiterDto) {
+    const existing = await this.waitersService.findByEmail(payload.email);
+    if (existing) throw 'Email tersebut sudah masuk ke dalam waiting list';
     await this.waitersService.save(payload);
   }
 }

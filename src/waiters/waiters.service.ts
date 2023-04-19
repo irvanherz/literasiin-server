@@ -10,6 +10,12 @@ export class WaitersService {
     @InjectRepository(Waiter)
     private readonly waitersRepo: Repository<Waiter>,
   ) {}
+
+  async findByEmail(email: string) {
+    const result = await this.waitersRepo.findOne({ where: { email } });
+    return result;
+  }
+
   async save(payload: Partial<CreateWaiterDto>) {
     const result = await this.waitersRepo.save(payload);
     return result;
