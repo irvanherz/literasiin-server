@@ -12,6 +12,7 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Queue } from 'bull';
 import { OAuth2Client } from 'google-auth-library';
 import { MailsService } from 'src/notifications/mails.service';
@@ -32,6 +33,7 @@ export class AuthController {
     private usersService: UsersService,
     private readonly authService: AuthService,
     private readonly mailsSevice: MailsService,
+    private readonly configsService: ConfigService,
     @InjectQueue('mails')
     private readonly mailsQueue: Queue,
     private readonly amqpConnection: AmqpConnection,
@@ -159,13 +161,11 @@ export class AuthController {
 
   @Post('/google')
   async authWithGoogle(@Body() body: AuthWithGoogleDto) {
-    const client = new OAuth2Client(
-      '18583978221-3926dnoc2anb3u939go00gk14brdmpsd.apps.googleusercontent.com',
-    );
+    const clientKey = this.configsService.get<string>('GOOGLE_OAUTH_CLIENT_ID');
+    const client = new OAuth2Client(clientKey);
     const ticket = await client.verifyIdToken({
       idToken: body.idToken,
-      audience:
-        '18583978221-3926dnoc2anb3u939go00gk14brdmpsd.apps.googleusercontent.com',
+      audience: clientKey,
     });
     const payload = ticket.getPayload();
 
