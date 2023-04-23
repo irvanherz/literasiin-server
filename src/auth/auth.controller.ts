@@ -162,7 +162,10 @@ export class AuthController {
   @Post('/google')
   async authWithGoogle(@Body() body: AuthWithGoogleDto) {
     const clientKey = this.configsService.get<string>('GOOGLE_OAUTH_CLIENT_ID');
-    const client = new OAuth2Client(clientKey);
+    const clientSecret = this.configsService.get<string>(
+      'GOOGLE_OAUTH_CLIENT_SECRET',
+    );
+    const client = new OAuth2Client(clientKey, clientSecret);
     const ticket = await client.verifyIdToken({
       idToken: body.idToken,
       audience: clientKey,
