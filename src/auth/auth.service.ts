@@ -12,8 +12,7 @@ import { UsersService } from 'src/users/users.service';
 import { Wallet } from 'src/wallets/entities/wallet.entity';
 import { DataSource, Repository } from 'typeorm';
 import * as uuid from 'uuid';
-import { ResetPasswordDto } from './dto/reset-password.dto';
-import { SignupWithEmailDto } from './dto/signup-with-email.dto';
+import { ResetPasswordDto, SignupWithEmailDto } from './dto/auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -59,30 +58,26 @@ export class AuthService {
   async signupWithEmail(signupDto: SignupWithEmailDto) {
     const { password, ...createUserDto } = signupDto;
 
-    const user = this.usersRepo.create({
-      ...createUserDto,
-      role: 'user',
-    });
     const key = await bcrypt.hash(password, 5);
-    const identity = this.identitiesRepo.create({
-      type: 'password',
-      userId: user.id,
-      key,
-    });
-    const wallet = this.walletsRepo.create();
-    let createdUser: User = null;
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      const created = await queryRunner.manager.save<User>(user);
-      identity.userId = created.id;
-      wallet.userId = created.id;
-      await queryRunner.manager.save<Identity>(identity);
-      await queryRunner.manager.save<Wallet>(wallet);
+      const userP = this.usersRepo.create({
+        ...createUserDto,
+        role: 'user',
+      });
+      const user = await queryRunner.manager.save(User, userP);
+      const identityP = this.identitiesRepo.create({
+        type: 'password',
+        userId: user.id,
+        key,
+      });
+      await queryRunner.manager.save(Identity, identityP);
+      const walletP = this.walletsRepo.create({ userId: user.id });
+      await queryRunner.manager.save(Wallet, walletP);
       await queryRunner.commitTransaction();
-      createdUser = created;
-      return createdUser;
+      return user;
     } catch (err) {
       await queryRunner.rollbackTransaction();
       throw err;

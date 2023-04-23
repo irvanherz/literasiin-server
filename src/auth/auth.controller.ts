@@ -18,11 +18,13 @@ import { OAuth2Client } from 'google-auth-library';
 import { MailsService } from 'src/notifications/mails.service';
 import { UsersService } from 'src/users/users.service';
 import { AuthService } from './auth.service';
-import { AuthWithGoogleDto } from './dto/auth-with-google.dto';
-import { ResetPasswordDto } from './dto/reset-password.dto';
-import { SigninDto } from './dto/sigin.dto';
-import { SignOutDto } from './dto/signout.dto';
-import { SignupWithEmailDto } from './dto/signup-with-email.dto';
+import {
+  AuthWithGoogleDto,
+  ResetPasswordDto,
+  SigninDto,
+  SignOutDto,
+  SignupWithEmailDto,
+} from './dto/auth.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { LocalAuthGuard } from './local-auth.guard';
 import { User } from './user.decorator';
@@ -234,8 +236,6 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   profile(@Request() req) {
-    console.log('A', req.user);
-
     return req.user;
   }
 }
