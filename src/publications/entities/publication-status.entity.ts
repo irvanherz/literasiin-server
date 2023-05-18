@@ -3,11 +3,9 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Publication } from './publication.entity';
 
 @Entity()
 export class PublicationStatus {
@@ -23,7 +21,4 @@ export class PublicationStatus {
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt: Date;
-
-  @ManyToOne(() => Publication, (publication) => publication.statuses)
-  publication: Publication;
 }

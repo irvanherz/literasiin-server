@@ -1,20 +1,22 @@
 /* eslint-disable @typescript-eslint/no-inferrable-types */
-import { IsNumber, IsOptional, IsString, Validate } from 'class-validator';
+import { PartialType } from '@nestjs/mapped-types';
+import {
+  IsLatLong,
+  IsNumber,
+  IsObject,
+  IsOptional,
+  IsString,
+  Validate,
+} from 'class-validator';
 import {
   UserIdFilter,
   UserIdFilterValidatorConstraint,
 } from 'src/libs/validations';
 
-export class MediaFilterDto {
-  @IsOptional()
-  @Validate(UserIdFilterValidatorConstraint)
-  userId: UserIdFilter = 'me';
+export class UserAddressFilterDto {
   @IsOptional()
   @IsString()
-  type?: string;
-  @IsOptional()
-  @IsString()
-  tag?: string;
+  userId?: string;
   @IsOptional()
   @IsString()
   search?: string;
@@ -23,7 +25,7 @@ export class MediaFilterDto {
   page?: number = 1;
   @IsOptional()
   @IsNumber()
-  limit?: number = 16;
+  limit?: number = 50;
   @IsOptional()
   @IsString()
   sortBy?: string = 'createdAt';
@@ -32,16 +34,23 @@ export class MediaFilterDto {
   sortOrder?: string = 'desc';
 }
 
-export class CreateImageMediaDto {
+export class CreateUserAddressDto {
   @IsOptional()
   @Validate(UserIdFilterValidatorConstraint)
   userId: UserIdFilter;
   @IsString()
-  preset: string;
+  type?: string;
+  @IsNumber()
+  postalCode?: number;
+  @IsLatLong()
+  location?: string;
+  @IsString()
+  phone?: string;
+  @IsString()
+  address?: string;
+  @IsOptional()
+  @IsObject()
+  meta?: Date;
 }
 
-export class CreateDocumentMediaDto {
-  @IsOptional()
-  @Validate(UserIdFilterValidatorConstraint)
-  userId: UserIdFilter;
-}
+export class UpdateUserAddressDto extends PartialType(CreateUserAddressDto) {}

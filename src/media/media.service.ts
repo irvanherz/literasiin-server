@@ -6,7 +6,11 @@ import * as path from 'path';
 import * as sharp from 'sharp';
 import slugify from 'slugify';
 import { ArrayContains, ILike, Repository } from 'typeorm';
-import { CreateMediaDto, MediaFilterDto } from './dto/media.dto';
+import {
+  CreateDocumentMediaDto,
+  CreateImageMediaDto,
+  MediaFilterDto,
+} from './dto/media.dto';
 import { Media } from './entities/media.entity';
 
 const PHOTO_SIZES = [
@@ -126,7 +130,11 @@ export class MediaService {
     private readonly mediaRepo: Repository<Media>,
   ) {}
 
-  async uploadImage(payload: CreateMediaDto, file: Express.Multer.File) {
+  async uploadImage(
+    payload: CreateImageMediaDto,
+    file: Express.Multer.File,
+    extra: Partial<Media> = {},
+  ) {
     const userId = payload?.userId;
     const presetId = payload.preset;
     const preset: any = PRESETS[presetId];
@@ -171,12 +179,61 @@ export class MediaService {
     }
     const media = await this.mediaRepo.save({
       ...preset.data,
+      type: 'image',
       userId,
       name: nameBase,
       meta: {
         objects: uploads,
         originalName: file.originalname,
+        originalSize: file.size,
       },
+      ...extra,
+    });
+    return media;
+  }
+
+  async uploadDocument(
+    payload: CreateDocumentMediaDto,
+    file: Express.Multer.File,
+    extra: Partial<Media> = {},
+  ) {
+    const userId = payload?.userId;
+    const baseUrl =
+      'https://' + this.configService.get<string>('MINIO_ENDPOINT');
+    const bucket = this.configService.get<string>('MINIO_BUCKET');
+    const nameComponents = path.parse(file.originalname);
+    const nameBase =
+      Date.now().toString() +
+      '_' +
+      slugify(nameComponents.name, {
+        replacement: '-',
+        trim: true,
+        lower: true,
+      });
+    const uploads = [];
+    const objectName = `${nameBase}_original.${nameComponents.ext}`;
+
+    await this.minioService.client.putObject(bucket, objectName, file.buffer, {
+      'Content-Type': 'application/octet-stream',
+    });
+    const url = `${baseUrl}/${bucket}/${objectName}`;
+    uploads.push({
+      url,
+      name: objectName,
+      meta: {
+        size: file.buffer.length,
+      },
+    });
+    const media = await this.mediaRepo.save({
+      userId: userId as any,
+      type: 'document',
+      name: nameBase,
+      meta: {
+        objects: uploads,
+        originalName: file.originalname,
+        originalSize: file.size,
+      },
+      ...extra,
     });
     return media;
   }

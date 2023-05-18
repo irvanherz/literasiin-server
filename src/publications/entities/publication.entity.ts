@@ -1,17 +1,22 @@
-import { User } from 'src/users/entities/user.entity';
+import { Media } from 'src/media/entities/media.entity';
+import { UserAddress } from 'src/users/entities/user-address';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { PublicationFile } from './publication-file';
-import { PublicationStatus } from './publication-status.entity';
-import { Publisher } from './publisher.entity';
+
+type PublicationMeta = {
+  pageSize: 'a4' | 'a5';
+  numColorPages: number;
+  numBwPages: number;
+  numPrints: number;
+  publicationPackage: string;
+};
 
 @Entity()
 export class Publication {
@@ -19,22 +24,43 @@ export class Publication {
   id: number;
   @Column()
   userId: number;
-  @Column({ type: 'int', nullable: true })
-  publisherId: number;
+  @Column({ type: 'enum', enum: ['indie', 'selfpub'], nullable: true })
+  type: 'indie' | 'selfpub' | null;
   @Column({ type: 'varchar', length: 255 })
   title: string;
-  @Column({ type: 'varchar', length: 255, nullable: true })
+  @Column({ type: 'varchar', length: 255, default: '' })
   author: string;
-  @Column({ type: 'varchar', length: 500, nullable: true })
-  address: string;
-  @Column({ type: 'enum', enum: ['a4', 'a5'], nullable: true })
-  size: string;
+  @Column({ type: 'int', nullable: true })
+  coverId: number;
+  @Column({ type: 'int', default: 0 })
+  royalty: number;
+  @Column({ type: 'int', nullable: true })
+  addressId: number;
+  @Column({ type: 'int', nullable: true })
+  shipmentId: number;
+  @Column({ type: 'int', nullable: true })
+  orderId: number;
+  @Column({ type: 'json', default: {} })
+  meta: any;
   @Column({
     type: 'enum',
-    enum: ['draft', 'process', 'published'],
+    enum: [
+      'draft',
+      'payment',
+      'approval',
+      'publishing',
+      'shipment',
+      'published',
+    ],
     default: 'draft',
   })
-  status: number;
+  status:
+    | 'draft'
+    | 'payment'
+    | 'verification'
+    | 'publishing'
+    | 'shipping'
+    | 'published';
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()
@@ -42,12 +68,8 @@ export class Publication {
   @DeleteDateColumn()
   deletedAt?: Date;
 
-  @ManyToOne(() => Publisher, { eager: true, nullable: true })
-  publisher: Publisher;
-  @ManyToOne(() => User, { eager: true })
-  user: User;
-  @OneToMany(() => PublicationStatus, (status) => status.publication)
-  statuses: PublicationStatus[];
-  @OneToMany(() => PublicationFile, (file) => file.publication)
-  files: PublicationStatus[];
+  @ManyToOne(() => Media, { eager: true, nullable: true })
+  cover: Media;
+  @ManyToOne(() => UserAddress, { nullable: true })
+  address: UserAddress;
 }

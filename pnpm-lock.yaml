@@ -3,6 +3,7 @@ lockfileVersion: 5.4
 specifiers:
   '@golevelup/nestjs-rabbitmq': ^3.5.0
   '@nestjs-modules/mailer': ^1.8.1
+  '@nestjs/axios': ^2.0.0
   '@nestjs/bull': ^0.6.2
   '@nestjs/bullmq': ^1.1.0
   '@nestjs/cli': ^9.0.0
@@ -20,11 +21,13 @@ specifiers:
   '@nestjs/testing': ^9.0.0
   '@nestjs/typeorm': ^9.0.1
   '@nestjs/websockets': ^9.2.1
+  '@types/axios': ^0.14.0
   '@types/bcrypt': ^5.0.0
   '@types/bull': ^4.10.0
   '@types/cron': ^2.0.1
   '@types/ejs': ^3.1.1
   '@types/express': ^4.17.13
+  '@types/geojson': ^7946.0.10
   '@types/jest': 28.1.8
   '@types/minio': ^7.0.15
   '@types/multer': ^1.4.7
@@ -38,6 +41,7 @@ specifiers:
   '@types/uuid': ^9.0.0
   '@typescript-eslint/eslint-plugin': ^5.0.0
   '@typescript-eslint/parser': ^5.0.0
+  axios: ^1.4.0
   bcrypt: ^5.1.0
   bull: ^4.10.3
   class-transformer: ^0.5.1
@@ -51,6 +55,7 @@ specifiers:
   firebase-admin: ^11.5.0
   google-auth-library: ^8.7.0
   jest: 28.1.3
+  joi: ^17.9.2
   lodash: ^4.17.21
   midtrans-client: ^1.3.1
   moment-timezone: ^0.5.40
@@ -64,7 +69,7 @@ specifiers:
   prettier: ^2.3.2
   reflect-metadata: ^0.1.13
   rimraf: ^3.0.2
-  rxjs: ^7.2.0
+  rxjs: ^7.8.0
   sharp: ^0.31.3
   slugify: ^1.6.5
   socket.io: ^4.6.1
@@ -81,6 +86,7 @@ specifiers:
 dependencies:
   '@golevelup/nestjs-rabbitmq': 3.5.0_ubmmrcqtmfxeoof5hyze5vl4ge
   '@nestjs-modules/mailer': 1.8.1_x5rh2wwt6qit6v327365jmvnye
+  '@nestjs/axios': 2.0.0_hrievrm3n2nk4h6uwq36vznr3e
   '@nestjs/bull': 0.6.2_5augtl65dojhbptifpyevrtuhi
   '@nestjs/bullmq': 1.1.0_hjcqpoaebdr7gdo5hgc22hthbe
   '@nestjs/common': 9.2.1_welcnyot5bzd5wa2aovbkxpi4i
@@ -95,6 +101,8 @@ dependencies:
   '@nestjs/swagger': 6.1.4_4fhhxyztwhblafku3krlstrun4
   '@nestjs/typeorm': 9.0.1_rq3e63xrdnihep2b3mxfcpnrny
   '@nestjs/websockets': 9.2.1_cbx4gblrpxxed5smhozfworgty
+  '@types/axios': 0.14.0
+  axios: 1.4.0
   bcrypt: 5.1.0
   bull: 4.10.3
   class-transformer: 0.5.1
@@ -104,6 +112,7 @@ dependencies:
   ejs: 3.1.8
   firebase-admin: 11.5.0
   google-auth-library: 8.7.0
+  joi: 17.9.2
   lodash: 4.17.21
   midtrans-client: 1.3.1
   moment-timezone: 0.5.40
@@ -132,6 +141,7 @@ devDependencies:
   '@types/cron': 2.0.1
   '@types/ejs': 3.1.1
   '@types/express': 4.17.15
+  '@types/geojson': 7946.0.10
   '@types/jest': 28.1.8
   '@types/minio': 7.0.15
   '@types/multer': 1.4.7
@@ -783,6 +793,16 @@ packages:
     dev: false
     optional: true
 
+  /@hapi/hoek/9.3.0:
+    resolution: {integrity: sha512-/c6rf4UJlmHlC9b5BaNvzAcFv7HZ2QHaV0D4/HNlBdvFnvQq8RI4kYdhyPCl7Xj+oWvTWQ8ujhqS53LIgAe6KQ==}
+    dev: false
+
+  /@hapi/topo/5.1.0:
+    resolution: {integrity: sha512-foQZKJig7Ob0BMAYBfcJk8d77QtOe7Wo4ox7ff1lQYoNNAb6jwcY1ncdoy2e9wQZzvNy7ODZCYJkK8kzmcAnAg==}
+    dependencies:
+      '@hapi/hoek': 9.3.0
+    dev: false
+
   /@humanwhocodes/config-array/0.11.8:
     resolution: {integrity: sha512-UybHIJzJnR5Qc/MsD9Kr+RpO2h+/P1GhOwdiLPXK5TWk5sgTdu88bTD9UP+CKbPPh5Rni1u0GjAdYQLemG8g+g==}
     engines: {node: '>=10.10.0'}
@@ -1180,6 +1200,20 @@ packages:
     transitivePeerDependencies:
       - encoding
       - supports-color
+    dev: false
+
+  /@nestjs/axios/2.0.0_hrievrm3n2nk4h6uwq36vznr3e:
+    resolution: {integrity: sha512-F6oceoQLEn031uun8NiommeMkRIojQqVryxQy/mK7fx0CI0KbgkJL3SloCQcsOD+agoEnqKJKXZpEvL6FNswJg==}
+    peerDependencies:
+      '@nestjs/common': ^7.0.0 || ^8.0.0 || ^9.0.0
+      axios: ^1.3.1
+      reflect-metadata: ^0.1.12
+      rxjs: ^6.0.0 || ^7.0.0
+    dependencies:
+      '@nestjs/common': 9.2.1_welcnyot5bzd5wa2aovbkxpi4i
+      axios: 1.4.0
+      reflect-metadata: 0.1.13
+      rxjs: 7.8.0
     dev: false
 
   /@nestjs/bull-shared/0.1.2_hjcqpoaebdr7gdo5hgc22hthbe:
@@ -1633,6 +1667,20 @@ packages:
       selderee: 0.10.0
     dev: false
 
+  /@sideway/address/4.1.4:
+    resolution: {integrity: sha512-7vwq+rOHVWjyXxVlR76Agnvhy8I9rpzjosTESvmhNeXOXdZZB15Fl+TI9x1SiHZH5Jv2wTGduSxFDIaq0m3DUw==}
+    dependencies:
+      '@hapi/hoek': 9.3.0
+    dev: false
+
+  /@sideway/formula/3.0.1:
+    resolution: {integrity: sha512-/poHZJJVjx3L+zVD6g9KgHfYnb443oi7wLu/XKojDviHy6HOEOA6z1Trk5aR1dGcmPenJEgb2sK2I80LeS3MIg==}
+    dev: false
+
+  /@sideway/pinpoint/2.0.0:
+    resolution: {integrity: sha512-RNiOoTPkptFtSVzQevY/yWtZwf/RxyVnPy/OcA9HBM3MlGDnBEYL5B41H0MTn0Uec8Hi+2qUtTfG2WWZBmMejQ==}
+    dev: false
+
   /@sinclair/typebox/0.24.51:
     resolution: {integrity: sha512-1P1OROm/rdubP5aFDSZQILU0vrLCJ4fvHt6EoqHEM+2D/G5MK3bIaymUKLit8Js9gbns5UyJnkP/TZROLw4tUA==}
     dev: true
@@ -1678,6 +1726,15 @@ packages:
 
   /@tsconfig/node16/1.0.3:
     resolution: {integrity: sha512-yOlFc+7UtL/89t2ZhjPvvB/DeAr3r+Dq58IgzsFkOAvVC6NMJXmCGjbptdXdR9qsX7pKcTL+s87FtYREi2dEEQ==}
+
+  /@types/axios/0.14.0:
+    resolution: {integrity: sha512-KqQnQbdYE54D7oa/UmYVMZKq7CO4l8DEENzOKc4aBRwxCXSlJXGz83flFx5L7AWrOQnmuN3kVsRdt+GZPPjiVQ==}
+    deprecated: This is a stub types definition for axios (https://github.com/mzabriskie/axios). axios provides its own type definitions, so you don't need @types/axios installed!
+    dependencies:
+      axios: 1.4.0
+    transitivePeerDependencies:
+      - debug
+    dev: false
 
   /@types/babel__core/7.20.0:
     resolution: {integrity: sha512-+n8dL/9GWblDO0iU6eZAwEIJVr5DWigtle+Q6HLOrh/pdbXOhOtqzq8VPPE2zvNJzSKY4vH/z3iT3tn0A3ypiQ==}
@@ -1788,6 +1845,10 @@ packages:
       '@types/express-serve-static-core': 4.17.32
       '@types/qs': 6.9.7
       '@types/serve-static': 1.15.0
+
+  /@types/geojson/7946.0.10:
+    resolution: {integrity: sha512-Nmh0K3iWQJzniTuPRcJn5hxXkfB1T1pgB89SBig5PlJQU5yocazeu4jATJlaA0GYFKWMqDdvYemoSnF2pXgLVA==}
+    dev: true
 
   /@types/glob/8.0.1:
     resolution: {integrity: sha512-8bVUjXZvJacUFkJXHdyZ9iH1Eaj5V7I8c4NdH5sQJsdXkqT4CA5Dhb4yb4VE/3asyx4L9ayZr1NIhTsWHczmMw==}
@@ -2526,6 +2587,16 @@ packages:
     resolution: {integrity: sha512-fPwcX4EvnSHuInCMItEhAGnaSEXRBjtzh9fOtsE6E1G6p7vl7edEeZe11QHf18+6+9gR5PbKV/sGKNaD8YaMeA==}
     dependencies:
       follow-redirects: 1.15.2
+    transitivePeerDependencies:
+      - debug
+    dev: false
+
+  /axios/1.4.0:
+    resolution: {integrity: sha512-S4XCWMEmzvo64T9GfvQDOXgYRDJ/wsSZc7Jvdgx5u1sd0JwsuPLqb3SYmusag+edF6ziyMensPVqLTSc1PiSEA==}
+    dependencies:
+      follow-redirects: 1.15.2
+      form-data: 4.0.0
+      proxy-from-env: 1.1.0
     transitivePeerDependencies:
       - debug
     dev: false
@@ -5605,6 +5676,16 @@ packages:
       - supports-color
       - ts-node
     dev: true
+
+  /joi/17.9.2:
+    resolution: {integrity: sha512-Itk/r+V4Dx0V3c7RLFdRh12IOjySm2/WGPMubBT92cQvRfYZhPM2W0hZlctjj72iES8jsRCwp7S/cRmWBnJ4nw==}
+    dependencies:
+      '@hapi/hoek': 9.3.0
+      '@hapi/topo': 5.1.0
+      '@sideway/address': 4.1.4
+      '@sideway/formula': 3.0.1
+      '@sideway/pinpoint': 2.0.0
+    dev: false
 
   /jose/4.11.4:
     resolution: {integrity: sha512-94FdcR8felat4vaTJyL/WVdtlWLlsnLMZP8v+A0Vru18K3bQ22vn7TtpVh3JlgBFNIlYOUlGqwp/MjRPOnIyCQ==}

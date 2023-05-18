@@ -35,7 +35,6 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { PublicationFile } from './publications/entities/publication-file';
 import { PublicationStatus } from './publications/entities/publication-status.entity';
 import { Publication } from './publications/entities/publication.entity';
-import { Publisher } from './publications/entities/publisher.entity';
 import { PublicationsModule } from './publications/publications.module';
 import { ChapterMeta } from './stories/entities/chapter-meta.entity';
 import { ChapterReader } from './stories/entities/chapter-reader.entity';
@@ -51,6 +50,7 @@ import { Story } from './stories/entities/story.entity';
 import { StoriesModule } from './stories/stories.module';
 import { Identity } from './users/entities/identity.entity';
 import { PasswordResetToken } from './users/entities/password-reset-token.entity';
+import { UserAddress } from './users/entities/user-address';
 import { UserDevice } from './users/entities/user-device.entity';
 import { UserFollow } from './users/entities/user-follow.entity';
 import { User } from './users/entities/user.entity';
@@ -60,6 +60,7 @@ import { WaitersModule } from './waiters/waiters.module';
 import { WalletTransaction } from './wallets/entities/wallet-transaction.entity';
 import { Wallet } from './wallets/entities/wallet.entity';
 import { WalletsModule } from './wallets/wallets.module';
+import { ShipmentsModule } from './shipments/shipments.module';
 
 @Module({
   imports: [
@@ -92,6 +93,7 @@ import { WalletsModule } from './wallets/wallets.module';
           UserFollow,
           User,
           UserDevice,
+          UserAddress,
           Identity,
           Story,
           StoryWriter,
@@ -106,7 +108,6 @@ import { WalletsModule } from './wallets/wallets.module';
           StoryTag,
           StoryComment,
           Publication,
-          Publisher,
           PublicationStatus,
           PublicationFile,
           PasswordResetToken,
@@ -184,6 +185,7 @@ import { WalletsModule } from './wallets/wallets.module';
     FinancesModule,
     KbsModule,
     WaitersModule,
+    ShipmentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

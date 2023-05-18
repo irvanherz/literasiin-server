@@ -1,29 +1,25 @@
 /* eslint-disable @typescript-eslint/no-inferrable-types */
+import { Media } from 'src/media/entities/media.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
-  ManyToOne,
+  JoinColumn,
+  OneToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from 'typeorm';
-import { Publication } from './publication.entity';
 
 @Entity()
 export class PublicationFile {
   @PrimaryGeneratedColumn()
   id: number;
-  @Column()
+  @Column({ type: 'int' })
   publicationId: number;
-  @Column({ type: 'varchar', length: 255 })
-  name: string;
-  @Column({ type: 'json', default: {} })
-  meta: any;
+  @Column({ type: 'int' })
+  mediaId: number;
   @CreateDateColumn()
   createdAt: Date;
-  @UpdateDateColumn()
-  updatedAt: Date;
-
-  @ManyToOne(() => Publication, (publication) => publication.statuses)
-  publication: Publication;
+  @OneToOne(() => Media, { eager: true })
+  @JoinColumn()
+  media: Media;
 }

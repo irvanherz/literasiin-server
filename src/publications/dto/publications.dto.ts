@@ -1,6 +1,12 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { IsOptional, IsString, Validate } from 'class-validator';
-import { CreateCategoryDto } from 'src/articles/dto/create-category.dto';
+import {
+  IsBoolean,
+  IsNumber,
+  IsObject,
+  IsOptional,
+  IsString,
+  Validate,
+} from 'class-validator';
 import {
   UserIdFilter,
   UserIdFilterValidatorConstraint,
@@ -12,6 +18,30 @@ export class CreatePublicationDto {
   userId: UserIdFilter;
   @IsString()
   title: string;
+  @IsOptional()
+  @IsString()
+  author: string;
+  @IsOptional()
+  @IsString()
+  type: string;
+  @IsOptional()
+  @IsNumber()
+  addressId: number;
+  @IsOptional()
+  @IsNumber()
+  coverId: number;
+  @IsOptional()
+  @IsNumber()
+  royalty: number;
+  @IsOptional()
+  @IsObject()
+  meta: any;
 }
 
-export class UpdatePublicationDto extends PartialType(CreateCategoryDto) {}
+export class PublicationDetailOptions {
+  @IsOptional()
+  @IsBoolean()
+  includeAddress?: boolean = false;
+}
+
+export class UpdatePublicationDto extends PartialType(CreatePublicationDto) {}

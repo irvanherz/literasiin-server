@@ -17,7 +17,7 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { OptionalJwtAuthGuard } from 'src/auth/optional-jwt-auth.guard';
 import { User } from 'src/auth/user.decorator';
 import { sanitizeFilter } from 'src/libs/validations';
-import { CreateMediaDto, MediaFilterDto } from './dto/media.dto';
+import { CreateImageMediaDto, MediaFilterDto } from './dto/media.dto';
 import { MediaService } from './media.service';
 
 @UseGuards(JwtAuthGuard)
@@ -54,12 +54,12 @@ export class MediaController {
   @UseInterceptors(FileInterceptor('file'))
   async uploadPhoto(
     @UploadedFile() file: Express.Multer.File,
-    @Body() payload: CreateMediaDto,
+    @Body() payload: CreateImageMediaDto,
     @User() currentUser,
   ) {
-    console.log(payload);
-
     payload.userId = sanitizeFilter(payload.userId || 'me', { currentUser });
+    if (!payload.userId !== currentUser?.id && currentUser?.role !== 'admin')
+      throw new ForbiddenException();
     const res = await this.mediaService.uploadImage(payload, file);
     return {
       data: res,
