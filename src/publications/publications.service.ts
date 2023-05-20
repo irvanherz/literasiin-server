@@ -1,8 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BiteshipService } from 'src/shipments/biteship.service';
-import { Repository } from 'typeorm';
-import { PublicationDetailOptions } from './dto/publications.dto';
+import { ILike, Repository } from 'typeorm';
+import {
+  PublicationDetailOptions,
+  PublicationFilterDto,
+} from './dto/publications.dto';
 import { Publication } from './entities/publication.entity';
 
 @Injectable()
@@ -19,8 +22,19 @@ export class PublicationsService {
     return result;
   }
 
-  async findMany(filter: any = {}) {
-    const result = this.publicationsRepository.findAndCount({});
+  async findMany(filter: PublicationFilterDto) {
+    const take = filter.limit || 1;
+    const skip = (filter.page - 1) * take;
+    const result = this.publicationsRepository.findAndCount({
+      where: {
+        userId: filter.userId ? (filter.userId as any) : undefined,
+        title: filter.search ? ILike(filter.search) : undefined,
+        status: filter.status ? (filter.status as any) : undefined,
+      },
+      skip,
+      take,
+      order: { [filter.sortBy]: filter.sortOrder },
+    });
     return result;
   }
 
@@ -40,6 +54,11 @@ export class PublicationsService {
   async deleteById(id: number) {
     const result = await this.publicationsRepository.softDelete(id);
     return result.affected;
+  }
+
+  async save(payload: Partial<Publication>) {
+    const result = await this.publicationsRepository.save(payload);
+    return result;
   }
 
   async pay(id: number) {
@@ -153,8 +172,9 @@ export class PublicationsService {
         orderDetails: [
           {
             qty: 1,
-            type: 'publishing',
+            type: 'publication',
             meta: { id: pub.id, name: 'Publishing', price: pkg.price },
+            unitPrice: pkg.price,
             amount: pkg.price,
           },
           {
@@ -170,7 +190,6 @@ export class PublicationsService {
       const { numBwPages, numColorPages, numCopies } = pub.meta;
       const bwPagePrice = 100;
       const colorPagePrice = 300;
-      const weight = Math.ceil((pub.meta.numCopies / 3) * 1000);
       const unitPrice =
         numBwPages * bwPagePrice + numColorPages * colorPagePrice;
       const totalPrice = unitPrice * numCopies;
@@ -196,7 +215,7 @@ export class PublicationsService {
         orderDetails: [
           {
             qty: numCopies,
-            type: 'publishing',
+            type: 'publication',
             meta: { id: pub.id, name: 'Publishing', price: unitPrice },
             unitPrice: unitPrice,
             amount: totalPrice,

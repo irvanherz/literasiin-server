@@ -14,8 +14,11 @@ export class OrderItem {
   id: number;
   @Column({ type: 'int' })
   orderId: number;
-  @Column({ type: 'enum', enum: ['book', 'coin', 'fee'] })
-  type: 'book' | 'coin' | 'fee';
+  @Column({
+    type: 'enum',
+    enum: ['book', 'publication', 'shipping-fee', 'coin', 'fee'],
+  })
+  type: 'book' | 'publication' | 'shipping-fee' | 'coin' | 'fee';
   @Column({ type: 'int' })
   qty: number;
   @Column({ type: 'decimal', precision: 20, scale: 2, default: 0 })

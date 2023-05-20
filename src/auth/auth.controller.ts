@@ -1,5 +1,4 @@
 import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
-import { InjectQueue } from '@nestjs/bull';
 import {
   BadRequestException,
   Body,
@@ -13,9 +12,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Queue } from 'bull';
 import { OAuth2Client } from 'google-auth-library';
-import { MailsService } from 'src/notifications/mails.service';
 import { UsersService } from 'src/users/users.service';
 import { AuthService } from './auth.service';
 import {
@@ -34,10 +31,7 @@ export class AuthController {
   constructor(
     private usersService: UsersService,
     private readonly authService: AuthService,
-    private readonly mailsSevice: MailsService,
     private readonly configsService: ConfigService,
-    @InjectQueue('mails')
-    private readonly mailsQueue: Queue,
     private readonly amqpConnection: AmqpConnection,
   ) {}
 

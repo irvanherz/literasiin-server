@@ -12,12 +12,14 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { OptionalJwtAuthGuard } from 'src/auth/optional-jwt-auth.guard';
 import { User } from 'src/auth/user.decorator';
 import { OrdersService } from 'src/finances/orders.service';
 import { sanitizeFilter } from 'src/libs/validations';
 import {
   CreatePublicationDto,
   PublicationDetailOptions,
+  PublicationFilterDto,
   UpdatePublicationDto,
 } from './dto/publications.dto';
 import { PublicationsService } from './publications.service';
@@ -39,9 +41,11 @@ export class PublicationsController {
     return { data };
   }
 
+  @UseGuards(OptionalJwtAuthGuard)
   @Get()
-  async findMany() {
-    const [data, numItems] = await this.publicationsService.findMany();
+  async findMany(@Query() filter: PublicationFilterDto, @User() currentUser) {
+    filter.userId = sanitizeFilter(filter.userId, { currentUser });
+    const [data, numItems] = await this.publicationsService.findMany(filter);
     const meta = { numItems };
     return { data, meta };
   }
@@ -85,6 +89,7 @@ export class PublicationsController {
     );
     pub.status = 'payment';
     pub.orderId = order.id;
+    await this.publicationsService.save(pub);
     return { data: order };
   }
 

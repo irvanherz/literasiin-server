@@ -1,4 +1,3 @@
-import { BullModule } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -26,9 +25,6 @@ import { SocketJwtAuthGuard } from './socket-jwt-auth.guard';
     PassportModule,
     SharedJwtModule,
     SharedRabbitMQModule,
-    BullModule.registerQueue({
-      name: 'mails',
-    }),
     UsersModule,
     NotificationsModule,
     TypeOrmModule.forFeature([

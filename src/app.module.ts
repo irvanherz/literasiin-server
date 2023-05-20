@@ -1,5 +1,4 @@
 import { MailerModule } from '@nestjs-modules/mailer';
-import { BullModule } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -36,6 +35,7 @@ import { PublicationFile } from './publications/entities/publication-file';
 import { PublicationStatus } from './publications/entities/publication-status.entity';
 import { Publication } from './publications/entities/publication.entity';
 import { PublicationsModule } from './publications/publications.module';
+import { ShipmentsModule } from './shipments/shipments.module';
 import { ChapterMeta } from './stories/entities/chapter-meta.entity';
 import { ChapterReader } from './stories/entities/chapter-reader.entity';
 import { Chapter } from './stories/entities/chapter.entity';
@@ -60,7 +60,6 @@ import { WaitersModule } from './waiters/waiters.module';
 import { WalletTransaction } from './wallets/entities/wallet-transaction.entity';
 import { Wallet } from './wallets/entities/wallet.entity';
 import { WalletsModule } from './wallets/wallets.module';
-import { ShipmentsModule } from './shipments/shipments.module';
 
 @Module({
   imports: [
@@ -159,16 +158,6 @@ import { ShipmentsModule } from './shipments/shipments.module';
         },
         defaults: {
           from: configService.get<string>('MAIL_FROM'),
-        },
-      }),
-    }),
-    BullModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        redis: {
-          host: configService.get<string>('BULL_REDIS_HOST'),
-          port: configService.get<number>('BULL_REDIS_PORT'),
         },
       }),
     }),
