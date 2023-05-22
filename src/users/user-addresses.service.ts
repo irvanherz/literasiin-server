@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserAddressFilterDto } from './dto/user-addresses.dto';
 import { UserAddress } from './entities/user-address';
@@ -21,7 +21,10 @@ export class UserAddressesService {
     const take = filter.limit || 1;
     const skip = (filter.page - 1) * take;
     const result = this.addressesRepo.findAndCount({
-      where: {},
+      where: {
+        userId: filter.userId ? (filter.userId as any) : undefined,
+        address: filter.search ? ILike(`${filter.search}`) : undefined,
+      },
       skip,
       take,
       order: { [filter.sortBy]: filter.sortOrder },

@@ -38,6 +38,10 @@ export class PublicationFilterDto {
   @IsOptional()
   @IsString()
   sortOrder: string = 'desc';
+
+  @IsOptional()
+  @IsBoolean()
+  includeAddress?: boolean = false;
 }
 
 export class CreatePublicationDto {

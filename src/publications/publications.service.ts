@@ -31,6 +31,7 @@ export class PublicationsService {
         title: filter.search ? ILike(filter.search) : undefined,
         status: filter.status ? (filter.status as any) : undefined,
       },
+      relations: filter.includeAddress ? { address: true } : undefined,
       skip,
       take,
       order: { [filter.sortBy]: filter.sortOrder },

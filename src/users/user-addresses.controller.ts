@@ -16,8 +16,10 @@ import { OptionalJwtAuthGuard } from 'src/auth/optional-jwt-auth.guard';
 import { User } from 'src/auth/user.decorator';
 import { sanitizeFilter } from 'src/libs/validations';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { CreateUserAddressDto } from './dto/user-addresses.dto';
-import { UserFiltersDto } from './dto/user-filters.dto';
+import {
+  CreateUserAddressDto,
+  UserAddressFilterDto,
+} from './dto/user-addresses.dto';
 import { UserAddressesService } from './user-addresses.service';
 
 @Controller()
@@ -40,12 +42,13 @@ export class UsersAddressesController {
 
   @UseGuards(OptionalJwtAuthGuard)
   @Get('users/addresses')
-  async findMany(@Query() filters: UserFiltersDto) {
-    const [users, count] = await this.addressesService.findMany(filters);
-    const numPages = Math.ceil(count / filters.limit);
+  async findMany(@Query() filter: UserAddressFilterDto, @User() currentUser) {
+    filter.userId = sanitizeFilter(filter.userId || 'me', { currentUser });
+    const [users, count] = await this.addressesService.findMany(filter);
+    const numPages = Math.ceil(count / filter.limit);
     const meta = {
-      page: filters.page,
-      limit: filters.limit,
+      page: filter.page,
+      limit: filter.limit,
       numItems: count,
       numPages,
     };
