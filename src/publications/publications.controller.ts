@@ -44,7 +44,8 @@ export class PublicationsController {
   @UseGuards(OptionalJwtAuthGuard)
   @Get()
   async findMany(@Query() filter: PublicationFilterDto, @User() currentUser) {
-    filter.userId = sanitizeFilter(filter.userId, { currentUser });
+    filter.userId = sanitizeFilter(filter.userId || 'me', { currentUser });
+    filter.status = sanitizeFilter(filter.status);
     const [data, numItems] = await this.publicationsService.findMany(filter);
     const meta = { numItems };
     return { data, meta };

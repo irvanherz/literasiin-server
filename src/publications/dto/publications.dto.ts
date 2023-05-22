@@ -25,7 +25,7 @@ export class PublicationFilterDto {
   >;
   @IsOptional()
   @Validate(UserIdFilterValidatorConstraint)
-  userId: UserIdFilter = 'me';
+  userId: UserIdFilter;
   @IsOptional()
   @IsNumber()
   page: number = 1;

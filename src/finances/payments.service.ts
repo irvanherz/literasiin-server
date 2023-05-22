@@ -1,3 +1,4 @@
+import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,6 +10,7 @@ export class PaymentsService {
   constructor(
     @InjectRepository(Payment)
     private readonly paymentsRepo: Repository<Payment>,
+    private readonly amqpConnection: AmqpConnection,
   ) {}
 
   async create(payload: Partial<Payment>) {
@@ -41,14 +43,18 @@ export class PaymentsService {
   async handleAutoExpire() {
     console.log('[SCHEDULER] Expiring unpaid payment');
 
-    await this.paymentsRepo.update(
-      {
+    const unpaidPayments = await this.paymentsRepo.find({
+      where: {
         status: 'unpaid',
         expiredAt: LessThan(new Date()),
       },
-      {
-        status: 'canceled',
-      },
-    );
+    });
+    for (const payment of unpaidPayments) {
+      payment.status = 'canceled';
+      const updatedPayment = await this.paymentsRepo.save(payment);
+      this.amqpConnection.publish('finances.payments.updated', '', {
+        payment: updatedPayment,
+      });
+    }
   }
 }

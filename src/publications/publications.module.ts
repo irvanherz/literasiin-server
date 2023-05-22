@@ -13,6 +13,7 @@ import { ShipmentsModule } from 'src/shipments/shipments.module';
 import { PublicationFile } from './entities/publication-file';
 import { PublicationStatus } from './entities/publication-status.entity';
 import { Publication } from './entities/publication.entity';
+import { FinancesSubscriber } from './finances.subscriber';
 import { PublicationFilesController } from './publication-files.controller';
 import { PublicationFilesService } from './publication-files.service';
 import { PublicationsController } from './publications.controller';
@@ -40,6 +41,7 @@ import { PublicationsService } from './publications.service';
     PublicationFilesService,
     OrdersService,
     BiteshipService,
+    FinancesSubscriber,
   ],
 })
 export class PublicationsModule {}

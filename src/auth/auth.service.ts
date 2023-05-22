@@ -12,7 +12,11 @@ import { UsersService } from 'src/users/users.service';
 import { Wallet } from 'src/wallets/entities/wallet.entity';
 import { DataSource, Repository } from 'typeorm';
 import * as uuid from 'uuid';
-import { ResetPasswordDto, SignupWithEmailDto } from './dto/auth.dto';
+import {
+  ChangePasswordDto,
+  ResetPasswordDto,
+  SignupWithEmailDto,
+} from './dto/auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -152,6 +156,19 @@ export class AuthService {
       await this.prtRepo.save(prt);
       return result;
     }
+  }
+
+  async changePassword(payload: ChangePasswordDto) {
+    const identity = await this.identitiesRepo.findOne({
+      where: { userId: payload.userId as any, type: 'password' },
+    });
+    if (!identity) throw new Error('Invalid credential');
+    const matched = await bcrypt.compare(payload.oldPassword, identity.key);
+    const newPassword = await bcrypt.hash(payload.newPassword, 5);
+    if (!matched) throw new Error('Invalid credential');
+    identity.key = newPassword;
+    const result = await this.identitiesRepo.save(identity);
+    return result;
   }
 
   async validateUser(username: string, password: string) {

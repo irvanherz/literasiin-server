@@ -42,6 +42,14 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
             name: 'finances.orders.items.paid',
             type: 'fanout',
           },
+          {
+            name: 'finances.orders.items.failed',
+            type: 'fanout',
+          },
+          {
+            name: 'finances.orders.items.canceled',
+            type: 'fanout',
+          },
           //NOTIF
           {
             name: 'notifications.emails.queues',

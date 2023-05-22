@@ -1,5 +1,6 @@
 import { Media } from 'src/media/entities/media.entity';
 import { UserAddress } from 'src/users/entities/user-address';
+import { User } from 'src/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
@@ -72,4 +73,6 @@ export class Publication {
   cover: Media;
   @ManyToOne(() => UserAddress, { nullable: true })
   address: UserAddress;
+  @ManyToOne(() => User, { eager: true })
+  user: User;
 }

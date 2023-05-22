@@ -13,10 +13,12 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { OAuth2Client } from 'google-auth-library';
+import { sanitizeFilter } from 'src/libs/validations';
 import { UsersService } from 'src/users/users.service';
 import { AuthService } from './auth.service';
 import {
   AuthWithGoogleDto,
+  ChangePasswordDto,
   ResetPasswordDto,
   SigninDto,
   SignOutDto,
@@ -144,6 +146,20 @@ export class AuthController {
   @Post('/reset-password')
   async resetPassword(@Body() body: ResetPasswordDto) {
     const result = await this.authService.resetPassword(body);
+    if (!result) throw new BadRequestException();
+    return;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/change-password')
+  async changePassword(
+    @Body() payload: ChangePasswordDto,
+    @User() currentUser,
+  ) {
+    payload.userId = sanitizeFilter(payload.userId || 'me', { currentUser });
+    if (payload.userId !== currentUser.id && currentUser.role !== 'admin')
+      throw new BadRequestException();
+    const result = await this.authService.changePassword(payload);
     if (!result) throw new BadRequestException();
     return;
   }

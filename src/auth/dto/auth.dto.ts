@@ -1,3 +1,4 @@
+import { Optional } from '@nestjs/common';
 import { Transform } from 'class-transformer';
 import {
   IsAlphanumeric,
@@ -7,8 +8,13 @@ import {
   IsOptional,
   IsString,
   MinLength,
+  Validate,
 } from 'class-validator';
 import * as dayjs from 'dayjs';
+import {
+  UserIdFilter,
+  UserIdFilterValidatorConstraint,
+} from 'src/libs/validations';
 
 export class AuthWithGoogleDto {
   @IsString()
@@ -37,6 +43,16 @@ export class ResetPasswordDto {
   token: string;
   @IsString()
   password: string;
+}
+
+export class ChangePasswordDto {
+  @Optional()
+  @Validate(UserIdFilterValidatorConstraint)
+  userId: UserIdFilter;
+  @IsString()
+  oldPassword: string;
+  @IsString()
+  newPassword: string;
 }
 
 export class SigninDto {

@@ -13,7 +13,6 @@ export class FinancesSubscriber {
     routingKey: '',
   })
   public async handlePaymentUpdated(payload: any) {
-    console.log('Paid');
     try {
       const { payment } = payload;
       if (payment.status === 'paid') {
@@ -22,6 +21,24 @@ export class FinancesSubscriber {
         );
         for (const item of items) {
           this.amqpConnection.publish('finances.orders.items.paid', '', {
+            item,
+          });
+        }
+      } else if (payment.status === 'failed') {
+        const items = await this.ordersService.findOrderItemsByPaymentId(
+          payment.id,
+        );
+        for (const item of items) {
+          this.amqpConnection.publish('finances.orders.items.failed', '', {
+            item,
+          });
+        }
+      } else if (payment.status === 'canceled') {
+        const items = await this.ordersService.findOrderItemsByPaymentId(
+          payment.id,
+        );
+        for (const item of items) {
+          this.amqpConnection.publish('finances.orders.items.canceled', '', {
             item,
           });
         }
