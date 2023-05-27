@@ -23,7 +23,7 @@ export class StoryFilterDto {
   status?: ExtendedFilter<'draft' | 'published'> = 'published';
   @ValidateIf((e) => e.userId)
   @Validate(UserIdFilterValidatorConstraint)
-  userId?: UserIdFilter = 'me';
+  userId?: UserIdFilter;
   @IsOptional()
   @Validate(UserIdFilterValidatorConstraint)
   bookmarkedByUserId?: UserIdFilter;
