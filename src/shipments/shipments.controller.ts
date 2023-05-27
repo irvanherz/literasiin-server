@@ -14,7 +14,7 @@ export class ShipmentsController {
     const data = await this.biteshipService.queryCouriers();
     return { data };
   }
-  @Get('/x')
+  @Get('/webhooks/biteship/status')
   async findAllX() {
     const data = await this.biteshipService.queryCourierRates({
       origin_postal_code: 57139,

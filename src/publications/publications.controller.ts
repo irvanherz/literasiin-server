@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -16,6 +17,7 @@ import { OptionalJwtAuthGuard } from 'src/auth/optional-jwt-auth.guard';
 import { User } from 'src/auth/user.decorator';
 import { OrdersService } from 'src/finances/orders.service';
 import { sanitizeFilter } from 'src/libs/validations';
+import { ShipmentsService } from 'src/shipments/shipments.service';
 import {
   CreatePublicationDto,
   PublicationDetailOptions,
@@ -29,6 +31,7 @@ export class PublicationsController {
   constructor(
     private readonly publicationsService: PublicationsService,
     private readonly ordersService: OrdersService,
+    private readonly shipmentsService: ShipmentsService,
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -79,6 +82,10 @@ export class PublicationsController {
       includeAddress: true,
     });
     if (!pub) throw new NotFoundException();
+    if (pub.status !== 'draft')
+      return new BadRequestException(
+        'This publication cannot proceed to payment',
+      );
     //estimate
     const info = await this.publicationsService.calculatePayment(pub);
     const order = await this.ordersService.createWithDetails(
@@ -90,8 +97,26 @@ export class PublicationsController {
     );
     pub.status = 'payment';
     pub.orderId = order.id;
+    const result = await this.publicationsService.save(pub);
+    return { data: result };
+  }
+
+  @Post(':id/ship')
+  async ship(@Param('id') id: number) {
+    const pub = await this.publicationsService.findById(id, {
+      includeAddress: true,
+    });
+    if (pub.status !== 'publishing')
+      return new BadRequestException(
+        'This publication cannot proceed to shipping',
+      );
+    const shipment = await this.shipmentsService.create({
+      status: 'created',
+      userId: pub.userId,
+    });
+    pub.status = 'shipping';
+    pub.shipmentId = shipment.id;
     await this.publicationsService.save(pub);
-    return { data: order };
   }
 
   @Post(':id/available-couriers')

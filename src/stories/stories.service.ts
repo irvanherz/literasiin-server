@@ -54,9 +54,9 @@ export class StoriesService {
     }
   }
 
-  async findMany(filters: StoryFilterDto) {
-    const take = filters.limit;
-    const skip = (filters.page - 1) * take;
+  async findMany(filter: StoryFilterDto) {
+    const take = filter.limit;
+    const skip = (filter.page - 1) * take;
 
     let query = await this.storiesRepo
       .createQueryBuilder('story')
@@ -72,40 +72,40 @@ export class StoriesService {
       .leftJoinAndSelect('story.writers', 'user', 'user.id=sw.userId')
       .leftJoinAndSelect('user.photo', 'up');
 
-    if (filters.bookmarkedByUserId) {
+    if (filter.bookmarkedByUserId) {
       query = query.innerJoinAndMapOne(
         'story.reader',
         'story_reader',
         'reader',
         'reader.storyId=story.id AND reader.userId=:userId AND reader.bookmark=true',
-        { userId: filters.bookmarkedByUserId },
+        { userId: filter.bookmarkedByUserId },
       );
     }
     query = query.orderBy(
-      filters.sortBy.includes('.') ? filters.sortBy : `story.${filters.sortBy}`,
-      filters.sortOrder.toUpperCase() as any,
+      filter.sortBy.includes('.') ? filter.sortBy : `story.${filter.sortBy}`,
+      filter.sortOrder.toUpperCase() as any,
     );
-    if (filters.search) {
+    if (filter.search) {
       query = query.andWhere('story.title like :search', {
-        title: `%${filters.search}%`,
+        title: `%${filter.search}%`,
       });
     }
-    if (filters.userId) {
+    if (filter.userId) {
       query = query.andWhere(
         `(SELECT COUNT(*) FROM story_writer sw2 WHERE sw2."storyId"=story.id AND sw2."userId"=:userId AND sw2.status='approved')=1`,
         {
-          userId: filters.userId,
+          userId: filter.userId,
         },
       );
     }
-    if (filters.status) {
+    if (filter.status) {
       query = query.andWhere('story.status=:status', {
-        status: filters.status,
+        status: filter.status,
       });
     }
-    if (filters.categoryId) {
+    if (filter.categoryId) {
       query = query.andWhere('story.categoryId=:categoryId', {
-        categoryId: filters.categoryId,
+        categoryId: filter.categoryId,
       });
     }
 

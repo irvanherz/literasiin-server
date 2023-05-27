@@ -39,7 +39,7 @@ export class StoriesController {
   @UseGuards(OptionalJwtAuthGuard)
   @Get('stories')
   async findMany(@Query() filter: StoryFilterDto, @User() currentUser: any) {
-    filter.userId = sanitizeFilter(filter.userId, { currentUser });
+    filter.userId = sanitizeFilter(filter.userId || 'me', { currentUser });
     filter.categoryId = sanitizeFilter(filter.categoryId);
     filter.status = sanitizeFilter(filter.status);
     filter.bookmarkedByUserId = sanitizeFilter(filter.bookmarkedByUserId, {

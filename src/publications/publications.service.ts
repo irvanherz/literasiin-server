@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ConfigurationsService } from 'src/configurations/configurations.service';
 import { BiteshipService } from 'src/shipments/biteship.service';
 import { ILike, Repository } from 'typeorm';
 import {
@@ -12,8 +13,9 @@ import { Publication } from './entities/publication.entity';
 export class PublicationsService {
   constructor(
     @InjectRepository(Publication)
-    private publicationsRepository: Repository<Publication>,
-    private biteshipService: BiteshipService,
+    private readonly publicationsRepository: Repository<Publication>,
+    private readonly biteshipService: BiteshipService,
+    private readonly configurationsService: ConfigurationsService,
   ) {}
 
   async create(payload: Partial<Publication>) {
@@ -83,20 +85,25 @@ export class PublicationsService {
     },
   };
 
-  private buildBiteshipPayload(pub: Publication) {
+  private buildBiteshipPayload(pub: Publication, config: any) {
     if (pub.type === 'indie') {
       const packageId = pub.meta.packageId as keyof typeof this.packages;
-      const pkg = this.packages[packageId];
+      const packageConfig = config.indiePublishingPackages.find(
+        (pkg) => pkg.id === packageId,
+      );
+      const weight = packageConfig.packageWeight;
       return {
-        origin_postal_code: 65115,
+        origin_postal_code: config.publisherAddress.postalCode,
+        origin_latitude: config.publisherAddress.coordinate.latitude,
+        origin_longitude: config.publisherAddress.coordinate.longitude,
         destination_postal_code: pub.address.postalCode,
-        couriers: 'jne,jnt,sicepat,wahana',
+        couriers: config.supportedCourierCodes.join(','),
         items: [
           {
-            name: 'Indie Publishing',
+            name: `Indie Publishing (${packageConfig.name})`,
             quantity: 1,
-            value: pkg.price,
-            weight: 1000,
+            value: packageConfig.price,
+            weight: weight,
           },
         ],
       };
@@ -109,7 +116,9 @@ export class PublicationsService {
         numBwPages * bwPagePrice + numColorPages * colorPagePrice;
       const totalPrice = unitPrice * numCopies;
       return {
-        origin_postal_code: 65115,
+        origin_postal_code: config.publisherAddress.postalCode,
+        origin_latitude: config.publisherAddress.coordinate.latitude,
+        origin_longitude: config.publisherAddress.coordinate.longitude,
         destination_postal_code: pub.address.postalCode,
         couriers: 'jne',
         items: [
@@ -125,10 +134,17 @@ export class PublicationsService {
     throw new Error('Invalid publication type');
   }
 
-  async queryCourierRates(pub: Publication) {
+  async queryCourierRates(pub: Publication, config?: any) {
     if (!pub) throw new Error('Publication does not exist');
     if (!pub.address) throw new Error('Address has not been set');
-    const payload = this.buildBiteshipPayload(pub);
+    if (!config) {
+      const configData = await this.configurationsService.findByName(
+        'publication-config',
+      );
+      config = configData.value;
+    }
+
+    const payload = this.buildBiteshipPayload(pub, config);
 
     const response = await this.biteshipService.queryCourierRates(
       payload as any,
@@ -136,9 +152,9 @@ export class PublicationsService {
     return response;
   }
 
-  private async queryShippingInfo(pub: Publication) {
+  private async queryShippingInfo(pub: Publication, config: any) {
     const { courier_code, courier_service_code } = pub.meta?.shipping || {};
-    const info = await this.queryCourierRates(pub);
+    const info = await this.queryCourierRates(pub, config);
     const shipping = info.pricing.find(
       (c) =>
         c.courier_code === courier_code &&
@@ -148,20 +164,27 @@ export class PublicationsService {
   }
 
   async calculatePayment(pub: Publication) {
+    const config = await this.configurationsService.findByName(
+      'publication-config',
+    );
+    const publicationConfig = config.value;
+
     if (pub.type == 'indie') {
       const packageId = pub.meta.packageId as keyof typeof this.packages;
-      const pkg = this.packages[packageId];
-      const shipping = await this.queryShippingInfo(pub);
+      const packageConfig = publicationConfig.indiePublishingPackages.find(
+        (pkg) => pkg.id === packageId,
+      );
+      const shipping = await this.queryShippingInfo(pub, publicationConfig);
       const shippingFee = shipping.price;
-      const finalAmount = pkg.price + shippingFee;
+      const finalAmount = packageConfig.price + shippingFee;
       return {
         totalPrice: finalAmount,
         breakdown: [
           {
-            name: pkg.name,
+            name: `Indie Publishing (${packageConfig.name})`,
             qty: 1,
-            unitPrice: pkg.price,
-            totalPrice: pkg.price,
+            unitPrice: packageConfig.price,
+            totalPrice: packageConfig.price,
           },
           {
             name: 'Shipping',
@@ -174,9 +197,13 @@ export class PublicationsService {
           {
             qty: 1,
             type: 'publication',
-            meta: { id: pub.id, name: 'Publishing', price: pkg.price },
-            unitPrice: pkg.price,
-            amount: pkg.price,
+            meta: {
+              id: pub.id,
+              name: `Indie Publishing (${packageConfig.name})`,
+              price: packageConfig.price,
+            },
+            unitPrice: packageConfig.price,
+            amount: packageConfig.price,
           },
           {
             qty: 1,
@@ -188,13 +215,16 @@ export class PublicationsService {
         ],
       };
     } else if (pub.type == 'selfpub') {
-      const { numBwPages, numColorPages, numCopies } = pub.meta;
-      const bwPagePrice = 100;
-      const colorPagePrice = 300;
+      const { numBwPages, numColorPages, numCopies, paperType } = pub.meta;
+      const paperTypeConfig = publicationConfig.paperTypes.find(
+        (paper) => paper.id === paperType,
+      );
+      const bwPagePrice = paperTypeConfig.bwPageUnitPrice;
+      const colorPagePrice = paperTypeConfig.colorPageUnitPrice;
       const unitPrice =
         numBwPages * bwPagePrice + numColorPages * colorPagePrice;
       const totalPrice = unitPrice * numCopies;
-      const shipping = await this.queryShippingInfo(pub);
+      const shipping = await this.queryShippingInfo(pub, publicationConfig);
       const shippingFee = shipping.price;
       const finalPrice = totalPrice + shippingFee;
       return {

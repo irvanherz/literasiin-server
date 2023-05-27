@@ -75,3 +75,37 @@ export type QueryCourierRatesDto = {
   couriers: string;
   items: QueryCourierRatesItemDto[];
 };
+
+export type OrderStatusWebhookDto = {
+  event: 'order.status';
+  courier_tracking_id: string;
+  courier_waybill_id: string;
+  courier_company: string;
+  courier_type: string;
+  courier_driver_name: string;
+  courier_driver_phone: string;
+  courier_link: string;
+  order_id: string;
+  order_price: number;
+  status: 'confirmed';
+};
+
+export type OrderPriceWebhookDto = {
+  event: 'order.price';
+  cash_on_delivery_fee: number;
+  courier_tracking_id: string;
+  courier_waybill_id: string;
+  order_id: string;
+  price: number;
+  proof_of_delivery_fee: number;
+  shippment_fee: number;
+  status: 'picked';
+};
+
+export type OrderWaybillIdWebhookDto = {
+  event: 'order.waybill_id';
+  order_id: string;
+  courier_tracking_id: string;
+  courier_waybill_id: string;
+  status: 'picked';
+};

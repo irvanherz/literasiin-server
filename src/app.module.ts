@@ -35,6 +35,7 @@ import { PublicationFile } from './publications/entities/publication-file';
 import { PublicationStatus } from './publications/entities/publication-status.entity';
 import { Publication } from './publications/entities/publication.entity';
 import { PublicationsModule } from './publications/publications.module';
+import { Shipment } from './shipments/entities/shipment.entity';
 import { ShipmentsModule } from './shipments/shipments.module';
 import { ChapterMeta } from './stories/entities/chapter-meta.entity';
 import { ChapterReader } from './stories/entities/chapter-reader.entity';
@@ -48,6 +49,7 @@ import { StoryTag } from './stories/entities/story-tag.entity';
 import { StoryWriter } from './stories/entities/story-writer';
 import { Story } from './stories/entities/story.entity';
 import { StoriesModule } from './stories/stories.module';
+import { StorytellingsModule } from './storytellings/storytellings.module';
 import { Identity } from './users/entities/identity.entity';
 import { PasswordResetToken } from './users/entities/password-reset-token.entity';
 import { UserAddress } from './users/entities/user-address';
@@ -129,6 +131,7 @@ import { WalletsModule } from './wallets/wallets.module';
           ChatRoom,
           ChatMember,
           ChatMessage,
+          Shipment,
         ],
       }),
     }),
@@ -175,6 +178,7 @@ import { WalletsModule } from './wallets/wallets.module';
     KbsModule,
     WaitersModule,
     ShipmentsModule,
+    StorytellingsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
