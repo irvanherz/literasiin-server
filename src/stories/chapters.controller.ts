@@ -45,7 +45,7 @@ export class ChaptersController {
       currentUser?.role !== 'admin'
     )
       throw new ForbiddenException();
-    const data = await this.chaptersService.create(payload);
+    const data = await this.chaptersService.create(payload as any);
     return { data };
   }
 
@@ -94,7 +94,7 @@ export class ChaptersController {
   @Patch('/stories/chapters/:id')
   async updateById(
     @Param('id') id: number,
-    @Body() setData: UpdateChapterDto,
+    @Body() payload: UpdateChapterDto,
     @User() currentUser,
   ) {
     const chapter = await this.chaptersService.findById(id);
@@ -106,7 +106,7 @@ export class ChaptersController {
       currentUser?.role !== 'admin'
     )
       throw new ForbiddenException();
-    await this.chaptersService.updateById(id, setData);
+    await this.chaptersService.updateById(id, payload as any);
     return;
   }
 

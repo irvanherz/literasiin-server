@@ -1,5 +1,8 @@
 /* eslint-disable @typescript-eslint/no-inferrable-types */
+import { PartialType } from '@nestjs/mapped-types';
 import {
+  IsBoolean,
+  IsEnum,
   IsNumber,
   IsOptional,
   IsString,
@@ -13,6 +16,31 @@ import {
   UserIdFilter,
   UserIdFilterValidatorConstraint,
 } from 'src/libs/validations';
+
+export class CreateStoryDto {
+  @IsOptional()
+  @IsNumber()
+  userId?: number;
+  @IsString()
+  title: string;
+  @IsOptional()
+  @IsString()
+  description?: string;
+  @IsOptional()
+  @IsNumber()
+  categoryId?: number;
+  @IsOptional()
+  @IsNumber()
+  coverId?: number;
+  @IsOptional()
+  @IsBoolean()
+  hasCompleted?: boolean;
+  @IsOptional()
+  @IsEnum(['draft', 'published'])
+  status?: 'draft' | 'published';
+}
+
+export class UpdateStoryDto extends CreateStoryDto {}
 
 export class StoryFilterDto {
   @IsOptional()
@@ -43,3 +71,12 @@ export class StoryFilterDto {
   @IsString()
   sortOrder: string = 'desc';
 }
+
+export class CreateTagDto {
+  @IsString()
+  name: string;
+}
+
+export class UpdateTagDto extends PartialType(CreateTagDto) {}
+
+export class UpdateChapterMetaDto {}

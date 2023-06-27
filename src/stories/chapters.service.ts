@@ -5,8 +5,6 @@ import {
   ChapterFilterDto,
   FindChapterByIdOptions,
 } from './dto/chapter-filter.dto';
-import { CreateChapterDto } from './dto/create-chapter.dto';
-import { UpdateChapterDto } from './dto/update-chapter.dto';
 import { ChapterMeta } from './entities/chapter-meta.entity';
 import { ChapterReader } from './entities/chapter-reader.entity';
 import { Chapter } from './entities/chapter.entity';
@@ -23,7 +21,7 @@ export class ChaptersService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async create(payload: CreateChapterDto) {
+  async create(payload: Partial<Chapter>) {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -100,8 +98,8 @@ export class ChaptersService {
     };
   }
 
-  async updateById(id: number, updateChapterDto: UpdateChapterDto) {
-    const result = await this.chaptersRepo.update(id, updateChapterDto);
+  async updateById(id: number, payload: Partial<Chapter>) {
+    const result = await this.chaptersRepo.update(id, payload);
     return result.affected;
   }
 
@@ -136,13 +134,4 @@ export class ChaptersService {
     );
     return result.affected;
   }
-
-  // async trackViewById(chapterId: number) {
-  //   const result = await this.chapterMetaRepo.increment(
-  //     { chapterId },
-  //     'numViews',
-  //     1,
-  //   );
-  //   return result.affected;
-  // }
 }

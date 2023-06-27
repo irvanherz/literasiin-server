@@ -16,9 +16,11 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { OptionalJwtAuthGuard } from 'src/auth/optional-jwt-auth.guard';
 import { User } from 'src/auth/user.decorator';
 import { sanitizeFilter } from 'src/libs/validations';
-import { CreateStoryDto } from './dto/create-story.dto';
-import { StoryFilterDto } from './dto/story-filter.dto';
-import { UpdateStoryDto } from './dto/update-story.dto';
+import {
+  CreateStoryDto,
+  StoryFilterDto,
+  UpdateStoryDto,
+} from './dto/stories.dto';
 import { StoriesService } from './stories.service';
 
 @Controller()

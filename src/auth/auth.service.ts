@@ -162,10 +162,10 @@ export class AuthService {
     const identity = await this.identitiesRepo.findOne({
       where: { userId: payload.userId as any, type: 'password' },
     });
-    if (!identity) throw new Error('Invalid credential');
+    if (!identity) throw new BadRequestException('Invalid credential');
     const matched = await bcrypt.compare(payload.oldPassword, identity.key);
     const newPassword = await bcrypt.hash(payload.newPassword, 5);
-    if (!matched) throw new Error('Invalid credential');
+    if (!matched) throw new BadRequestException('Invalid credential');
     identity.key = newPassword;
     const result = await this.identitiesRepo.save(identity);
     return result;
@@ -216,9 +216,9 @@ export class AuthService {
     });
     let user = await this.usersRepo.findOne({ where: { email } });
     if (identity) {
-      if (!user) throw new Error('User not found');
+      if (!user) throw new BadRequestException('User not found');
       if (identity.userId !== user.id)
-        throw new Error(
+        throw new BadRequestException(
           'Something went wrong. Please contact customer service',
         );
       return [user, false] as [User, boolean];

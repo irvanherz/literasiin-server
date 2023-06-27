@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConfigurationsService } from 'src/configurations/configurations.service';
 import { BiteshipService } from 'src/shipments/biteship.service';
@@ -131,12 +131,12 @@ export class PublicationsService {
         ],
       };
     }
-    throw new Error('Invalid publication type');
+    throw new BadRequestException('Invalid publication type');
   }
 
   async queryCourierRates(pub: Publication, config?: any) {
-    if (!pub) throw new Error('Publication does not exist');
-    if (!pub.address) throw new Error('Address has not been set');
+    if (!pub) throw new BadRequestException('Publication does not exist');
+    if (!pub.address) throw new BadRequestException('Address has not been set');
     if (!config) {
       const configData = await this.configurationsService.findByName(
         'publication-config',

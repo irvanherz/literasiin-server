@@ -1,4 +1,5 @@
 import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { ChapterCommentStatus } from '../entities/chapter.entity';
 
 export class CreateChapterDto {
   @IsNumber()
@@ -14,4 +15,10 @@ export class CreateChapterDto {
   @IsOptional()
   @IsString()
   status: 'draft' | 'published';
+  @IsOptional()
+  @IsNumber()
+  price?: number;
+  @IsOptional()
+  @IsString()
+  commentStatus?: ChapterCommentStatus;
 }

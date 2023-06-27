@@ -11,9 +11,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { CreateTagDto } from './dto/create-tag.dto';
+import { CreateTagDto, UpdateTagDto } from './dto/stories.dto';
 import { StoryTagFilterDto } from './dto/story-tag-filter.dto';
-import { UpdateTagDto } from './dto/update-tag.dto';
 import { StoryTagsService } from './story-tags.service';
 
 @Controller('/stories/tags')

@@ -17,9 +17,6 @@ export class ChapterMeta {
   numViews: number;
   @Column({ type: 'int', default: 0 })
   numVotes: number;
-  @Column({ type: 'decimal', precision: 20, scale: 2, default: 0 })
-  price: number;
-
   @OneToOne(() => Chapter, (chapter) => chapter.meta, {
     cascade: true,
     onDelete: 'CASCADE',

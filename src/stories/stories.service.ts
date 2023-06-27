@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
-import { StoryFilterDto } from './dto/story-filter.dto';
-import { UpdateStoryDto } from './dto/update-story.dto';
+import { StoryFilterDto, UpdateStoryDto } from './dto/stories.dto';
 import { StoryMeta } from './entities/story-meta.entity';
 import { StoryReader } from './entities/story-reader.entity';
 import { StoryTagMap } from './entities/story-tag-map.entity';

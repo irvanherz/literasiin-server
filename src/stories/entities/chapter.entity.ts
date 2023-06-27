@@ -12,7 +12,8 @@ import {
 import { ChapterMeta } from './chapter-meta.entity';
 import { Story } from './story.entity';
 
-type StoryType = 'draft' | 'published';
+export type ChapterStatus = 'draft' | 'published';
+export type ChapterCommentStatus = 'enabled' | 'disabled' | 'moderated';
 
 @Entity()
 export class Chapter {
@@ -27,7 +28,15 @@ export class Chapter {
   @Column({ type: 'text', nullable: true })
   content?: string;
   @Column({ type: 'enum', enum: ['draft', 'published'], default: 'draft' })
-  status: StoryType;
+  status: ChapterStatus;
+  @Column({ type: 'decimal', precision: 20, scale: 2, default: 0 })
+  price: number;
+  @Column({
+    type: 'enum',
+    enum: ['enabled', 'disabled', 'moderated'],
+    default: 'enabled',
+  })
+  commentStatus: ChapterCommentStatus;
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()
