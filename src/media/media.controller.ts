@@ -58,7 +58,7 @@ export class MediaController {
     @User() currentUser,
   ) {
     payload.userId = sanitizeFilter(payload.userId || 'me', { currentUser });
-    if (!payload.userId !== currentUser?.id && currentUser?.role !== 'admin')
+    if (payload.userId !== currentUser?.id && currentUser?.role !== 'admin')
       throw new ForbiddenException();
     const res = await this.mediaService.uploadImage(payload, file);
     return {
@@ -72,7 +72,7 @@ export class MediaController {
     const media = await this.mediaService.findById(id);
     if (!media) throw new NotFoundException();
 
-    if (!media.userId !== currentUser?.id && currentUser?.role !== 'admin')
+    if (media.userId !== currentUser?.id && currentUser?.role !== 'admin')
       throw new ForbiddenException();
 
     await this.mediaService.deleteById(id);

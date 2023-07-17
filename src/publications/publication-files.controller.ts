@@ -60,7 +60,7 @@ export class PublicationFilesController {
     @User() currentUser,
   ) {
     payload.userId = sanitizeFilter(payload.userId || 'me', { currentUser });
-    if (!payload.userId !== currentUser?.id && currentUser?.role !== 'admin')
+    if (payload.userId !== currentUser?.id && currentUser?.role !== 'admin')
       throw new ForbiddenException();
     const media = await this.mediaService.uploadDocument(payload as any, file, {
       tags: ['publication-file'],
@@ -79,7 +79,7 @@ export class PublicationFilesController {
     const media = await this.mediaService.findById(id);
     if (!media) throw new NotFoundException();
 
-    if (!media.userId !== currentUser?.id && currentUser?.role !== 'admin')
+    if (media.userId !== currentUser?.id && currentUser?.role !== 'admin')
       throw new ForbiddenException();
 
     await this.mediaService.deleteById(id);

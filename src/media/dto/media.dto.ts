@@ -35,7 +35,7 @@ export class MediaFilterDto {
 export class CreateImageMediaDto {
   @IsOptional()
   @Validate(UserIdFilterValidatorConstraint)
-  userId: UserIdFilter;
+  userId: UserIdFilter = 'me';
   @IsString()
   preset: string;
 }
