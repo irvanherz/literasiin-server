@@ -1,5 +1,5 @@
 import { BetaAnalyticsDataClient } from '@google-analytics/data';
-import { Controller, Get } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 // Using a default constructor instructs the client to use the credentials
@@ -14,14 +14,29 @@ export class GoogleAnalyticsController {
   }
 
   // @UseGuards(JwtAuthGuard)
-  @Get('current-active-users-per-country')
-  async getCurrentActiveUsers() {
+  @Post('run-realtime-report')
+  async runRealtimeReport(@Body() payload: any) {
+    console.log(payload);
+
     const [response] = await this.adc.runRealtimeReport({
+      ...payload,
       property: `properties/${this.configsService.get<string>(
         'GOOGLE_ANALYTICS_PROPERTY_ID',
       )}`,
-      dimensions: [{ name: 'country' }],
-      metrics: [{ name: 'activeUsers' }],
+    });
+
+    return {
+      data: response,
+    };
+  }
+
+  @Post('run-report')
+  async runReport(@Body() payload: any) {
+    const [response] = await this.adc.runReport({
+      ...payload,
+      property: `properties/${this.configsService.get<string>(
+        'GOOGLE_ANALYTICS_PROPERTY_ID',
+      )}`,
     });
 
     return {
