@@ -2,31 +2,29 @@ import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
+  Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Storytelling } from './storytelling.entity';
 
-export class Storytelling {
+@Entity()
+export class StorytellingCategory {
   @PrimaryGeneratedColumn()
   id: number;
-  @Column()
-  storyId: number;
   @Column({ type: 'varchar', length: 255 })
-  title: string;
+  name: string;
   @Column({ type: 'text', nullable: true })
   description: string;
-  @Column({ type: 'time', nullable: true })
-  duration: string;
-  @Column({ type: 'int', nullable: true })
-  thumbnailId: number;
-  @Column({ type: 'int', nullable: true })
-  mediaId: number;
-  @Column({ type: 'enum', enum: ['draft', 'published'], default: 'draft' })
-  status: 'draft' | 'published';
+  @Column({ type: 'int', default: 0 })
+  priority: number;
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt: Date;
   @DeleteDateColumn()
   deletedAt?: Date;
+  @OneToMany(() => Storytelling, (storytelling) => storytelling.category)
+  storytellings: Storytelling[];
 }

@@ -31,6 +31,24 @@ const PHOTO_SIZES = [
   },
 ];
 
+const STORYTELLING_COVER_SIZES = [
+  {
+    id: 'lg',
+    width: 920,
+    height: 920,
+  },
+  {
+    id: 'md',
+    width: 640,
+    height: 640,
+  },
+  {
+    id: 'sm',
+    width: 320,
+    height: 320,
+  },
+];
+
 const COVER_SIZES = [
   {
     id: 'lg',
@@ -103,6 +121,13 @@ const PRESETS = {
     data: {
       type: 'image',
       tags: ['story-cover'],
+    },
+  },
+  'storytelling-cover': {
+    sizes: STORYTELLING_COVER_SIZES,
+    data: {
+      type: 'image',
+      tags: ['storytelling-cover'],
     },
   },
   'article-image': {

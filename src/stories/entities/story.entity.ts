@@ -19,6 +19,7 @@ import { Chapter } from './chapter.entity';
 import { StoryCategory } from './story-category.entity';
 import { StoryMeta } from './story-meta.entity';
 import { StoryTag } from './story-tag.entity';
+import { StoryWriter } from './story-writer';
 
 type StoryType = 'draft' | 'published';
 
@@ -81,5 +82,5 @@ export class Story {
     joinColumn: { name: 'storyId', referencedColumnName: 'id' },
     inverseJoinColumn: { name: 'userId', referencedColumnName: 'id' },
   })
-  writers: StoryTag[];
+  writers: StoryWriter[];
 }
