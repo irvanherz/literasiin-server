@@ -1,10 +1,14 @@
+import { HttpService } from '@nestjs/axios';
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import * as dayjs from 'dayjs';
 import { TokenPayload } from 'google-auth-library';
+import { GetTokenResponse } from 'google-auth-library/build/src/auth/oauth2client';
 import * as moment from 'moment-timezone';
+import { firstValueFrom } from 'rxjs';
 import { Identity } from 'src/users/entities/identity.entity';
 import { PasswordResetToken } from 'src/users/entities/password-reset-token.entity';
 import { UserDevice } from 'src/users/entities/user-device.entity';
@@ -22,7 +26,9 @@ import {
 @Injectable()
 export class AuthService {
   constructor(
+    private readonly httpService: HttpService,
     private readonly dataSource: DataSource,
+    private readonly configsService: ConfigService,
     private jwtService: JwtService,
     private usersService: UsersService,
     @InjectRepository(PasswordResetToken)
@@ -211,7 +217,7 @@ export class AuthService {
     return 'user' + result + Date.now().toString();
   }
 
-  async validateUserWithGoogle(payload: TokenPayload) {
+  async validateUserWithGoogle(payload: TokenPayload, token: GetTokenResponse) {
     const email = payload.email;
     const sub = payload.sub;
     let identity = await this.identitiesRepo.findOne({
@@ -237,9 +243,100 @@ export class AuthService {
       identity = await this.identitiesRepo.save({
         type: 'google',
         key: sub,
+        meta: token?.tokens,
         userId: user.id,
       });
       return [user, true] as [User, boolean];
+    }
+  }
+
+  async validateUserWithFacebook(profile: any, token: any) {
+    const email = profile.email;
+    const userId = profile.id;
+    let identity = await this.identitiesRepo.findOne({
+      where: { type: 'facebook', key: userId },
+    });
+    let user = await this.usersRepo.findOne({ where: { email } });
+    if (identity) {
+      if (!user) throw new BadRequestException('User not found');
+      if (identity.userId !== user.id)
+        throw new BadRequestException(
+          'Something went wrong. Please contact customer service',
+        );
+      return [user, false] as [User, boolean];
+    } else {
+      if (!user) {
+        user = await this.signupWithEmail({
+          email,
+          fullName:
+            [
+              profile?.first_name || '',
+              profile?.middle_name || '',
+              profile?.last_name || '',
+            ].join(' ') || 'User',
+          password: this.randomPassword(),
+          username: this.randomUsername(),
+        } as any);
+      }
+      identity = await this.identitiesRepo.save({
+        type: 'facebook',
+        key: userId,
+        meta: token,
+        userId: user.id,
+      });
+      return [user, true] as [User, boolean];
+    }
+  }
+
+  async getFacebookAccessTokenFromCode(code: string) {
+    try {
+      const clientId = this.configsService.get<string>('FACEBOOK_APP_ID');
+      const clientSecret = this.configsService.get<string>(
+        'FACEBOOK_APP_SECRET',
+      );
+      const redirectUri =
+        this.configsService.get<string>('APP_BASEURL') +
+        '/auth/facebook/redirect';
+      const { data } = await firstValueFrom(
+        this.httpService.get<any>(
+          `https://graph.facebook.com/v17.0/oauth/access_token`,
+          {
+            params: {
+              client_id: clientId,
+              client_secret: clientSecret,
+              redirect_uri: redirectUri,
+              code: code,
+            },
+          },
+        ),
+      );
+      return data;
+    } catch (err) {
+      if (err?.response?.data) return err.response.data;
+      throw err;
+    }
+  }
+
+  async getFacebookUserData(accessToken) {
+    try {
+      const { data } = await firstValueFrom(
+        this.httpService.get<any>(`https://graph.facebook.com/v17.0/me`, {
+          params: {
+            fields: [
+              'id',
+              'email',
+              'first_name',
+              'middle_name',
+              'last_name',
+            ].join(','),
+            access_token: accessToken,
+          },
+        }),
+      );
+      return data;
+    } catch (err) {
+      if (err?.response?.data) return err.response.data;
+      throw err;
     }
   }
 }

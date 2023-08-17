@@ -2,11 +2,11 @@ import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import { Strategy } from 'passport-google-oauth20';
+import { Strategy } from 'passport-facebook';
 import { AuthService } from './auth.service';
 
 @Injectable()
-export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
+export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
   constructor(
     private readonly authService: AuthService,
     private readonly configService: ConfigService,
@@ -14,18 +14,18 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   ) {
     super({
       accessType: 'offline',
-      clientID: configService.get<string>('GOOGLE_OAUTH_CLIENT_ID'),
-      clientSecret: configService.get<string>('GOOGLE_OAUTH_CLIENT_SECRET'),
+      clientID: configService.get<string>('FACEBOOK_APP_ID'),
+      clientSecret: configService.get<string>('FACEBOOK_APP_SECRET'),
       callbackURL:
-        configService.get<string>('APP_BASEURL') + '/auth/google/redirect',
-      scope: ['email', 'profile', 'openid'],
+        configService.get<string>('APP_BASEURL') + '/auth/facebook/redirect',
+      scope: ['email', 'public_profile'],
     });
   }
 
   // async validate(token: string, refreshToken: string, profile: Profile) {
   //   console.log(token, refreshToken, profile);
   //   const [user, isNewUser] =
-  //     await this.authService.validateUserWithGoogleViaPassport(
+  //     await this.authService.validateUserWithFacebookViaPassport(
   //       token,
   //       refreshToken,
   //       profile,

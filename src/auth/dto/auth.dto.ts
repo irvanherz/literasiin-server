@@ -16,9 +16,22 @@ import {
   UserIdFilterValidatorConstraint,
 } from 'src/libs/validations';
 
+// export class AuthWithGoogleDto {
+//   @IsString()
+//   idToken: string;
+//   //device
+//   @IsString()
+//   deviceType: string;
+//   @IsString()
+//   deviceId: string;
+//   @IsOptional()
+//   @IsString()
+//   notificationToken?: string;
+// }
+
 export class AuthWithGoogleDto {
   @IsString()
-  idToken: string;
+  code: string;
   //device
   @IsString()
   deviceType: string;

@@ -1,3 +1,4 @@
+import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -15,6 +16,7 @@ import { UsersService } from 'src/users/users.service';
 import { Wallet } from 'src/wallets/entities/wallet.entity';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { FacebookStrategy } from './facebook.strategy';
 import { GoogleStrategy } from './google.strategy';
 import { JwtStrategy } from './jwt.strategy';
 import { LocalStrategy } from './local.strategy';
@@ -22,6 +24,7 @@ import { SocketJwtAuthGuard } from './socket-jwt-auth.guard';
 
 @Module({
   imports: [
+    HttpModule,
     PassportModule,
     SharedJwtModule,
     SharedRabbitMQModule,
@@ -41,6 +44,7 @@ import { SocketJwtAuthGuard } from './socket-jwt-auth.guard';
     AuthService,
     LocalStrategy,
     GoogleStrategy,
+    FacebookStrategy,
     JwtStrategy,
     UsersService,
     IdentitiesService,

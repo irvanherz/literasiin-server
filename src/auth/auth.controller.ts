@@ -24,6 +24,8 @@ import {
   SigninDto,
   SignupWithEmailDto,
 } from './dto/auth.dto';
+import { FacebookAuthGuard } from './facebook-auth.guard';
+import { GoogleAuthGuard } from './google-auth.guard';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { LocalAuthGuard } from './local-auth.guard';
 import { User } from './user.decorator';
@@ -169,21 +171,26 @@ export class AuthController {
     return;
   }
 
-  @Post('/google')
+  @Post('/with-google')
   async authWithGoogle(@Body() body: AuthWithGoogleDto) {
     const clientKey = this.configsService.get<string>('GOOGLE_OAUTH_CLIENT_ID');
     const clientSecret = this.configsService.get<string>(
       'GOOGLE_OAUTH_CLIENT_SECRET',
     );
-    const client = new OAuth2Client(clientKey, clientSecret);
+    const callbackURL =
+      this.configsService.get<string>('APP_BASEURL') + '/auth/google/redirect';
+    const client = new OAuth2Client(clientKey, clientSecret, callbackURL);
+    const token = await client.getToken(body.code);
+
     const ticket = await client.verifyIdToken({
-      idToken: body.idToken,
+      idToken: token.tokens.id_token,
       audience: clientKey,
     });
     const payload = ticket.getPayload();
 
     const [user, isNewUser] = await this.authService.validateUserWithGoogle(
       payload,
+      token,
     );
 
     if (isNewUser) {
@@ -214,32 +221,60 @@ export class AuthController {
     };
   }
 
-  // @UseGuards(GoogleAuthGuard)
-  // @Get('/google')
-  // continueWithGoogle(@Request() req) {
-  //   console.log('login', req.user);
-  //   return this.authService.signin({ id: 1, name: 'Kucing' });
-  // }
+  @Post('/with-facebook')
+  async authWithFacebook(@Body() body: AuthWithGoogleDto) {
+    const token = await this.authService.getFacebookAccessTokenFromCode(
+      body.code,
+    );
+    console.log(token);
+    const profile = await this.authService.getFacebookUserData(
+      token.access_token,
+    );
+    console.log(profile);
+    const [user, isNewUser] = await this.authService.validateUserWithFacebook(
+      profile,
+      token,
+    );
 
-  // @UseGuards(GoogleAuthGuard)
-  // @Get('/google/redirect')
-  // async continueWithGoogleRedirect() {
-  //   const data = await this.authService.signin({ id: 1, name: 'Kucing' });
-  //   const jsonData = JSON.stringify(data);
+    if (isNewUser) {
+      this.amqpConnection.publish('users.created', '', {
+        user,
+      });
+    }
 
-  //   return `
-  //     <!DOCTYPE html>
-  //     <html>
-  //     <script>
-  //       const data = ${jsonData};
-  //       window.opener.postMessage({ type: 'google-auth-completed', data: data }, '*');
-  //       window.close();
-  //     </script>
-  //     </body>
+    const auth = await this.authService.signin({
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+    });
+    const device = await this.authService.saveDevice({
+      userId: user.id,
+      deviceType: body?.deviceType || 'other',
+      deviceId: body.deviceId,
+      notificationToken: body?.notificationToken || null,
+    });
+    return {
+      data: user,
+      meta: {
+        token: auth.token,
+        refreshToken: auth.refreshToken,
+        device,
+      },
+    };
+  }
 
-  //     </html>
-  //   `;
-  // }
+  @UseGuards(GoogleAuthGuard)
+  @Get('/google')
+  continueWithGoogle() {
+    console.log('continueWithGoogle');
+  }
+
+  @UseGuards(FacebookAuthGuard)
+  @Get('/facebook')
+  continueWithFacebook() {
+    console.log('continueWithFacebook');
+  }
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')

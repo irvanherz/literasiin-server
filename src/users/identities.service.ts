@@ -55,6 +55,14 @@ export class IdentitiesService {
     return result;
   }
 
+  async findByTypeAndKey(type: string, key: string) {
+    const result = await this.identitiesRepository.findOne({
+      where: { type, key },
+    });
+    if (result && result.type === 'password') result.key = '<encrypted>';
+    return result;
+  }
+
   async updateById(id: number, data: UpdateIdentityDto) {
     const result = await this.identitiesRepository.update(id, data);
     return result.affected;
