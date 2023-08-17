@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
+import * as dayjs from 'dayjs';
 import { TokenPayload } from 'google-auth-library';
 import * as moment from 'moment-timezone';
 import { Identity } from 'src/users/entities/identity.entity';
@@ -39,9 +40,11 @@ export class AuthService {
   async signin(user: any) {
     const token = this.jwtService.sign({ ...user }, { expiresIn: '5m' });
     const refreshToken = this.jwtService.sign({ ...user }, { expiresIn: '5d' });
+    const expiredAt = dayjs().add(1, 'minutes').toDate();
     return {
       token,
       refreshToken,
+      expiredAt,
     };
   }
 

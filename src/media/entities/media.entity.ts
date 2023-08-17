@@ -17,8 +17,11 @@ export class Media {
   userId: number;
   @Column({ type: 'varchar', length: 255 })
   name: string;
-  @Column({ type: 'enum', enum: ['image', 'video', 'document', 'other'] })
-  type: 'image' | 'video' | 'document' | 'other';
+  @Column({
+    type: 'enum',
+    enum: ['image', 'video', 'document', 'audio', 'other'],
+  })
+  type: 'image' | 'video' | 'document' | 'audio' | 'other';
   @Column({ type: 'text', array: true })
   tags: string[];
   @Column({ type: 'json', default: {} })

@@ -17,7 +17,11 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { OptionalJwtAuthGuard } from 'src/auth/optional-jwt-auth.guard';
 import { User } from 'src/auth/user.decorator';
 import { sanitizeFilter } from 'src/libs/validations';
-import { CreateImageMediaDto, MediaFilterDto } from './dto/media.dto';
+import {
+  CreateAudioMediaDto,
+  CreateImageMediaDto,
+  MediaFilterDto,
+} from './dto/media.dto';
 import { MediaService } from './media.service';
 
 @UseGuards(JwtAuthGuard)
@@ -61,6 +65,23 @@ export class MediaController {
     if (payload.userId !== currentUser?.id && currentUser?.role !== 'admin')
       throw new ForbiddenException();
     const res = await this.mediaService.uploadImage(payload, file);
+    return {
+      data: res,
+    };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('audio')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadAudio(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() payload: CreateAudioMediaDto,
+    @User() currentUser,
+  ) {
+    payload.userId = sanitizeFilter(payload.userId || 'me', { currentUser });
+    if (payload.userId !== currentUser?.id && currentUser?.role !== 'admin')
+      throw new ForbiddenException();
+    const res = await this.mediaService.uploadAudio(payload, file);
     return {
       data: res,
     };

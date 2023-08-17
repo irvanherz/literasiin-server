@@ -1,13 +1,19 @@
 /* eslint-disable @typescript-eslint/no-inferrable-types */
 import { PartialType } from '@nestjs/mapped-types';
 import { Transform } from 'class-transformer';
-import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { ExtendedFilter } from 'src/libs/validations';
 
 export class StorytellingEpisodeFilter {
   @IsOptional()
   @IsNumber()
-  storytellingId: number;
+  storytellingId?: number;
   @IsOptional()
   @IsString()
   status?: ExtendedFilter<'draft' | 'published'> = 'published';
@@ -43,14 +49,14 @@ export class CreateStorytellingEpisodeDto {
   @IsString()
   description?: string;
   @IsOptional()
-  @IsString()
-  content?: string;
-  @IsOptional()
-  @IsString()
-  status: 'draft' | 'published';
-  @IsOptional()
   @IsNumber()
   price?: number;
+  @IsOptional()
+  @IsNumber()
+  mediaId?: number;
+  @IsOptional()
+  @IsEnum(['draft', 'published'])
+  status?: 'draft' | 'published';
 }
 
 export class UpdateStorytellingEpisodeDto extends PartialType(

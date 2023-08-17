@@ -8,6 +8,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ArticlesModule } from './articles/articles.module';
 import { ArticleCategory } from './articles/entities/article-category.entity';
+import { ArticleComment } from './articles/entities/article-comment.entity';
 import { ArticleMeta } from './articles/entities/article-meta.entity';
 import { ArticleReader } from './articles/entities/article-reader.entity';
 import { Article } from './articles/entities/article.entity';
@@ -128,6 +129,7 @@ import { WalletsModule } from './wallets/wallets.module';
           ArticleMeta,
           ArticleReader,
           ArticleCategory,
+          ArticleComment,
           Media,
           Configuration,
           Wallet,

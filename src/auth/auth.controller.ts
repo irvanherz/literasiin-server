@@ -20,8 +20,8 @@ import {
   AuthWithGoogleDto,
   ChangePasswordDto,
   ResetPasswordDto,
-  SigninDto,
   SignOutDto,
+  SigninDto,
   SignupWithEmailDto,
 } from './dto/auth.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
@@ -31,7 +31,7 @@ import { User } from './user.decorator';
 @Controller('auth')
 export class AuthController {
   constructor(
-    private usersService: UsersService,
+    private readonly usersService: UsersService,
     private readonly authService: AuthService,
     private readonly configsService: ConfigService,
     private readonly amqpConnection: AmqpConnection,
@@ -66,8 +66,7 @@ export class AuthController {
       return {
         data: user,
         meta: {
-          token: auth.token,
-          refreshToken: auth.refreshToken,
+          ...auth,
           device,
         },
       };
@@ -98,8 +97,7 @@ export class AuthController {
     return {
       data: user,
       meta: {
-        token: auth.token,
-        refreshToken: auth.refreshToken,
+        ...auth,
         device,
       },
     };

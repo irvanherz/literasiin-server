@@ -45,3 +45,9 @@ export class CreateDocumentMediaDto {
   @Validate(UserIdFilterValidatorConstraint)
   userId: UserIdFilter;
 }
+
+export class CreateAudioMediaDto {
+  @IsOptional()
+  @Validate(UserIdFilterValidatorConstraint)
+  userId: UserIdFilter;
+}

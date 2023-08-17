@@ -1,3 +1,4 @@
+import { Media } from 'src/media/entities/media.entity';
 import {
   Column,
   CreateDateColumn,
@@ -25,18 +26,12 @@ export class StorytellingEpisode {
   title: string;
   @Column({ type: 'text', nullable: true })
   description?: string;
-  @Column({ type: 'text', nullable: true })
-  content?: string;
+  @Column({ type: 'int', nullable: true })
+  mediaId?: number;
   @Column({ type: 'enum', enum: ['draft', 'published'], default: 'draft' })
   status: ChapterStatus;
   @Column({ type: 'decimal', precision: 20, scale: 2, default: 0 })
   price: number;
-  @Column({
-    type: 'enum',
-    enum: ['enabled', 'disabled', 'moderated'],
-    default: 'enabled',
-  })
-  commentStatus: ChapterCommentStatus;
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()
@@ -54,4 +49,7 @@ export class StorytellingEpisode {
     nullable: true,
   })
   meta?: StorytellingEpisodeMeta;
+  @OneToOne(() => Media, { eager: true, nullable: true })
+  @JoinColumn()
+  media: Media;
 }

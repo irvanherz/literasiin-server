@@ -4,6 +4,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  MinLength,
 } from 'class-validator';
 
 export type GenderType = 'male' | 'female' | 'other';
@@ -13,6 +14,7 @@ export class CreateUserDto {
   @IsEmail()
   email: string;
   @IsString()
+  @MinLength(3)
   username?: string;
   @IsOptional()
   @IsNumber()

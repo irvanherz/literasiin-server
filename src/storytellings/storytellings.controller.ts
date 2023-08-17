@@ -21,11 +21,15 @@ import {
   StorytellingFilter,
   UpdateStorytellingDto,
 } from './dto/storytellings.dto';
+import { StorytellingEpisodesService } from './storytelling-episodes.service';
 import { StorytellingsService } from './storytellings.service';
 
 @Controller()
 export class StorytellingsController {
-  constructor(private readonly storytellingsService: StorytellingsService) {}
+  constructor(
+    private readonly storytellingsService: StorytellingsService,
+    private readonly episodesService: StorytellingEpisodesService,
+  ) {}
 
   @UseGuards(JwtAuthGuard)
   @Post('storytellings')
@@ -69,6 +73,23 @@ export class StorytellingsController {
     const storytelling = await this.storytellingsService.findById(id);
     if (!storytelling) throw new NotFoundException();
     return { data: storytelling };
+  }
+
+  @Get('storytellings/:id/tracks')
+  async findTracksById(@Param('id') id: number) {
+    const storytelling = await this.storytellingsService.findById(id);
+    const [episodes] = await this.episodesService.findMany({
+      storytellingId: id,
+      limit: 1000,
+      page: 1,
+    } as any);
+    if (!storytelling) throw new NotFoundException();
+    return {
+      data: {
+        storytelling,
+        episodes,
+      },
+    };
   }
 
   // @Post('storytellings/:id/tags/:tag')

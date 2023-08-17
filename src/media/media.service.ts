@@ -1,12 +1,14 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
+import { parseBuffer } from 'music-metadata-browser';
 import { MinioService } from 'nestjs-minio-client';
 import * as path from 'path';
 import * as sharp from 'sharp';
 import slugify from 'slugify';
 import { ArrayContains, ILike, Repository } from 'typeorm';
 import {
+  CreateAudioMediaDto,
   CreateDocumentMediaDto,
   CreateImageMediaDto,
   MediaFilterDto,
@@ -252,6 +254,55 @@ export class MediaService {
     const media = await this.mediaRepo.save({
       userId: userId as any,
       type: 'document',
+      name: nameBase,
+      meta: {
+        objects: uploads,
+        originalName: file.originalname,
+        originalSize: file.size,
+      },
+      ...extra,
+    });
+    return media;
+  }
+
+  async uploadAudio(
+    payload: CreateAudioMediaDto,
+    file: Express.Multer.File,
+    extra: Partial<Media> = {},
+  ) {
+    const userId = payload?.userId;
+    const baseUrl =
+      'https://' + this.configService.get<string>('MINIO_ENDPOINT');
+    const bucket = this.configService.get<string>('MINIO_BUCKET');
+    const nameComponents = path.parse(file.originalname);
+    const nameBase =
+      Date.now().toString() +
+      '_' +
+      slugify(nameComponents.name, {
+        replacement: '-',
+        trim: true,
+        lower: true,
+      });
+    const uploads = [];
+    const objectName = `${nameBase}_original.mp3`;
+
+    await this.minioService.client.putObject(bucket, objectName, file.buffer, {
+      'Content-Type': 'audio/mp3',
+    });
+    const meta = await parseBuffer(file.buffer);
+    const url = `${baseUrl}/${bucket}/${objectName}`;
+    uploads.push({
+      url,
+      name: objectName,
+      meta: {
+        ...meta,
+        size: file.buffer.length,
+      },
+    });
+    const media = await this.mediaRepo.save({
+      tags: ['storytelling-audio'],
+      userId: userId as any,
+      type: 'audio',
       name: nameBase,
       meta: {
         objects: uploads,
