@@ -23,6 +23,8 @@ import { OrderItem } from './finances/entities/order-item.entity';
 import { Order } from './finances/entities/order.entity';
 import { Payment } from './finances/entities/payment.entity';
 import { FinancesModule } from './finances/finances.module';
+import { UserMessage } from './general/entities/user-message.entity';
+import { GeneralModule } from './general/general.module';
 import { KbCategory } from './kbs/entities/kb-category.entity';
 import { Kb } from './kbs/entities/kb.entity';
 import { KbsModule } from './kbs/kbs.module';
@@ -152,6 +154,8 @@ import { WalletsModule } from './wallets/wallets.module';
           StorytellingCategory,
           StorytellingEpisodeMeta,
           StorytellingEpisodeAudience,
+
+          UserMessage,
         ],
       }),
     }),
@@ -200,6 +204,7 @@ import { WalletsModule } from './wallets/wallets.module';
     ShipmentsModule,
     StorytellingsModule,
     ReportsModule,
+    GeneralModule,
   ],
   controllers: [AppController],
   providers: [AppService],

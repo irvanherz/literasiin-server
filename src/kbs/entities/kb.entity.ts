@@ -31,6 +31,9 @@ export class Kb {
   updatedAt: Date;
   @DeleteDateColumn()
   deletedAt?: Date;
-  @ManyToOne(() => KbCategory, (category) => category.kbs)
+  @ManyToOne(() => KbCategory, (category) => category.kbs, {
+    eager: true,
+    nullable: true,
+  })
   category: KbCategory;
 }
