@@ -14,7 +14,7 @@ export class StorytellingEpisodeMeta {
   @Column()
   episodeId: number;
   @Column({ type: 'int', default: 0 })
-  numViews: number;
+  numListens: number;
   @Column({ type: 'int', default: 0 })
   numVotes: number;
   @OneToOne(() => StorytellingEpisode, (episode) => episode.meta, {

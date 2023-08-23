@@ -12,13 +12,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { OptionalJwtAuthGuard } from 'src/auth/optional-jwt-auth.guard';
 import { User } from 'src/auth/user.decorator';
 import { sanitizeFilter } from 'src/libs/validations';
 import { Mixed } from 'src/mixed.decorator';
 import {
   CreateStorytellingEpisodeDto,
   FindStorytellingEpisodeByIdOptions,
+  FindTrackByIdOptions,
   StorytellingEpisodeFilter,
   UpdateStorytellingEpisodeDto,
 } from './dto/storytelling-episodes.dto';
@@ -48,6 +48,7 @@ export class StorytellingEpisodesController {
     )
       throw new ForbiddenException();
     const data = await this.episodesService.create(payload as any);
+    await this.storytellingsService.updateNumEpisodes(data.storytellingId);
     return { data };
   }
 
@@ -71,25 +72,16 @@ export class StorytellingEpisodesController {
     return { data: episode };
   }
 
-  @Post('/storytellings/episodes/:id/view')
-  async view(@Param('id') id: number) {
-    const episode = await this.episodesService.findById(id);
-    if (!episode) throw new NotFoundException();
-    await this.storytellingsService.incrementNumViews(episode.storytellingId);
-    await this.episodesService.incrementNumViews(id);
-    return;
-  }
-
-  @UseGuards(OptionalJwtAuthGuard)
-  @Get('/storytellings/episodes/:id/context')
-  async getActionContext(@Param('id') id: number, @User() currentUser) {
-    const episode = await this.episodesService.findById(id);
-    if (!episode) throw new NotFoundException();
-    const data = await this.episodesService.findContextById(
-      id,
-      currentUser?.id,
-    );
-    return { data };
+  @UseGuards(JwtAuthGuard)
+  @Get('/storytellings/episodes/:id/track')
+  async findTrackById(
+    @Param('id') id: number,
+    @Query() opts: FindTrackByIdOptions,
+  ) {
+    const data = await this.episodesService.findTrackById(id, opts);
+    return {
+      data,
+    };
   }
 
   @UseGuards(JwtAuthGuard)
@@ -111,6 +103,8 @@ export class StorytellingEpisodesController {
     )
       throw new ForbiddenException();
     await this.episodesService.updateById(id, payload as any);
+    if (payload.status)
+      await this.storytellingsService.updateNumEpisodes(episode.storytellingId);
     return;
   }
 
@@ -129,6 +123,7 @@ export class StorytellingEpisodesController {
     )
       throw new ForbiddenException();
     await this.episodesService.deleteById(id);
+    await this.storytellingsService.updateNumEpisodes(episode.storytellingId);
     return;
   }
 }

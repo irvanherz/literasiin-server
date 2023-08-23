@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, LessThan, MoreThan, Repository } from 'typeorm';
 import {
   FindStorytellingEpisodeByIdOptions,
+  FindTrackByIdOptions,
   StorytellingEpisodeFilter,
 } from './dto/storytelling-episodes.dto';
 import { StorytellingEpisodeAudience } from './entities/storytelling-episode-audience.entity';
@@ -17,7 +18,7 @@ export class StorytellingEpisodesService {
     @InjectRepository(StorytellingEpisodeMeta)
     private readonly storytellingEpisodeMetaRepo: Repository<StorytellingEpisodeMeta>,
     @InjectRepository(StorytellingEpisodeAudience)
-    private readonly readersRepo: Repository<StorytellingEpisodeAudience>,
+    private readonly audiencesRepo: Repository<StorytellingEpisodeAudience>,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -59,12 +60,12 @@ export class StorytellingEpisodesService {
       take,
       order: { [filter.sortBy]: filter.sortOrder },
     });
+
     return result;
   }
 
   async findById(id: number, options: FindStorytellingEpisodeByIdOptions = {}) {
     const { includeStorytelling } = options;
-    console.log(includeStorytelling);
 
     const result = await this.episodesRepo.findOne({
       where: { id },
@@ -73,31 +74,27 @@ export class StorytellingEpisodesService {
     return result;
   }
 
-  async findContextById(id: number, userId: number) {
-    const read = userId
-      ? await this.readersRepo.findOne({ where: { episodeId: id, userId } })
-      : undefined;
-    const vote = read?.vote || 0;
-    const currentEpisode = await this.episodesRepo.findOne({ where: { id } });
-    const prevEpisode = await this.episodesRepo.findOne({
+  async findTrackById(id: number, options: FindTrackByIdOptions = {}) {
+    const current = await this.episodesRepo.findOne({
+      where: { id },
+      relations: { storytelling: true },
+    });
+    if (!current) throw new NotFoundException();
+    const prev = await this.episodesRepo.findOne({
       where: {
-        id: LessThan(id),
-        storytellingId: currentEpisode.storytellingId,
-        status: 'published',
+        storytellingId: current.storytellingId,
+        id: LessThan(current.id),
+        status: options.status !== 'any' ? options.status : undefined,
       },
     });
-    const nextEpisode = await this.episodesRepo.findOne({
+    const next = await this.episodesRepo.findOne({
       where: {
-        id: MoreThan(id),
-        storytellingId: currentEpisode.storytellingId,
-        status: 'published',
+        storytellingId: current.storytellingId,
+        id: MoreThan(current.id),
+        status: options.status !== 'any' ? options.status : undefined,
       },
     });
-    return {
-      vote,
-      prevEpisode,
-      nextEpisode,
-    };
+    return { current, prev, next };
   }
 
   async updateById(id: number, payload: Partial<StorytellingEpisode>) {
@@ -110,30 +107,28 @@ export class StorytellingEpisodesService {
     return result.affected;
   }
 
-  async incrementNumViews(episodeId: number) {
+  async incrementNumListens(episodeId: number) {
     const result = await this.storytellingEpisodeMetaRepo.increment(
       { episodeId },
-      'numViews',
+      'numListens',
       1,
     );
     return result.affected;
   }
-
-  async incrementNumVotes(episodeId: number) {
-    const result = await this.storytellingEpisodeMetaRepo.increment(
-      { episodeId },
-      'numVotes',
-      1,
-    );
-    return result.affected;
+  async updateNumVotes(episodeId: number) {
+    const numVotes = await this.audiencesRepo.count({
+      where: { episodeId, vote: true },
+    });
+    await this.storytellingEpisodeMetaRepo.update({ episodeId }, { numVotes });
   }
 
-  async decrementNumVotes(episodeId: number) {
-    const result = await this.storytellingEpisodeMetaRepo.increment(
+  async updateNumListens(episodeId: number) {
+    const numListens = await this.audiencesRepo.sum('numListens', {
+      episodeId,
+    });
+    await this.storytellingEpisodeMetaRepo.update(
       { episodeId },
-      'numVotes',
-      -1,
+      { numListens },
     );
-    return result.affected;
   }
 }

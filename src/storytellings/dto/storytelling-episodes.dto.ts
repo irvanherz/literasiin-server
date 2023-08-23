@@ -62,3 +62,9 @@ export class CreateStorytellingEpisodeDto {
 export class UpdateStorytellingEpisodeDto extends PartialType(
   CreateStorytellingEpisodeDto,
 ) {}
+
+export class FindTrackByIdOptions {
+  @IsOptional()
+  @IsString()
+  status?: ExtendedFilter<'draft' | 'published'> = 'published';
+}

@@ -92,20 +92,6 @@ export class StorytellingsController {
     };
   }
 
-  // @Post('storytellings/:id/tags/:tag')
-  // async assignTag(@Param('id') id: number, @Param('tag') tag: string) {
-  //   const storytelling = await this.storytellingsService.findById(id);
-  //   if (!storytelling) throw new NotFoundException();
-  //   await this.storytellingsService.assignTag(id, tag);
-  // }
-
-  // @Delete('storytellings/:id/tags/:tag')
-  // async unassignTag(@Param('id') id: number, @Param('tag') tag: string) {
-  //   const storytelling = await this.storytellingsService.findById(id);
-  //   if (!storytelling) throw new NotFoundException();
-  //   await this.storytellingsService.unassignTag(id, tag);
-  // }
-
   @UseGuards(JwtAuthGuard)
   @Patch('storytellings/:id')
   async updateById(
@@ -146,17 +132,5 @@ export class StorytellingsController {
 
     await this.storytellingsService.deleteById(id);
     return;
-  }
-
-  @UseGuards(OptionalJwtAuthGuard)
-  @Get('/storytellings/:id/context')
-  async getActionContext(@Param('id') id: number, @User() currentUser) {
-    const chapter = await this.storytellingsService.findById(id);
-    if (!chapter) throw new NotFoundException();
-    const data = await this.storytellingsService.findContextById(
-      id,
-      currentUser?.id,
-    );
-    return { data };
   }
 }

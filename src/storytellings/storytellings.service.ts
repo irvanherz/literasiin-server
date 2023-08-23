@@ -4,6 +4,8 @@ import { DataSource, Repository } from 'typeorm';
 import { StorytellingFilter } from './dto/storytellings.dto';
 import { StorytellingAudience } from './entities/storytelling-audience.entity';
 import { StorytellingAuthor } from './entities/storytelling-author.entity';
+import { StorytellingEpisodeAudience } from './entities/storytelling-episode-audience.entity';
+import { StorytellingEpisode } from './entities/storytelling-episode.entity';
 import { StorytellingMeta } from './entities/storytelling-meta.entity';
 import { Storytelling } from './entities/storytelling.entity';
 
@@ -17,6 +19,10 @@ export class StorytellingsService {
     private metaRepo: Repository<StorytellingMeta>,
     @InjectRepository(StorytellingAudience)
     private readonly audiencesRepo: Repository<StorytellingAudience>,
+    @InjectRepository(StorytellingEpisode)
+    private episodesRepo: Repository<StorytellingEpisode>,
+    @InjectRepository(StorytellingEpisodeAudience)
+    private episodeAudiencesRepo: Repository<StorytellingEpisodeAudience>,
   ) {}
 
   async create(payload: Partial<Storytelling>) {
@@ -127,19 +133,6 @@ export class StorytellingsService {
     return result;
   }
 
-  async findContextById(storytellingId: number, userId?: number) {
-    let hasBookmarked = false;
-    if (userId) {
-      const reader = await this.audiencesRepo.findOne({
-        where: { storytellingId, userId },
-      });
-      hasBookmarked = reader?.bookmark || false;
-    }
-    return {
-      hasBookmarked,
-    };
-  }
-
   async updateById(id: number, payload: Partial<Storytelling>) {
     const result = await this.storytellingsRepo.update(id, payload);
     return result.affected;
@@ -150,51 +143,67 @@ export class StorytellingsService {
     return result.affected;
   }
 
-  async incrementNumViews(storytellingId: number) {
-    const result = await this.metaRepo.increment(
-      { storytellingId },
-      'numViews',
-      1,
-    );
-    return result.affected;
+  async updateNumViews(storytellingId: number) {
+    const numViews = await this.audiencesRepo.sum('numViews', {
+      storytellingId,
+    });
+    await this.metaRepo.update({ storytellingId }, { numViews });
   }
 
-  async incrementNumVotes(storytellingId: number) {
-    const result = await this.metaRepo.increment(
+  async updateNumListeners(storytellingId: number) {
+    const data = await this.episodesRepo
+      .createQueryBuilder('episode')
+      .leftJoin(
+        StorytellingEpisodeAudience,
+        'audience',
+        'episode.id=audience.episodeId',
+      )
+      .groupBy('episode.storytellingId')
+      .where('episode.storytellingId=:storytellingId', { storytellingId })
+      .select('SUM(audience.numListens)', 'numListens')
+      .addSelect('COUNT(DISTINCT audience.userId)', 'numListeners')
+      .getRawOne();
+
+    const numListens = data?.numListens || 0;
+    const numListeners = data?.numListeners || 0;
+    await this.metaRepo.update(
       { storytellingId },
-      'numVotes',
-      1,
+      { numListens, numListeners },
     );
-    return result.affected;
   }
 
-  async decrementNumVotes(storytellingId: number) {
-    const result = await this.metaRepo.increment(
-      { storytellingId },
-      'numVotes',
-      -1,
-    );
-    return result.affected;
+  async updateNumVotes(storytellingId: number) {
+    const data = await this.episodesRepo
+      .createQueryBuilder('episode')
+      .leftJoin(
+        StorytellingEpisodeAudience,
+        'audience',
+        'episode.id=audience.episodeId',
+      )
+      .groupBy('episode.storytellingId')
+      .where('episode.storytellingId=:storytellingId AND audience.vote=true', {
+        storytellingId,
+      })
+      .select('COUNT(audience.id)', 'numVotes')
+      .getRawOne();
+
+    const numVotes = data?.numVotes || 0;
+    await this.metaRepo.update({ storytellingId }, { numVotes });
   }
 
-  // async assignTag(storytellingId: number, name: string) {
-  //   let tag = null;
-  //   tag = await this.storytellingTagsRepo.findOne({ where: { name } });
-  //   if (!tag) {
-  //     const setData = { name };
-  //     tag = await this.storytellingTagsRepo.save(setData);
-  //   }
-  //   const tagId = tag.id;
-  //   return await this.storytellingTagMapRepo.save({ storytellingId, tagId });
-  // }
-
-  // async unassignTag(storytellingId: number, name: string) {
-  //   const tag = await this.storytellingTagsRepo.findOne({ where: { name } });
-  //   const tagId = tag.id;
-  //   const result = await this.storytellingTagMapRepo.delete({
-  //     storytellingId,
-  //     tagId,
-  //   });
-  //   return result.affected;
-  // }
+  async updateNumEpisodes(storytellingId: number) {
+    const numEpisodes = await this.episodesRepo.count({
+      where: { storytellingId },
+    });
+    const numPublishedEpisodes = await this.episodesRepo.count({
+      where: { storytellingId, status: 'published' },
+    });
+    await this.metaRepo.update(
+      { storytellingId },
+      { numEpisodes, numPublishedEpisodes },
+    );
+    if (!numPublishedEpisodes) {
+      await this.storytellingsRepo.update(storytellingId, { status: 'draft' });
+    }
+  }
 }

@@ -101,6 +101,7 @@ import { WalletsModule } from './wallets/wallets.module';
         password: configService.get<string>('DATABASE_PASS'),
         database: configService.get<string>('DATABASE_NAME'),
         synchronize: true,
+        // logging: true,
         entities: [
           Waiter,
           UserFollow,

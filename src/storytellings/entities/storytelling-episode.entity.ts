@@ -28,6 +28,8 @@ export class StorytellingEpisode {
   description?: string;
   @Column({ type: 'int', nullable: true })
   mediaId?: number;
+  @Column({ type: 'int', nullable: true })
+  priority?: number;
   @Column({ type: 'enum', enum: ['draft', 'published'], default: 'draft' })
   status: ChapterStatus;
   @Column({ type: 'decimal', precision: 20, scale: 2, default: 0 })

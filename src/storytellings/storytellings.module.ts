@@ -10,10 +10,14 @@ import { StorytellingEpisodeMeta } from './entities/storytelling-episode-meta.en
 import { StorytellingEpisode } from './entities/storytelling-episode.entity';
 import { StorytellingMeta } from './entities/storytelling-meta.entity';
 import { Storytelling } from './entities/storytelling.entity';
+import { StorytellingAudiencesController } from './storytelling-audiences.controller';
+import { StorytellingAudiencesService } from './storytelling-audiences.service';
 import { StorytellingAuthorsController } from './storytelling-authors.controller';
 import { StorytellingAuthorsService } from './storytelling-authors.service';
 import { StorytellingCategoriesController } from './storytelling-categories.controller';
 import { StorytellingCategoriesService } from './storytelling-categories.service';
+import { StorytellingEpisodeAudiencesController } from './storytelling-episode-audience.controller';
+import { StorytellingEpisodeAudiencesService } from './storytelling-episode-audience.service';
 import { StorytellingEpisodesController } from './storytelling-episodes.controller';
 import { StorytellingEpisodesService } from './storytelling-episodes.service';
 import { StorytellingsController } from './storytellings.controller';
@@ -35,12 +39,16 @@ import { StorytellingsService } from './storytellings.service';
     ]),
   ],
   controllers: [
+    StorytellingEpisodeAudiencesController,
+    StorytellingAudiencesController,
     StorytellingAuthorsController,
     StorytellingCategoriesController,
     StorytellingEpisodesController,
     StorytellingsController,
   ],
   providers: [
+    StorytellingEpisodeAudiencesService,
+    StorytellingAudiencesService,
     StorytellingAuthorsService,
     StorytellingCategoriesService,
     StorytellingEpisodesService,

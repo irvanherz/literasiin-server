@@ -21,6 +21,12 @@ export class StorytellingAudience {
   userId: number;
   @Column({ type: 'boolean', default: false })
   bookmark: boolean;
+  @Column({ type: 'int', default: 0 })
+  numViews: number;
+  @Column({ type: 'int', default: 0 })
+  numListens: number;
+  @Column({ type: 'int', default: 0 })
+  numListeners: number;
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()

@@ -4,15 +4,8 @@ import {
   JoinColumn,
   OneToOne,
   PrimaryGeneratedColumn,
-  ValueTransformer,
-  VirtualColumn,
 } from 'typeorm';
 import { Storytelling } from './storytelling.entity';
-
-const NumberTransformer: ValueTransformer = {
-  to: (entityValue: string) => entityValue,
-  from: (databaseValue: string) => +databaseValue,
-};
 
 @Entity()
 export class StorytellingMeta {
@@ -23,7 +16,15 @@ export class StorytellingMeta {
   @Column({ type: 'int', default: 0 })
   numViews: number;
   @Column({ type: 'int', default: 0 })
+  numListens: number;
+  @Column({ type: 'int', default: 0 })
+  numListeners: number;
+  @Column({ type: 'int', default: 0 })
   numVotes: number;
+  @Column({ type: 'int', default: 0 })
+  numEpisodes: number;
+  @Column({ type: 'int', default: 0 })
+  numPublishedEpisodes: number;
 
   @OneToOne(() => Storytelling, (storytelling) => storytelling.meta, {
     cascade: true,
@@ -31,18 +32,4 @@ export class StorytellingMeta {
   })
   @JoinColumn()
   storytelling: Storytelling;
-  @VirtualColumn({
-    type: 'int',
-    query: (alias) =>
-      `SELECT COUNT(*) FROM storytelling_episode c WHERE c."storytellingId"=${alias}."storytellingId"`,
-    transformer: NumberTransformer,
-  })
-  numEpisodes: number;
-  @VirtualColumn({
-    type: 'int',
-    query: (alias) =>
-      `SELECT COUNT(*) FROM storytelling_episode c WHERE c."storytellingId"=${alias}."storytellingId" AND c.status='published'`,
-    transformer: NumberTransformer,
-  })
-  numPublishedEpisodes: number;
 }
