@@ -74,6 +74,7 @@ import { WaitersModule } from './waiters/waiters.module';
 import { WalletTransaction } from './wallets/entities/wallet-transaction.entity';
 import { Wallet } from './wallets/entities/wallet.entity';
 import { WalletsModule } from './wallets/wallets.module';
+import { RobotsModule } from './robots/robots.module';
 
 @Module({
   imports: [
@@ -206,6 +207,7 @@ import { WalletsModule } from './wallets/wallets.module';
     StorytellingsModule,
     ReportsModule,
     GeneralModule,
+    RobotsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-inferrable-types */
 import { PartialType } from '@nestjs/mapped-types';
 import {
+  IsArray,
   IsBoolean,
   IsEnum,
   IsNumber,
@@ -32,6 +33,12 @@ export class CreateStoryDto {
   @IsOptional()
   @IsNumber()
   coverId?: number;
+  @IsOptional()
+  @IsString()
+  languageId?: string;
+  @IsOptional()
+  @IsArray()
+  tags?: string[];
   @IsOptional()
   @IsBoolean()
   hasCompleted?: boolean;

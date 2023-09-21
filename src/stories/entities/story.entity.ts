@@ -5,7 +5,6 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  JoinColumn,
   JoinTable,
   ManyToMany,
   ManyToOne,
@@ -18,7 +17,6 @@ import {
 import { Chapter } from './chapter.entity';
 import { StoryCategory } from './story-category.entity';
 import { StoryMeta } from './story-meta.entity';
-import { StoryTag } from './story-tag.entity';
 import { StoryWriter } from './story-writer';
 
 type StoryType = 'draft' | 'published';
@@ -42,6 +40,8 @@ export class Story {
   coverId?: number;
   @Column({ type: 'int', nullable: true })
   categoryId: number;
+  @Column({ type: 'varchar', length: 10, default: 'id' })
+  languageId: string;
   @Column({ type: 'enum', enum: ['draft', 'published'], default: 'draft' })
   status: StoryType;
   @Column({ type: 'boolean', default: false })
@@ -59,16 +59,9 @@ export class Story {
     nullable: true,
   })
   category: StoryCategory;
-  @ManyToMany(() => StoryTag, (tag) => tag.stories, { eager: true })
-  @JoinTable({
-    synchronize: false,
-    name: 'story_tag_map',
-    joinColumn: { name: 'storyId', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'tagId', referencedColumnName: 'id' },
-  })
-  tags: StoryTag[];
-  @OneToOne(() => Media)
-  @JoinColumn()
+  @Column({ type: 'simple-array', default: '' })
+  tags: string[];
+  @ManyToOne(() => Media, { nullable: true, eager: true })
   cover: Media;
   @OneToOne(() => StoryMeta, (meta) => meta.story, {
     eager: true,

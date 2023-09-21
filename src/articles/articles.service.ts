@@ -65,8 +65,8 @@ export class ArticlesService {
       filter.sortOrder.toUpperCase() as any,
     );
     if (filter.search) {
-      query = query.andWhere('article.title like :search', {
-        title: `%${filter.search}%`,
+      query = query.andWhere('article.title ilike :search', {
+        search: `%${filter.search}%`,
       });
     }
     if (filter.userId) {

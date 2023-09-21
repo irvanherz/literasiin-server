@@ -21,6 +21,7 @@ import { StoriesController } from './stories.controller';
 import { StoriesService } from './stories.service';
 import { StoryCategoriesController } from './story-categories.controller';
 import { StoryCategoriesService } from './story-categories.service';
+import { StoryCollaborationsGateway } from './story-collaborations.gateway';
 import { StoryCommentsController } from './story-comments.controller';
 import { StoryCommentsService } from './story-comments.service';
 import { StoryReadersController } from './story-readers.controller';
@@ -67,6 +68,7 @@ import { StoryWritersService } from './story-writers.service';
     StoryCategoriesService,
     ChaptersService,
     ChapterReadersService,
+    StoryCollaborationsGateway,
   ],
 })
 export class StoriesModule {}

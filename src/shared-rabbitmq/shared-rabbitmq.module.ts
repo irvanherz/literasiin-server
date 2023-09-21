@@ -11,49 +11,59 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       useFactory: (configService: ConfigService) => ({
         uri: configService.get<string>('RABBITMQ_SERVER'),
         exchanges: [
-          //USER
+          //USERS
           {
             name: 'users.created',
             type: 'fanout',
+            options: { autoDelete: true },
           },
           {
             name: 'users.followed',
             type: 'fanout',
+            options: { autoDelete: true },
           },
           {
             name: 'users.passwordResetTokens.created',
             type: 'fanout',
+            options: { autoDelete: true },
           },
           //STORIES
           {
             name: 'stories.writers.invitations.created',
             type: 'fanout',
+            options: { autoDelete: true },
           },
           //FINANCE
           {
             name: 'finances.payments.created',
             type: 'fanout',
+            options: { autoDelete: true },
           },
           {
             name: 'finances.payments.updated',
             type: 'fanout',
+            options: { autoDelete: true },
           },
           {
             name: 'finances.orders.items.paid',
             type: 'fanout',
+            options: { autoDelete: true },
           },
           {
             name: 'finances.orders.items.failed',
             type: 'fanout',
+            options: { autoDelete: true },
           },
           {
             name: 'finances.orders.items.canceled',
             type: 'fanout',
+            options: { autoDelete: true },
           },
           //NOTIF
           {
             name: 'notifications.emails.queues',
             type: 'direct',
+            options: { autoDelete: true },
           },
         ],
       }),

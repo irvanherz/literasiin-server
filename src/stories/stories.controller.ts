@@ -65,30 +65,16 @@ export class StoriesController {
     return { data: story };
   }
 
-  @Post('stories/:id/tags/:tag')
-  async assignTag(@Param('id') id: number, @Param('tag') tag: string) {
-    const story = await this.storiesService.findById(id);
-    if (!story) throw new NotFoundException();
-    await this.storiesService.assignTag(id, tag);
-  }
-
-  @Delete('stories/:id/tags/:tag')
-  async unassignTag(@Param('id') id: number, @Param('tag') tag: string) {
-    const story = await this.storiesService.findById(id);
-    if (!story) throw new NotFoundException();
-    await this.storiesService.unassignTag(id, tag);
-  }
-
   @UseGuards(JwtAuthGuard)
   @Patch('stories/:id')
   async updateById(
     @Param('id') id: number,
-    @Body() setData: UpdateStoryDto,
+    @Body() payload: UpdateStoryDto,
     @User() currentUser,
   ) {
     if (
-      setData.userId &&
-      setData.userId !== currentUser.id &&
+      payload.userId &&
+      payload.userId !== currentUser.id &&
       currentUser.role !== 'admin'
     )
       throw new BadRequestException();
@@ -101,7 +87,9 @@ export class StoriesController {
     )
       throw new ForbiddenException();
 
-    await this.storiesService.updateById(id, setData);
+    console.log(payload);
+
+    await this.storiesService.updateById(id, payload);
     return;
   }
 

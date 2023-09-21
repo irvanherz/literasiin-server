@@ -30,6 +30,7 @@ async function bootstrap() {
   );
   app.useGlobalFilters(new HttpExceptionFilter());
   app.enableCors({ origin: '*', credentials: true });
+  // app.useWebSocketAdapter(new WsAdapter(app));
   // initializeApp();
   await app.listen(configService.get<number>('PORT'));
 }

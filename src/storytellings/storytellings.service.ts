@@ -88,8 +88,8 @@ export class StorytellingsService {
       filter.sortOrder.toUpperCase() as any,
     );
     if (filter.search) {
-      query = query.andWhere('storytelling.title like :search', {
-        title: `%${filter.search}%`,
+      query = query.andWhere('storytelling.title ilike :search', {
+        search: `%${filter.search}%`,
       });
     }
     if (filter.userId) {

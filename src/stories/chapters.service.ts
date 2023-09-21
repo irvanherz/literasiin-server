@@ -62,7 +62,6 @@ export class ChaptersService {
 
   async findById(id: number, options: FindChapterByIdOptions = {}) {
     const { includeStory } = options;
-    console.log(includeStory);
 
     const result = await this.chaptersRepo.findOne({
       where: { id },

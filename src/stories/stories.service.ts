@@ -62,7 +62,6 @@ export class StoriesService {
       .leftJoinAndSelect('story.cover', 'media')
       .leftJoinAndSelect('story.meta', 'story_meta')
       .leftJoinAndSelect('story.category', 'story_category')
-      .leftJoinAndSelect('story.tags', 'story_tag')
       .leftJoin(
         'story_writer',
         'sw',
@@ -85,8 +84,8 @@ export class StoriesService {
       filter.sortOrder.toUpperCase() as any,
     );
     if (filter.search) {
-      query = query.andWhere('story.title like :search', {
-        title: `%${filter.search}%`,
+      query = query.andWhere('story.title ilike :search', {
+        search: `%${filter.search}%`,
       });
     }
     if (filter.userId) {
@@ -118,7 +117,6 @@ export class StoriesService {
       .leftJoinAndSelect('story.cover', 'media')
       .leftJoinAndSelect('story.meta', 'story_meta')
       .leftJoinAndSelect('story.category', 'story_category')
-      .leftJoinAndSelect('story.tags', 'story_tag')
       .leftJoin(
         'story_writer',
         'sw',
@@ -178,27 +176,6 @@ export class StoriesService {
       'numVotes',
       -1,
     );
-    return result.affected;
-  }
-
-  async assignTag(storyId: number, name: string) {
-    let tag = null;
-    tag = await this.storyTagsRepo.findOne({ where: { name } });
-    if (!tag) {
-      const setData = { name };
-      tag = await this.storyTagsRepo.save(setData);
-    }
-    const tagId = tag.id;
-    return await this.storyTagMapRepo.save({ storyId, tagId });
-  }
-
-  async unassignTag(storyId: number, name: string) {
-    const tag = await this.storyTagsRepo.findOne({ where: { name } });
-    const tagId = tag.id;
-    const result = await this.storyTagMapRepo.delete({
-      storyId,
-      tagId,
-    });
     return result.affected;
   }
 }
