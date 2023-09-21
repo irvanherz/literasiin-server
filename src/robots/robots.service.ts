@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import OpenAI from 'openai';
 import { FixGrammarDto } from './dto/robots.dto';
 
@@ -16,9 +17,9 @@ import { FixGrammarDto } from './dto/robots.dto';
 @Injectable()
 export class RobotsService {
   private readonly openai: OpenAI;
-  constructor() {
+  constructor(private readonly configService: ConfigService) {
     this.openai = new OpenAI({
-      apiKey: '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',
+      apiKey: configService.get<string>('OPENAI_APIKEY'),
     });
   }
 
