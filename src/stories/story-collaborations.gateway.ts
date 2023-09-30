@@ -8,7 +8,7 @@ import {
 import { Server } from 'ws';
 import { setupWSConnection } from 'y-websocket/bin/utils';
 
-@WebSocketGateway(+process.env.GATEWAY_PORT, {
+@WebSocketGateway(+process.env.GATEWAY_PORT_YJS, {
   cors: '*',
   path: 'main',
 })
