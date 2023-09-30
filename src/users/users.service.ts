@@ -104,6 +104,14 @@ export class UsersService {
     return result.affected;
   }
 
+  async updateLastLoginAt(id: number, timestamp?: Date) {
+    timestamp = timestamp || new Date();
+    const result = await this.usersRepository.update(id, {
+      lastLoginAt: timestamp,
+    });
+    return result.affected;
+  }
+
   async validate(type: string, email: string, key: string) {
     const user = await this.usersRepository.findOne({ where: { email } });
     const identity = await this.identitiesRepository.findOne({

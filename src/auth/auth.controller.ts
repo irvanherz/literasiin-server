@@ -65,6 +65,7 @@ export class AuthController {
         deviceId: payload.deviceId,
         notificationToken: payload?.notificationToken || null,
       });
+      await this.usersService.updateLastLoginAt(user.id);
       return {
         data: user,
         meta: {
@@ -96,6 +97,7 @@ export class AuthController {
       deviceId: body.deviceId,
       notificationToken: body?.notificationToken || null,
     });
+    await this.usersService.updateLastLoginAt(user.id);
     return {
       data: user,
       meta: {
@@ -211,6 +213,7 @@ export class AuthController {
       deviceId: body.deviceId,
       notificationToken: body?.notificationToken || null,
     });
+    await this.usersService.updateLastLoginAt(user.id);
     return {
       data: user,
       meta: {
@@ -226,11 +229,9 @@ export class AuthController {
     const token = await this.authService.getFacebookAccessTokenFromCode(
       body.code,
     );
-    console.log(token);
     const profile = await this.authService.getFacebookUserData(
       token.access_token,
     );
-    console.log(profile);
     const [user, isNewUser] = await this.authService.validateUserWithFacebook(
       profile,
       token,
@@ -254,6 +255,8 @@ export class AuthController {
       deviceId: body.deviceId,
       notificationToken: body?.notificationToken || null,
     });
+
+    await this.usersService.updateLastLoginAt(user.id);
     return {
       data: user,
       meta: {

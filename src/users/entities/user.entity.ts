@@ -39,6 +39,8 @@ export class User {
   gender?: GenderType;
   @Column({ type: 'enum', enum: ['user', 'admin', 'super'], default: 'user' })
   role: RoleType;
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  lastLoginAt: Date;
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()
