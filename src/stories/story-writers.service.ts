@@ -22,11 +22,14 @@ export class StoryWritersService {
   async findMany(filter: StoryWriterFilterDto) {
     const take = filter.limit || 1;
     const skip = (filter.page - 1) * take;
+    const sortBy = `sw.${filter.sortBy}`;
+    const sortOrder = filter.sortOrder.toUpperCase() as any;
     let query = await this.usersRepo
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.photo', 'photo')
       .leftJoinAndMapOne('user.meta', 'story_writer', 'sw', 'sw.userId=user.id')
-      .leftJoin('story', 's', 's.id=sw.storyId');
+      .leftJoin('story', 's', 's.id=sw.storyId')
+      .orderBy(sortBy, sortOrder);
 
     if (filter.storyId)
       query = query.andWhere('sw.storyId=:storyId', {

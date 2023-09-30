@@ -107,14 +107,14 @@ export class StorytellingEpisodesService {
     return result.affected;
   }
 
-  async incrementNumListens(episodeId: number) {
-    const result = await this.storytellingEpisodeMetaRepo.increment(
-      { episodeId },
-      'numListens',
-      1,
-    );
-    return result.affected;
-  }
+  // async incrementNumListens(episodeId: number) {
+  //   const result = await this.storytellingEpisodeMetaRepo.increment(
+  //     { episodeId },
+  //     'numListens',
+  //     1,
+  //   );
+  //   return result.affected;
+  // }
   async updateNumVotes(episodeId: number) {
     const numVotes = await this.audiencesRepo.count({
       where: { episodeId, vote: true },

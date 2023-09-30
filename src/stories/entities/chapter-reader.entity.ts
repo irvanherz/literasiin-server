@@ -18,8 +18,10 @@ export class ChapterReader {
   chapterId: number;
   @Column()
   userId: number;
+  @Column({ type: 'boolean', default: false })
+  vote: boolean;
   @Column({ type: 'int', default: 0 })
-  vote: number;
+  numReads: number;
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()

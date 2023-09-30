@@ -25,5 +25,5 @@ export class StoryWriterFilterDto {
   sortBy: string = 'createdAt';
   @IsOptional()
   @IsString()
-  sortOrder: string = 'desc';
+  sortOrder: string = 'asc';
 }

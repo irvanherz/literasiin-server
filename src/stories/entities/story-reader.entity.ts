@@ -21,6 +21,8 @@ export class StoryReader {
   userId: number;
   @Column({ type: 'boolean', default: false })
   bookmark: boolean;
+  @Column({ type: 'int', default: 0 })
+  numViews: number;
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()

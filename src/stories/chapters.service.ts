@@ -74,7 +74,7 @@ export class ChaptersService {
     const read = userId
       ? await this.readersRepo.findOne({ where: { chapterId: id, userId } })
       : undefined;
-    const vote = read?.vote || 0;
+    const vote = read?.vote;
     const currentChapter = await this.chaptersRepo.findOne({ where: { id } });
     const prevChapter = await this.chaptersRepo.findOne({
       where: {
@@ -107,30 +107,45 @@ export class ChaptersService {
     return result.affected;
   }
 
-  async incrementNumViews(chapterId: number) {
-    const result = await this.chapterMetaRepo.increment(
-      { chapterId },
-      'numViews',
-      1,
-    );
-    return result.affected;
+  // async incrementNumViews(chapterId: number) {
+  //   const result = await this.chapterMetaRepo.increment(
+  //     { chapterId },
+  //     'numViews',
+  //     1,
+  //   );
+  //   return result.affected;
+  // }
+
+  // async incrementNumVotes(chapterId: number) {
+  //   const result = await this.chapterMetaRepo.increment(
+  //     { chapterId },
+  //     'numVotes',
+  //     1,
+  //   );
+  //   return result.affected;
+  // }
+
+  // async decrementNumVotes(chapterId: number) {
+  //   const result = await this.chapterMetaRepo.increment(
+  //     { chapterId },
+  //     'numVotes',
+  //     -1,
+  //   );
+  //   return result.affected;
+  // }
+
+  async updateNumVotes(chapterId: number) {
+    const numVotes = await this.readersRepo.count({
+      where: { chapterId, vote: true },
+    });
+    await this.chapterMetaRepo.update({ chapterId }, { numVotes });
   }
 
-  async incrementNumVotes(chapterId: number) {
-    const result = await this.chapterMetaRepo.increment(
-      { chapterId },
-      'numVotes',
-      1,
-    );
-    return result.affected;
-  }
-
-  async decrementNumVotes(chapterId: number) {
-    const result = await this.chapterMetaRepo.increment(
-      { chapterId },
-      'numVotes',
-      -1,
-    );
-    return result.affected;
+  async updateNumReads(chapterId: number) {
+    const numReads = await this.readersRepo.sum('numReads', {
+      chapterId,
+    });
+    const numReaders = await this.readersRepo.count({ where: { chapterId } });
+    await this.chapterMetaRepo.update({ chapterId }, { numReads, numReaders });
   }
 }

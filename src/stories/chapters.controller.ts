@@ -69,14 +69,14 @@ export class ChaptersController {
     return { data: chapter };
   }
 
-  @Post('/stories/chapters/:id/view')
-  async view(@Param('id') id: number) {
-    const chapter = await this.chaptersService.findById(id);
-    if (!chapter) throw new NotFoundException();
-    await this.storiesService.incrementNumViews(chapter.storyId);
-    await this.chaptersService.incrementNumViews(id);
-    return;
-  }
+  // @Post('/stories/chapters/:id/view')
+  // async view(@Param('id') id: number) {
+  //   const chapter = await this.chaptersService.findById(id);
+  //   if (!chapter) throw new NotFoundException();
+  //   await this.storiesService.incrementNumViews(chapter.storyId);
+  //   await this.chaptersService.incrementNumViews(id);
+  //   return;
+  // }
 
   @UseGuards(OptionalJwtAuthGuard)
   @Get('/stories/chapters/:id/context')
@@ -107,6 +107,7 @@ export class ChaptersController {
     )
       throw new ForbiddenException();
     await this.chaptersService.updateById(id, payload as any);
+    await this.storiesService.updateNumChapters(story.id);
     return;
   }
 

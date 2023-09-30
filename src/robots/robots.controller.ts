@@ -6,16 +6,16 @@ import { RobotsService } from './robots.service';
 export class RobotsController {
   constructor(private readonly robotsService: RobotsService) {}
 
-  @Post('fix-grammar')
+  @Post('autofix')
   async fixGrammar(@Body() payload: FixGrammarDto) {
     const response = await this.robotsService.fixGrammar(payload);
-    return { data: response };
+    return { data: response.choices[0].message.content };
   }
 
   @Post('paraphrase')
   async paraphrase(@Body() payload: FixGrammarDto) {
     const response = await this.robotsService.paraphrase(payload);
-    return { data: response };
+    return { data: response.choices[0].message.content };
   }
 
   @Post('story-idea')

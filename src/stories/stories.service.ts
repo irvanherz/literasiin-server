@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { StoryFilterDto, UpdateStoryDto } from './dto/stories.dto';
+import { ChapterReader } from './entities/chapter-reader.entity';
+import { Chapter } from './entities/chapter.entity';
 import { StoryMeta } from './entities/story-meta.entity';
 import { StoryReader } from './entities/story-reader.entity';
 import { StoryTagMap } from './entities/story-tag-map.entity';
@@ -15,6 +17,8 @@ export class StoriesService {
     private dataSource: DataSource,
     @InjectRepository(Story)
     private storiesRepo: Repository<Story>,
+    @InjectRepository(Chapter)
+    private chaptersRepo: Repository<Chapter>,
     @InjectRepository(StoryMeta)
     private storyMetaRepo: Repository<StoryMeta>,
     @InjectRepository(StoryTag)
@@ -152,30 +156,100 @@ export class StoriesService {
     return result.affected;
   }
 
-  async incrementNumViews(storyId: number) {
-    const result = await this.storyMetaRepo.increment(
-      { storyId },
-      'numViews',
-      1,
-    );
-    return result.affected;
+  // async incrementNumViews(storyId: number) {
+  //   const result = await this.storyMetaRepo.increment(
+  //     { storyId },
+  //     'numViews',
+  //     1,
+  //   );
+  //   return result.affected;
+  // }
+
+  // async incrementNumVotes(storyId: number) {
+  //   const result = await this.storyMetaRepo.increment(
+  //     { storyId },
+  //     'numVotes',
+  //     1,
+  //   );
+  //   return result.affected;
+  // }
+
+  // async decrementNumVotes(storyId: number) {
+  //   const result = await this.storyMetaRepo.increment(
+  //     { storyId },
+  //     'numVotes',
+  //     -1,
+  //   );
+  //   return result.affected;
+  // }
+
+  async updateNumReads(storyId: number) {
+    const data = await this.chaptersRepo
+      .createQueryBuilder('chapter')
+      .leftJoin(ChapterReader, 'reader', 'chapter.id=reader.chapterId')
+      .groupBy('chapter.storyId')
+      .where('chapter.storyId=:storyId', { storyId })
+      .select('SUM(reader.numReads)', 'numReads')
+      .addSelect('COUNT(DISTINCT reader.userId)', 'numReaders')
+      .getRawOne();
+
+    console.log(data);
+
+    const numReads = data?.numReads || 0;
+    const numReaders = data?.numReaders || 0;
+    await this.storyMetaRepo.update({ storyId }, { numReads, numReaders });
   }
 
-  async incrementNumVotes(storyId: number) {
-    const result = await this.storyMetaRepo.increment(
-      { storyId },
-      'numVotes',
-      1,
-    );
-    return result.affected;
+  async updateNumVotes(storyId: number) {
+    const data = await this.chaptersRepo
+      .createQueryBuilder('chapter')
+      .leftJoin(ChapterReader, 'reader', 'chapter.id=reader.chapterId')
+      .groupBy('chapter.storyId')
+      .where('chapter.storyId=:storyId AND reader.vote=true', {
+        storyId,
+      })
+      .select('COUNT(reader.id)', 'numVotes')
+      .getRawOne();
+
+    const numVotes = data?.numVotes || 0;
+    await this.storyMetaRepo.update({ storyId }, { numVotes });
   }
 
-  async decrementNumVotes(storyId: number) {
-    const result = await this.storyMetaRepo.increment(
+  async updateNumViews(storyId: number) {
+    const data = await this.readersRepo
+      .createQueryBuilder('reader')
+      .select('SUM(reader.numViews)', 'numViews')
+      .addSelect('COUNT(DISTINCT reader.userId)', 'numViewers')
+      .groupBy('reader.storyId')
+      .where('reader.storyId=:storyId', { storyId })
+      .getRawOne();
+
+    const numViews = data?.numViews || 0;
+    const numViewers = data?.numViewers || 0;
+    await this.storyMetaRepo.update({ storyId }, { numViews, numViewers });
+  }
+
+  async updateNumChapters(storyId: number) {
+    const numChapters = await this.chaptersRepo.count({
+      where: { storyId },
+    });
+    const numPublishedChapters = await this.chaptersRepo.count({
+      where: { storyId, status: 'published' },
+    });
+    await this.storyMetaRepo.update(
       { storyId },
-      'numVotes',
-      -1,
+      { numChapters, numPublishedChapters },
     );
-    return result.affected;
+    if (!numPublishedChapters) {
+      await this.storiesRepo.update(storyId, { status: 'draft' });
+    }
+  }
+
+  async updateNumBookmarks(storyId: number) {
+    const numBookmarks = await this.readersRepo.count({
+      where: { storyId, bookmark: true },
+    });
+
+    await this.storyMetaRepo.update({ storyId }, { numBookmarks });
   }
 }

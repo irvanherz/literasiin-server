@@ -28,9 +28,9 @@ export class ChapterReadersController {
     const chapter = await this.chaptersService.findById(id);
     if (!chapter) throw new NotFoundException();
 
-    await this.readersService.vote(id, userId, 1);
-    await this.storiesService.incrementNumVotes(chapter.storyId);
-    await this.chaptersService.incrementNumVotes(id);
+    await this.readersService.vote(id, userId, true);
+    await this.chaptersService.updateNumVotes(id);
+    await this.storiesService.updateNumVotes(chapter.storyId);
     return;
   }
 
@@ -41,22 +41,22 @@ export class ChapterReadersController {
     const chapter = await this.chaptersService.findById(id);
     if (!chapter) throw new NotFoundException();
 
-    await this.readersService.vote(id, userId, 0);
-    await this.storiesService.decrementNumVotes(chapter.storyId);
-    await this.chaptersService.decrementNumVotes(id);
+    await this.readersService.vote(id, userId, false);
+    await this.chaptersService.updateNumVotes(id);
+    await this.storiesService.updateNumVotes(chapter.storyId);
     return;
   }
 
   @UseGuards(OptionalJwtAuthGuard)
   @Post('stories/chapters/:chapterId/readers/track')
   async track(@Param('chapterId') id: number, @User() currentUser) {
-    const userId = currentUser.id;
+    const userId = currentUser?.id || 0;
     const chapter = await this.chaptersService.findById(id);
     if (!chapter) throw new NotFoundException();
 
-    await this.readersService.track(id, userId);
-    await this.storiesService.incrementNumViews(chapter.storyId);
-    await this.chaptersService.incrementNumViews(id);
+    await this.readersService.track(chapter, userId);
+    await this.chaptersService.updateNumReads(id);
+    await this.storiesService.updateNumReads(chapter.storyId);
     return;
   }
 }
