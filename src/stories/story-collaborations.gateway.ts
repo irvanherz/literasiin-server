@@ -8,7 +8,7 @@ import {
 import { Server } from 'ws';
 import { setupWSConnection } from 'y-websocket/bin/utils';
 
-@WebSocketGateway(7778, {
+@WebSocketGateway(+process.env.GATEWAY_PORT, {
   cors: '*',
   path: 'main',
 })
