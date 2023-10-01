@@ -16,6 +16,8 @@ export class OptionalJwtAuthGuard extends AuthGuard('jwt') {
           'Token already expired',
           'auth/token-expired',
         );
+      } else if (info?.name === 'JsonWebTokenError') {
+        throw new UnauthorizedException('Invalid token', 'auth/invalid-token');
       }
       throw err || new UnauthorizedException();
     }
