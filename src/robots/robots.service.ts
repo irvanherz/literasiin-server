@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import OpenAI from 'openai';
-import { FixGrammarDto } from './dto/robots.dto';
+import { ChaptersService } from 'src/stories/chapters.service';
+import { StoriesService } from 'src/stories/stories.service';
+import { BuildStoryDto, FixGrammarDto } from './dto/robots.dto';
 
 // type Result = {
 //   title: string; //judul cerita
@@ -17,7 +19,11 @@ import { FixGrammarDto } from './dto/robots.dto';
 @Injectable()
 export class RobotsService {
   private readonly openai: OpenAI;
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly storiesService: StoriesService,
+    private readonly chaptersService: ChaptersService,
+  ) {
     this.openai = new OpenAI({
       apiKey: configService.get<string>('OPENAI_APIKEY'),
     });
@@ -81,5 +87,25 @@ export class RobotsService {
       max_tokens: 2000,
     });
     return response;
+  }
+
+  async buildStory(userId: number, payload: BuildStoryDto) {
+    const story = await this.storiesService.create({
+      userId,
+      title: payload.title,
+      description: payload.description,
+    });
+    for await (const chapter of payload.chapters) {
+      const content = chapter.outlines.reduce(
+        (a, c) => a + `<p>${c}</p>\n`,
+        '',
+      );
+      await this.chaptersService.create({
+        storyId: story.id,
+        title: chapter.title,
+        content,
+      });
+    }
+    return story;
   }
 }

@@ -6,8 +6,6 @@ import { ChapterReader } from './entities/chapter-reader.entity';
 import { Chapter } from './entities/chapter.entity';
 import { StoryMeta } from './entities/story-meta.entity';
 import { StoryReader } from './entities/story-reader.entity';
-import { StoryTagMap } from './entities/story-tag-map.entity';
-import { StoryTag } from './entities/story-tag.entity';
 import { StoryWriter } from './entities/story-writer';
 import { Story } from './entities/story.entity';
 
@@ -21,10 +19,6 @@ export class StoriesService {
     private chaptersRepo: Repository<Chapter>,
     @InjectRepository(StoryMeta)
     private storyMetaRepo: Repository<StoryMeta>,
-    @InjectRepository(StoryTag)
-    private storyTagsRepo: Repository<StoryTag>,
-    @InjectRepository(StoryTagMap)
-    private storyTagMapRepo: Repository<StoryTagMap>,
     @InjectRepository(StoryReader)
     private readonly readersRepo: Repository<StoryReader>,
   ) {}
