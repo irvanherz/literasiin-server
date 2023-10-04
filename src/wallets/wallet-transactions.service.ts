@@ -26,10 +26,14 @@ export class WalletTransactionsService {
       if (!wallet) throw new BadRequestException();
       // check balance
       wallet.balance = +wallet.balance + payload.amount;
-      if (wallet.balance < 0) throw new BadRequestException();
+      if (wallet.balance < 0)
+        throw new BadRequestException(
+          'Insufficient balance',
+          'wallet/insufficient-balance',
+        );
       // insert trx and update wallet
       payload.finalBalance = wallet.balance;
-      const createdTransaction = await queryRunner.manager.insert(
+      const createdTransaction = await queryRunner.manager.save(
         WalletTransaction,
         payload,
       );
@@ -39,11 +43,11 @@ export class WalletTransactionsService {
     } catch (err) {
       // since we have errors lets rollback the changes we made
       await queryRunner.rollbackTransaction();
+      throw err;
     } finally {
       // you need to release a queryRunner which was manually instantiated
       await queryRunner.release();
     }
-    throw new BadRequestException();
   }
 
   async findByQuery(filter: WalletTransactionFilter = {}) {

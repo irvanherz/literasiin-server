@@ -68,7 +68,12 @@ export class Story {
     nullable: true,
   })
   meta: StoryMeta;
-  @ManyToMany(() => User, { cascade: true, onDelete: 'CASCADE' })
+  @ManyToMany(() => User, {
+    cascade: true,
+    eager: true,
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
   @JoinTable({
     synchronize: false,
     name: 'story_writer',

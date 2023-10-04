@@ -166,7 +166,7 @@ export class AuthController {
     return;
   }
 
-  @Post('/logout')
+  @Post('/signout')
   async logout(@Body() body: SignOutDto) {
     await this.authService.signout(body);
     // if (!ok) throw new NotFoundException();

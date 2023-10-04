@@ -39,11 +39,13 @@ import { PublicationStatus } from './publications/entities/publication-status.en
 import { Publication } from './publications/entities/publication.entity';
 import { PublicationsModule } from './publications/publications.module';
 import { ReportsModule } from './reports/reports.module';
+import { RobotsModule } from './robots/robots.module';
 import { Shipment } from './shipments/entities/shipment.entity';
 import { ShipmentsModule } from './shipments/shipments.module';
 import { ChapterMeta } from './stories/entities/chapter-meta.entity';
 import { ChapterReader } from './stories/entities/chapter-reader.entity';
 import { Chapter } from './stories/entities/chapter.entity';
+import { StoryAccess } from './stories/entities/story-access';
 import { StoryCategory } from './stories/entities/story-category.entity';
 import { StoryComment } from './stories/entities/story-comment.entity';
 import { StoryMeta } from './stories/entities/story-meta.entity';
@@ -74,7 +76,6 @@ import { WaitersModule } from './waiters/waiters.module';
 import { WalletTransaction } from './wallets/entities/wallet-transaction.entity';
 import { Wallet } from './wallets/entities/wallet.entity';
 import { WalletsModule } from './wallets/wallets.module';
-import { RobotsModule } from './robots/robots.module';
 
 @Module({
   imports: [
@@ -116,6 +117,7 @@ import { RobotsModule } from './robots/robots.module';
           StoryTagMap,
           StoryTag,
           StoryMeta,
+          StoryAccess,
           Chapter,
           ChapterReader,
           ChapterMeta,

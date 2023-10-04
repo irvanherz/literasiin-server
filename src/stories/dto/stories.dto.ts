@@ -20,8 +20,8 @@ import {
 
 export class CreateStoryDto {
   @IsOptional()
-  @IsNumber()
-  userId?: number;
+  @Validate(UserIdFilterValidatorConstraint)
+  userId?: UserIdFilter = 'me';
   @IsString()
   title: string;
   @IsOptional()

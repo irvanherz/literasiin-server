@@ -30,11 +30,11 @@ export class StoriesController {
   @UseGuards(JwtAuthGuard)
   @Post('stories')
   async create(@Body() setData: CreateStoryDto, @User() currentUser: any) {
-    setData.userId = setData.userId || currentUser.id;
+    setData.userId = sanitizeFilter(setData.userId, { currentUser });
 
     if (setData.userId !== currentUser.id && currentUser.role !== 'admin')
       throw new ForbiddenException();
-    const data = await this.storiesService.create(setData);
+    const data = await this.storiesService.create(setData as any);
     return { data };
   }
 

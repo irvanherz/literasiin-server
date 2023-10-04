@@ -141,7 +141,7 @@ export class StoriesService {
   }
 
   async updateById(id: number, payload: UpdateStoryDto) {
-    const result = await this.storiesRepo.update(id, payload);
+    const result = await this.storiesRepo.update(id, payload as any);
     return result.affected;
   }
 
