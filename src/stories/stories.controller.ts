@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -72,12 +71,6 @@ export class StoriesController {
     @Body() payload: UpdateStoryDto,
     @User() currentUser,
   ) {
-    if (
-      payload.userId &&
-      payload.userId !== currentUser.id &&
-      currentUser.role !== 'admin'
-    )
-      throw new BadRequestException();
     const story = await this.storiesService.findById(id);
     if (!story) throw new NotFoundException();
 

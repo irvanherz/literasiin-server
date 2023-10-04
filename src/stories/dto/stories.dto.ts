@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-inferrable-types */
-import { PartialType } from '@nestjs/mapped-types';
+import { OmitType, PartialType } from '@nestjs/mapped-types';
 import {
   IsArray,
   IsBoolean,
@@ -47,7 +47,7 @@ export class CreateStoryDto {
   status?: 'draft' | 'published';
 }
 
-export class UpdateStoryDto extends CreateStoryDto {}
+export class UpdateStoryDto extends OmitType(CreateStoryDto, ['userId']) {}
 
 export class StoryFilterDto {
   @IsOptional()
