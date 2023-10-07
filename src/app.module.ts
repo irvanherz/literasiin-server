@@ -74,8 +74,10 @@ import { UsersModule } from './users/users.module';
 import { Waiter } from './waiters/entities/waiter.entity';
 import { WaitersModule } from './waiters/waiters.module';
 import { WalletTransaction } from './wallets/entities/wallet-transaction.entity';
+import { WalletWithdrawal } from './wallets/entities/wallet-withdrawal.entity';
 import { Wallet } from './wallets/entities/wallet.entity';
 import { WalletsModule } from './wallets/wallets.module';
+import { CampaignsModule } from './campaigns/campaigns.module';
 
 @Module({
   imports: [
@@ -140,6 +142,7 @@ import { WalletsModule } from './wallets/wallets.module';
           Configuration,
           Wallet,
           WalletTransaction,
+          WalletWithdrawal,
           Order,
           OrderItem,
           Payment,
@@ -210,6 +213,7 @@ import { WalletsModule } from './wallets/wallets.module';
     ReportsModule,
     GeneralModule,
     RobotsModule,
+    CampaignsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

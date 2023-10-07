@@ -13,8 +13,6 @@ export class MidtransController {
 
   @Post('webhooks/notification')
   async notification(@Req() req: RawBodyRequest<Request>) {
-    console.log('Haiya');
-
     const json = req.rawBody.toString();
     const statusResponse =
       await this.midtransService.snap.transaction.notification(json);
@@ -56,7 +54,6 @@ export class MidtransController {
       updatedPayment = await this.paymentsService.save(payment);
     }
 
-    console.log(updatedPayment);
     this.amqpConnection.publish('finances.payments.updated', '', {
       payment: updatedPayment,
     });
