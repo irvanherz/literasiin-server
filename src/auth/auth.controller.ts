@@ -23,6 +23,7 @@ import {
   SignOutDto,
   SigninDto,
   SignupWithEmailDto,
+  SupportSigninDto,
 } from './dto/auth.dto';
 import { FacebookAuthGuard } from './facebook-auth.guard';
 import { GoogleAuthGuard } from './google-auth.guard';
@@ -103,6 +104,26 @@ export class AuthController {
       meta: {
         ...auth,
         device,
+      },
+    };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/support/signin')
+  async SupportSignIn(@Body() body: SupportSigninDto, @User() currentUser) {
+    if (currentUser?.role !== 'admin') throw new BadRequestException();
+    const user = await this.usersService.findByEmailOrUsername(body.username);
+    const auth = await this.authService.signin({
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+    });
+    return {
+      data: user,
+      meta: {
+        ...auth,
+        device: null,
       },
     };
   }

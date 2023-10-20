@@ -84,6 +84,12 @@ export class SigninDto {
   notificationToken?: string;
 }
 
+export class SupportSigninDto {
+  @IsString()
+  @Transform(({ value }) => value.toLowerCase())
+  username: string;
+}
+
 export class SignOutDto {
   @IsString()
   deviceId: string;
